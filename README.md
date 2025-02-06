@@ -1,0 +1,43 @@
+# Microkernel Form Builder
+
+- requirements
+  - plugin engine
+    - inputs
+      - get inputs configuration
+      - generic type for converting user input config to single input in input list
+    - cards
+      - single card
+        - _configuration:_
+          - dictionary that maps input name to input component
+          - generic type to convert dictionary to usable config in inputList
+        - define structure for components that can be used stand alone and in gruops
+        - implement basic and general card types for built-in support
+          - Accordion
+          - Paper: simple box with elevation
+          - None: React Fragment (just for grouping in fb-config)
+        - each card can have optional header. it should be configurable for specifying how to perform actions and generate contents (e.g. in list card we should access current card index and current path).
+      - card group
+        - _configuration:_
+          - it can use single cards together as groups
+          - it can have unique cards types for groups (e.g. Tab, Stepper, etc)
+      - card list
+        - It doesn't support any plugins now
+        - useFieldArray hook for dynamic count of inputs
+        - it should be able to render all possible card structures (single cards, card group)
+    - submit
+    - layout
+      - grid container(wrapper for cards and cards content)
+      - grid item
+      - input field (handle label, grid, helper text)
+        - it should inherit from grid item
+  -
+  - global access
+    - withGlobalAccess:
+      - a higher order function for passing event provider.
+      - it should get generic type of current form value for type-safety of events.
+      - you can use FieldArrayPath for events type-safety.
+    - globalSubmit:
+      - functionality for performing submit action outside of form (e.g. in sidebar, etc.)
+  -
+- _Notes:_
+  - react hook form doesn't support flat arrays. add validation for input paths.
