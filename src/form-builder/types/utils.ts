@@ -20,4 +20,6 @@ type GetInputs<
     }[keyof TConfig["input"]]
   | ListInput;
 
-export type { GetInputs, BaseComponent, FbComponent };
+type InputArray<TConfig extends FormBuilderConfig> = Array<GetInputs<TConfig>>;
+
+export type { GetInputs, BaseComponent, FbComponent, InputArray };

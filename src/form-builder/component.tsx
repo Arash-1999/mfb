@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import type {
   BasicBuilderProps,
+  BuilderProps,
   FormBuilderConfig,
   FormBuilderProps,
   GetInputs,
@@ -43,7 +44,21 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     return null;
   }
 
-  public Builder() {}
+  public Builder = <TData extends FieldValues>({
+    inputs,
+  }: BuilderProps<TConfig>) => {
+    const {
+      layout: { "grid-container": GridContainer },
+    } = this.config;
+    const { InputMapper } = this;
+    const formMethods = useForm<TData>();
+
+    return (
+      <GridContainer>
+        <InputMapper inputs={inputs} formMethods={formMethods} />
+      </GridContainer>
+    );
+  };
 
   private InputMapper = <TFields extends FieldValues>({
     formMethods,

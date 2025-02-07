@@ -2,6 +2,7 @@ import FormBuilder from "../../form-builder/component";
 import { FormBuilderConfig, GetInputs } from "../../form-builder/types";
 import Field from "./field";
 import { RadioInput, TextInput } from "./input";
+import { GridContainer, GridItem } from "./layout";
 
 const config = {
   input: {
@@ -9,6 +10,11 @@ const config = {
     radio: RadioInput,
   },
   field: Field,
+  layout: {
+    "grid-container": GridContainer,
+    "grid-item": GridItem,
+    field: Field,
+  },
 } satisfies FormBuilderConfig;
 
 type SingleInput = GetInputs<typeof config>;

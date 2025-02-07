@@ -1,12 +1,12 @@
 import type { FieldValues, UseFormReturn } from "react-hook-form";
-import type { BaseComponent, FbComponent, GetInputs } from "./utils";
+import type { BaseComponent, FbComponent, InputArray } from "./utils";
 
 type LayoutKey = "grid-container" | "grid-item" | "field";
 
 interface FormBuilderConfig {
   input: FbComponent;
   field: BaseComponent;
-  layout?: Record<LayoutKey, BaseComponent>;
+  layout: Record<LayoutKey, BaseComponent>;
 }
 
 interface FormBuilderProps<TConfig extends FormBuilderConfig> {
@@ -23,11 +23,15 @@ type InputMapperProps<
   TFields extends FieldValues,
 > = {
   formMethods: UseFormReturn<TFields>;
-  inputs: Array<GetInputs<TConfig>>;
+  inputs: InputArray<TConfig>;
 };
 
 type BasicBuilderProps<TConfig extends FormBuilderConfig> = {
-  inputs: Array<GetInputs<TConfig>>;
+  inputs: InputArray<TConfig>;
+};
+
+type BuilderProps<TConfig extends FormBuilderConfig> = {
+  inputs: InputArray<TConfig>;
 };
 
 export type {
@@ -36,4 +40,5 @@ export type {
   RenderInputOptions,
   InputMapperProps,
   BasicBuilderProps,
+  BuilderProps,
 };

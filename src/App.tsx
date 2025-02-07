@@ -4,7 +4,7 @@ import { FB } from "./config/form-builder";
 function App() {
   return (
     <>
-      <FB.BasicBuilder
+      <FB.Builder
         inputs={[
           {
             type: "text",
@@ -31,6 +31,7 @@ function App() {
                 { key: "option-3", value: "option-3", label: "Option 3" },
               ],
             },
+            field: { span: 6 },
           },
         ]}
       />

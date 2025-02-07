@@ -1,0 +1,10 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(var(--col-count), minmax(0, 1fr));
+  gap: calc(var(--gap) * 8px);
+}
+
+.grid-item {
+  grid-column: span var(--span, 12) / span var(--span, 12);
+  background-color: mistyrose;
+}

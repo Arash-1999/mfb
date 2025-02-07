@@ -12,7 +12,12 @@ const TextInput = (props: TextInputProps) => {
   const { formMethods, path, ...resolvedProps } = props;
 
   return (
-    <input type="text" {...formMethods.register(path)} {...resolvedProps} />
+    <input
+      type="text"
+      {...formMethods.register(path)}
+      {...resolvedProps}
+      style={{ width: "100%" }}
+    />
   );
 };
 
