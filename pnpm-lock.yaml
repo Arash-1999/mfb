@@ -4,28 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-catalogs:
-  default:
-    react:
-      specifier: ^19.0.0
-      version: 19.0.0
-    react-dom:
-      specifier: ^19.0.0
-      version: 19.0.0
-    react-hook-form:
-      specifier: ^7.54.2
-      version: 7.54.2
-
 importers:
 
   .:
-    dependencies:
-      react:
-        specifier: ^19.0.0
-        version: 19.0.0
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.0.0(react@19.0.0)
     devDependencies:
       '@eslint/js':
         specifier: ^9.19.0
