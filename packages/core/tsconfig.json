@@ -1,37 +1,11 @@
 {
+  "extends": "@mfb/typescript-config/react-library.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "module": "ESNext",
-    "types": ["vite/client"],
-    "noEmit": true,
-    "moduleResolution": "Bundler",
-    "jsx": "react-jsx",
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "allowJs": false,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "useDefineForClassFields": true,
-    "strict": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["./src/**/*.ts", "./src/**/*.tsx"]
+  "include": ["./src/**/*.ts", "./src/**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
 }
