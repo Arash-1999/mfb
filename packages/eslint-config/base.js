@@ -7,7 +7,15 @@ import perfectionist from "eslint-plugin-perfectionist";
 /* @type {import("eslint").Linter.Config} */
 export const config = tseslint.config(
   js.configs.recommended,
-  tseslint.configs.recommendedTypeChecked,
+  tseslint.configs.recommended,
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
   eslintConfigPrettier,
   {
     plugins: {
@@ -19,6 +27,6 @@ export const config = tseslint.config(
   },
   perfectionist.configs["recommended-natural"],
   {
-    ignores: ["dist/**"],
+    ignores: ["dist/**", "eslint.config.{mjs,cjs}"],
   }
 );
