@@ -1,14 +1,17 @@
-import { FormBuilder } from '@mfb/core';
+import { FormBuilder, FormBuilderConfig, GetInputs } from "@mfb/core";
+import { getInput } from "./input";
+import { getLayout } from "./layout";
+import { FormField } from "./layout/field";
 
-const FB = new FormBuilder({
-  input: {},
-  field: () => <></>,
-  layout: {
-    "grid-container": () => <></>,
-    "grid-item": () => <></>,
-    field: () => <></>
-  }
-})
+const config = {
+  input: getInput(),
+  field: FormField,
+  layout: getLayout(),
+} satisfies FormBuilderConfig;
 
+type MfbInput = GetInputs<typeof config>;
 
-export {FB};
+const FB = new FormBuilder(config);
+
+export { FB };
+export type { MfbInput };

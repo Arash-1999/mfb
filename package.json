@@ -4,6 +4,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev --filter=./playground",
+    "build:watch": "turbo build:watch",
+    "dev:mui": "turbo run dev build:watch",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },

@@ -10,9 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/roboto": "^5.1.1",
+    "@mfb/core": "workspace:*",
+    "@mui/icons-material": "^6.4.5",
+    "@mui/material": "^6.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@mfb/core": "workspace:*"
+    "react-hook-form": "^7.54.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
