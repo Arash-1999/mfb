@@ -1,7 +1,6 @@
-import type { FieldValues } from'react-hook-form';
+import type { FieldValues } from "react-hook-form";
 
-import { Fragment } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
 import type {
   BasicBuilderProps,
@@ -22,11 +21,12 @@ class FormBuilder<TConfig extends FormBuilderConfig>
   constructor(config: TConfig) {
     this.config = config;
   }
-  
+
   BasicBuilder = <TFields extends FieldValues>({
     inputs,
   }: BasicBuilderProps<TConfig>) => {
     const { InputMapper } = this;
+    const { "grid-container": GridContainer } = this.config.layout;
     const formMethods = useForm<TFields>();
 
     const onSubmit = (value: TFields) => {
@@ -34,11 +34,15 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     };
 
     return (
-      <form onSubmit={void formMethods.handleSubmit(onSubmit)}>
-        <InputMapper formMethods={formMethods} inputs={inputs} />
-        {/* TODO: remove this submit button as configurable option */}
-        <button type="submit">SUBMIT</button>
-      </form>
+      <FormProvider {...formMethods}>
+        <form onSubmit={void formMethods.handleSubmit(onSubmit)}>
+          <GridContainer>
+            <InputMapper formMethods={formMethods} inputs={inputs} />
+          </GridContainer>
+          {/* TODO: remove this submit button as configurable option */}
+          <button type="submit">SUBMIT</button>
+        </form>
+      </FormProvider>
     );
   };
 
@@ -53,26 +57,27 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
     return (
       <GridContainer>
-        <InputMapper formMethods={formMethods}  inputs={inputs}/>
+        <InputMapper formMethods={formMethods} inputs={inputs} />
       </GridContainer>
     );
   };
-  
+
   private InputMapper = <TFields extends FieldValues>({
     formMethods,
     inputs,
   }: InputMapperProps<TConfig, TFields>) => {
+    const {'grid-item': GridItem} = this.config.layout;
+
     return inputs.map((input, i) => (
-      <Fragment key={`input-${i}`}>
+      <GridItem key={`input-${i}`}>
         {this.renderInput(input, { formMethods })}
-      </Fragment>
+      </GridItem>
     ));
   };
 
-
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, true>,
-    options: RenderInputOptions<TFields>,
+    options: RenderInputOptions<TFields>
   ) {
     if (input.type === "list") {
       return "";
