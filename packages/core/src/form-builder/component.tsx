@@ -23,6 +23,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
   }
 
   BasicBuilder = <TFields extends FieldValues>({
+    gridContainerProps,
     inputs,
   }: BasicBuilderProps<TConfig>) => {
     const { InputMapper } = this;
@@ -33,10 +34,11 @@ class FormBuilder<TConfig extends FormBuilderConfig>
       console.log(value);
     };
 
+    console.log(gridContainerProps);
     return (
       <FormProvider {...formMethods}>
         <form onSubmit={void formMethods.handleSubmit(onSubmit)}>
-          <GridContainer>
+          <GridContainer {...gridContainerProps}>
             <InputMapper formMethods={formMethods} inputs={inputs} />
           </GridContainer>
           {/* TODO: remove this submit button as configurable option */}
@@ -66,10 +68,10 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     formMethods,
     inputs,
   }: InputMapperProps<TConfig, TFields>) => {
-    const {'grid-item': GridItem} = this.config.layout;
+    const { "grid-item": GridItem } = this.config.layout;
 
     return inputs.map((input, i) => (
-      <GridItem key={`input-${i}`}>
+      <GridItem key={`input-${i}`} {...(input.gridProps || {})}>
         {this.renderInput(input, { formMethods })}
       </GridItem>
     ));
@@ -77,13 +79,15 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, true>,
-    options: RenderInputOptions<TFields>
+    options: RenderInputOptions<TFields>,
   ) {
     if (input.type === "list") {
       return "";
     }
+    const {
+      layout: { field: Field },
+    } = this.config;
     const inputFn = this.config.input[input.type];
-    const ThisField = this.config.field;
 
     if (typeof inputFn === "function" && typeof input.props === "object") {
       const renderedInput = inputFn({
@@ -91,7 +95,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
         ...input.props,
       });
       return input.field ? (
-        <ThisField {...input.field}>{renderedInput}</ThisField>
+        <Field {...input.field}>{renderedInput}</Field>
       ) : (
         renderedInput
       );

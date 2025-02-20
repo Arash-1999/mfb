@@ -14,7 +14,8 @@ type GetInputs<
   | ListInput
   | {
       [TInput in keyof TConfig["input"]]: {
-        field?: Parameters<TConfig["field"]>[0];
+        field?: GetLayoutProps<TConfig, "field">;
+        gridProps?: GetLayoutProps<TConfig, "grid-item">;
         props: TInternal extends false
           ? Omit<Parameters<TConfig["input"][TInput]>[0], "formMethods">
           : Parameters<TConfig["input"][TInput]>[0];
@@ -22,8 +23,20 @@ type GetInputs<
       };
     }[keyof TConfig["input"]];
 
+type GetLayoutProps<
+  TConfig extends FormBuilderConfig,
+  TItem extends LayoutKey,
+> = Parameters<TConfig["layout"][TItem]>[0];
+
 type InputArray<TConfig extends FormBuilderConfig> = Array<GetInputs<TConfig>>;
 
 type LayoutKey = "field" | "grid-container" | "grid-item";
 
-export type { BaseComponent, FbComponent, GetInputs, InputArray, LayoutKey };
+export type {
+  BaseComponent,
+  FbComponent,
+  GetInputs,
+  GetLayoutProps,
+  InputArray,
+  LayoutKey,
+};
