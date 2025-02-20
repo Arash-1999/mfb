@@ -7,6 +7,11 @@ import type { FormBuilderConfig } from "./config";
 type BaseComponent = (props: any) => JSX.Element;
 type FbComponent = Record<PropertyKey, BaseComponent>;
 
+type GetInputParameter<
+  TConfig extends FormBuilderConfig,
+  TInput extends PropertyKey,
+> = Parameters<TConfig["input"]["components"][TInput]>[0];
+
 type GetInputs<
   TConfig extends FormBuilderConfig,
   TInternal extends boolean = false,
@@ -17,8 +22,8 @@ type GetInputs<
         field?: GetLayoutProps<TConfig, "field">;
         gridProps?: GetLayoutProps<TConfig, "grid-item">;
         props: TInternal extends false
-          ? Omit<Parameters<TConfig["input"][TInput]>[0], "formMethods">
-          : Parameters<TConfig["input"][TInput]>[0];
+          ? Omit<GetInputParameter<TConfig, TInput>, "formMethods">
+          : GetInputParameter<TConfig, TInput>;
         type: TInput;
       };
     }[keyof TConfig["input"]];

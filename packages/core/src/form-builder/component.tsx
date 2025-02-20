@@ -34,7 +34,6 @@ class FormBuilder<TConfig extends FormBuilderConfig>
       console.log(value);
     };
 
-    console.log(gridContainerProps);
     return (
       <FormProvider {...formMethods}>
         <form onSubmit={void formMethods.handleSubmit(onSubmit)}>
@@ -85,9 +84,10 @@ class FormBuilder<TConfig extends FormBuilderConfig>
       return "";
     }
     const {
+      input: { components },
       layout: { field: Field },
     } = this.config;
-    const inputFn = this.config.input[input.type];
+    const inputFn = components[input.type];
 
     if (typeof inputFn === "function" && typeof input.props === "object") {
       const renderedInput = inputFn({
