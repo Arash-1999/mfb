@@ -20,7 +20,7 @@ const TextFieldInput = <TData extends FieldValues>({
       control={control}
       name={name}
       render={({ field: { ref, ...field } }) => (
-        <TextField inputRef={ref} {...textFieldProps} {...field} />
+        <TextField fullWidth inputRef={ref} {...textFieldProps} {...field} />
       )}
     />
   );

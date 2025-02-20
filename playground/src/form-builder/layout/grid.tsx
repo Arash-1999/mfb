@@ -5,8 +5,8 @@ import { Grid2 } from "@mui/material";
 type MuiGridProps = Omit<Grid2Props, "container">;
 const GridContainer = ({
   children,
-  gridProps,
-}: PropsWithChildren<{ gridProps: MuiGridProps }>) => {
+  ...gridProps
+}: PropsWithChildren<MuiGridProps>) => {
   return (
     <Grid2 container {...gridProps}>
       {children}
@@ -16,8 +16,8 @@ const GridContainer = ({
 
 const GridItem = ({
   children,
-  gridProps,
-}: PropsWithChildren<{ gridProps: MuiGridProps }>) => {
+  ...gridProps
+}: PropsWithChildren<MuiGridProps>) => {
   return (
     <Grid2 container={false} {...gridProps}>
       {children}

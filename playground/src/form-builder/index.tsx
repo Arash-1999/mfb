@@ -4,7 +4,7 @@ import { getLayout } from "./layout";
 import { FormField } from "./layout/field";
 
 const config = {
-  input: getInput(),
+  input: { compoents: getInput(), defaultValues: { text: "" } },
   field: FormField,
   layout: getLayout(),
 } satisfies FormBuilderConfig;
