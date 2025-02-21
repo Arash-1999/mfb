@@ -16,9 +16,9 @@ type GetInputs<
   TConfig extends FormBuilderConfig,
   TInternal extends boolean = false,
 > =
-  | ListInput
+  | ListInput<TConfig>
   | {
-      [TInput in keyof TConfig["input"]]: {
+      [TInput in keyof TConfig["input"]["components"]]: {
         field?: GetLayoutProps<TConfig, "field">;
         gridProps?: GetLayoutProps<TConfig, "grid-item">;
         props: TInternal extends false
@@ -26,7 +26,7 @@ type GetInputs<
           : GetInputParameter<TConfig, TInput>;
         type: TInput;
       };
-    }[keyof TConfig["input"]];
+    }[keyof TConfig["input"]["components"]];
 
 type GetLayoutProps<
   TConfig extends FormBuilderConfig,

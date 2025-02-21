@@ -11,6 +11,7 @@ import type {
   InputMapperProps,
   RenderInputOptions,
 } from "./types";
+import { listInputGuard } from "@/utils";
 
 // PERF: move logic to separate functions in a better folder structure
 class FormBuilder<TConfig extends FormBuilderConfig>
@@ -80,7 +81,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     input: GetInputs<TConfig, true>,
     options: RenderInputOptions<TFields>,
   ) {
-    if (input.type === "list") {
+    if (listInputGuard<TConfig>(input)) {
       return "";
     }
     const {
