@@ -1,4 +1,4 @@
-import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type { ArrayPath, FieldValues, UseFormReturn } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
 import type { GetLayoutProps, InputArray } from "./utils";
@@ -11,6 +11,15 @@ type BasicBuilderProps<TConfig extends FormBuilderConfig> = {
 type BuilderProps<TConfig extends FormBuilderConfig> = {
   inputs: InputArray<TConfig>;
 };
+type FieldArrayProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
+  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+  inputs: InputArray<TConfig>;
+  name: ArrayPath<TFields>;
+};
+
 interface FormBuilderProps<TConfig extends FormBuilderConfig> {
   config: TConfig;
 }
@@ -30,6 +39,7 @@ type RenderInputOptions<TFields extends FieldValues> = {
 export type {
   BasicBuilderProps,
   BuilderProps,
+  FieldArrayProps,
   FormBuilderConfig,
   FormBuilderProps,
   InputMapperProps,

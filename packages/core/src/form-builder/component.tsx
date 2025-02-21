@@ -1,17 +1,23 @@
 import type { FieldValues } from "react-hook-form";
 
-import { FormProvider, useForm } from "react-hook-form";
+import { listInputGuard } from "@/utils";
+import {
+  FormProvider,
+  useFieldArray,
+  useForm,
+  useFormContext,
+} from "react-hook-form";
 
 import type {
   BasicBuilderProps,
   BuilderProps,
+  FieldArrayProps,
   FormBuilderConfig,
   FormBuilderProps,
   GetInputs,
   InputMapperProps,
   RenderInputOptions,
 } from "./types";
-import { listInputGuard } from "@/utils";
 
 // PERF: move logic to separate functions in a better folder structure
 class FormBuilder<TConfig extends FormBuilderConfig>
@@ -64,6 +70,38 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     );
   };
 
+  private FieldArray = <TFields extends FieldValues>({
+    gridContainerProps = {},
+    inputs,
+    name,
+  }: FieldArrayProps<TConfig, TFields>) => {
+    const formMethods = useFormContext<TFields>();
+    const {
+      layout: { "grid-container": GridContainer },
+    } = this.config;
+    const { InputMapper } = this;
+
+    const { fields } = useFieldArray<TFields>({
+      name,
+    });
+
+    return (
+      <GridContainer {...gridContainerProps}>
+        {/* <GridItem key={field.id}> */}
+        {/*   <GridContainer> */}
+        {fields.map((field) => (
+          <InputMapper
+            formMethods={formMethods}
+            inputs={inputs}
+            key={field.id}
+          />
+        ))}
+        {/*   </GridContainer> */}
+        {/* </GridItem> */}
+      </GridContainer>
+    );
+  };
+
   private InputMapper = <TFields extends FieldValues>({
     formMethods,
     inputs,
@@ -82,7 +120,15 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     options: RenderInputOptions<TFields>,
   ) {
     if (listInputGuard<TConfig>(input)) {
-      return "";
+      const { FieldArray } = this;
+
+      return (
+        <FieldArray
+          gridContainerProps={input.gridContainerProps}
+          inputs={input.inputs}
+          name={input.name}
+        />
+      );
     }
     const {
       input: { components },
