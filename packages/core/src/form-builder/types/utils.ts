@@ -21,8 +21,9 @@ type GetInputs<
       [TInput in keyof TConfig["input"]["components"]]: {
         field?: GetLayoutProps<TConfig, "field">;
         gridProps?: GetLayoutProps<TConfig, "grid-item">;
+        name: string;
         props: TInternal extends false
-          ? Omit<GetInputParameter<TConfig, TInput>, "formMethods">
+          ? Omit<GetInputParameter<TConfig, TInput>, "formMethods" | "name">
           : GetInputParameter<TConfig, TInput>;
         type: TInput;
       };

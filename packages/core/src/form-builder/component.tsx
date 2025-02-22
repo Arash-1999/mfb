@@ -1,6 +1,6 @@
 import type { FieldValues } from "react-hook-form";
 
-import { listInputGuard } from "@/utils";
+import { listInputGuard, mergeName } from "@/utils";
 import {
   FormProvider,
   useFieldArray,
@@ -43,7 +43,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
     return (
       <FormProvider {...formMethods}>
-        <form onSubmit={void formMethods.handleSubmit(onSubmit)}>
+        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <GridContainer {...gridContainerProps}>
             <InputMapper formMethods={formMethods} inputs={inputs} />
           </GridContainer>
@@ -72,12 +72,13 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
   private FieldArray = <TFields extends FieldValues>({
     gridContainerProps = {},
+    gridProps = {},
     inputs,
     name,
   }: FieldArrayProps<TConfig, TFields>) => {
     const formMethods = useFormContext<TFields>();
     const {
-      layout: { "grid-container": GridContainer },
+      layout: { "grid-container": GridContainer, "grid-item": GridItem },
     } = this.config;
     const { InputMapper } = this;
 
@@ -86,38 +87,43 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     });
 
     return (
-      <GridContainer {...gridContainerProps}>
-        {/* <GridItem key={field.id}> */}
-        {/*   <GridContainer> */}
-        {fields.map((field) => (
-          <InputMapper
-            formMethods={formMethods}
-            inputs={inputs}
-            key={field.id}
-          />
-        ))}
-        {/*   </GridContainer> */}
-        {/* </GridItem> */}
-      </GridContainer>
+      <GridItem {...gridProps}>
+        <GridContainer {...gridContainerProps}>
+          {fields.map((field, i) => (
+            <InputMapper
+              formMethods={formMethods}
+              inputs={inputs}
+              key={field.id}
+              name={`${name}.${i}`}
+            />
+          ))}
+        </GridContainer>
+      </GridItem>
     );
   };
 
   private InputMapper = <TFields extends FieldValues>({
     formMethods,
     inputs,
+    name, // should passed in list input. optional in card or flat mode inputs.
   }: InputMapperProps<TConfig, TFields>) => {
     const { "grid-item": GridItem } = this.config.layout;
 
     return inputs.map((input, i) => (
       <GridItem key={`input-${i}`} {...(input.gridProps || {})}>
-        {this.renderInput(input, { formMethods })}
+        {this.renderInput(
+          Object.assign({}, input, {
+            name: mergeName(name || "", input.name),
+          }),
+          { formMethods }
+        )}
       </GridItem>
     ));
   };
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, true>,
-    options: RenderInputOptions<TFields>,
+    options: RenderInputOptions<TFields>
   ) {
     if (listInputGuard<TConfig>(input)) {
       const { FieldArray } = this;
@@ -125,6 +131,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
       return (
         <FieldArray
           gridContainerProps={input.gridContainerProps}
+          gridProps={input.gridProps}
           inputs={input.inputs}
           name={input.name}
         />
@@ -139,6 +146,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     if (typeof inputFn === "function" && typeof input.props === "object") {
       const renderedInput = inputFn({
         formMethods: options.formMethods,
+        name: input.name,
         ...input.props,
       });
       return input.field ? (

@@ -16,6 +16,7 @@ type FieldArrayProps<
   TFields extends FieldValues,
 > = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+  gridProps?: GetLayoutProps<TConfig, "grid-item">;
   inputs: InputArray<TConfig>;
   name: ArrayPath<TFields>;
 };
@@ -30,6 +31,7 @@ type InputMapperProps<
 > = {
   formMethods: UseFormReturn<TFields>;
   inputs: InputArray<TConfig>;
+  name?: string;
 };
 
 type RenderInputOptions<TFields extends FieldValues> = {
