@@ -10,16 +10,22 @@ const TestPage = () => {
         }}
         inputs={[
           {
+            gridProps: {
+              size: 12,
+            },
+            gridContainerProps: {
+              spacing: 1,
+            },
             type: "list",
             name: "akbar",
             inputs: [
               {
                 type: "text",
                 gridProps: {
-                  size: { xs: 12, md: 4 },
+                  size: { xs: 12, sm: 4 },
                 },
+                name: "input-1",
                 props: {
-                  name: "input-1",
                   textFieldProps: {
                     placeholder: "First Input",
                     size: "small",
@@ -29,10 +35,10 @@ const TestPage = () => {
               {
                 type: "text",
                 gridProps: {
-                  size: { xs: 12, md: 4 },
+                  size: { xs: 12, sm: 4 },
                 },
+                name: "input-2",
                 props: {
-                  name: "input-2",
                   textFieldProps: {
                     placeholder: "Second Input",
                     size: "small",
@@ -42,10 +48,10 @@ const TestPage = () => {
               {
                 type: "text",
                 gridProps: {
-                  size: { xs: 12, md: 4 },
+                  size: { xs: 12, sm: 4 },
                 },
+                name: "input-3",
                 props: {
-                  name: "input-3",
                   textFieldProps: {
                     placeholder: "Third Input",
                     size: "small",

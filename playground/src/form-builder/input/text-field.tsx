@@ -19,8 +19,15 @@ const TextFieldInput = <TData extends FieldValues>({
     <Controller
       control={control}
       name={name}
-      render={({ field: { ref, ...field } }) => (
-        <TextField fullWidth inputRef={ref} {...textFieldProps} {...field} />
+      render={({ field: { ref, value, ...field } }) => (
+        <TextField
+          fullWidth
+          inputRef={ref}
+          value={value || ""}
+          autoComplete="off"
+          {...textFieldProps}
+          {...field}
+        />
       )}
     />
   );
