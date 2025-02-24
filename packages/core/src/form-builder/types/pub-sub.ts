@@ -12,4 +12,6 @@ type FormAction<TData extends FieldValues = FieldValues> = {
   };
 }[keyof FieldArrayActions<TData>];
 
-export type { FieldArrayActions, FormAction };
+type MfbState = FormAction | null;
+
+export type { FieldArrayActions, FormAction, MfbState };

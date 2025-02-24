@@ -5,17 +5,19 @@ import type {
   SubjectType,
 } from "./types";
 
-class SubjectBase<T, K extends ActionBase<T> = DefaultAction<T>>
-  implements SubjectType<T, K>
+class SubjectBase<
+  TState,
+  TAction extends ActionBase<TState> = DefaultAction<TState>,
+> implements SubjectType<TState, TAction>
 {
-  public state: T;
-  private observers: { [key: string]: ObserverType<T, K> } = {};
+  public state: TState;
+  private observers: { [key: string]: ObserverType<TState, TAction> } = {};
 
-  constructor(defaultValue: T) {
+  constructor(defaultValue: TState) {
     this.state = defaultValue;
   }
 
-  attach(o: ObserverType<T, K>) {
+  attach(o: ObserverType<TState, TAction>) {
     if (o.name in this.observers) {
       return;
     }
@@ -27,7 +29,7 @@ class SubjectBase<T, K extends ActionBase<T> = DefaultAction<T>>
     return name in this.observers;
   }
 
-  detach(o: ObserverType<T, K>) {
+  detach(o: ObserverType<TState, TAction>) {
     if (o.name in this.observers) {
       delete this.observers[o.name];
     }

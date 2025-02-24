@@ -16,8 +16,11 @@ import type {
   FormBuilderProps,
   GetInputs,
   InputMapperProps,
+  MfbState,
   RenderInputOptions,
 } from "./types";
+
+import { useMfbSubject } from "./hooks/use-mfb-subject";
 
 // PERF: move logic to separate functions in a better folder structure
 class FormBuilder<TConfig extends FormBuilderConfig>
@@ -85,6 +88,14 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     const { fields } = useFieldArray<TFields>({
       name,
     });
+
+    const action = (state: MfbState) => {
+      if(state) {
+        console.log(state);
+      }
+    };
+
+    useMfbSubject({ action, name });
 
     return (
       <GridItem {...gridProps}>
