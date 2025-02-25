@@ -3,7 +3,6 @@ import type {
   BuilderProps,
   FieldArrayEvent,
   FieldArrayProps,
-  FormAction,
   FormBuilderConfig,
   FormBuilderProps,
   GetInputs,
@@ -12,15 +11,11 @@ import type {
 } from "@/types";
 import type { FieldValues } from "react-hook-form";
 
+import { useMfbFieldArray, useMfbGlobalEvent } from "@/hooks";
 import { listInputGuard, mergeName } from "@/utils";
 import { eventNames } from "@/utils/events";
-import { useCallback, useEffect } from "react";
-import {
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useFormContext,
-} from "react-hook-form";
+import { useCallback } from "react";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 // PERF: move logic to separate functions in a better folder structure
 class FormBuilder<TConfig extends FormBuilderConfig>
@@ -84,65 +79,20 @@ class FormBuilder<TConfig extends FormBuilderConfig>
       layout: { "grid-container": GridContainer, "grid-item": GridItem },
     } = this.config;
     const { InputMapper } = this;
+    const { action, fields } = useMfbFieldArray<TFields>({ name });
 
-    const { fields, ...methods } = useFieldArray<TFields>({
-      name,
-    });
-
-    const action = useCallback(
-      (event: FormAction<TFields>) => {
-        switch (event.type) {
-          case "append":
-            methods.append(...event.params);
-            break;
-
-          case "insert":
-            methods.insert(...event.params);
-            break;
-
-          case "move":
-            methods.move(...event.params);
-            break;
-
-          case "prepend":
-            methods.prepend(...event.params);
-            break;
-
-          case "remove":
-            methods.remove(...event.params);
-            break;
-
-          case "replace":
-            methods.replace(...event.params);
-            break;
-
-          case "swap":
-            methods.swap(...event.params);
-            break;
-
-          case "update":
-            methods.update(...event.params);
-            break;
-        }
-      },
-      [methods]
-    );
-
-    useEffect(() => {
-      const handler = (event: CustomEventInit<FieldArrayEvent<TFields>>) => {
+    const handler = useCallback(
+      (event: CustomEventInit<FieldArrayEvent<TFields>>) => {
         const { detail } = event;
         // TODO: check form id (it will have conflict in multiple mounted form in one page)
         if (detail && detail.name === name) {
           action(detail.action);
         }
-      };
+      },
+      [action, name]
+    );
 
-      window.addEventListener(eventNames["field-array"], handler);
-
-      return () => {
-        window.removeEventListener(eventNames["field-array"], handler);
-      };
-    }, [action, name]);
+    useMfbGlobalEvent({ eventName: eventNames["field-array"], handler });
 
     return (
       <GridItem {...gridProps}>
