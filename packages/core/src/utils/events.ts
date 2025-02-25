@@ -1,4 +1,4 @@
-import type { FieldArrayEvent, FormAction } from "@/form-builder";
+import type { FieldArrayEvent, FormAction } from "@/types";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
 // TODO: use factory design pattern for creating different events

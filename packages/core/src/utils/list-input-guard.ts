@@ -1,4 +1,4 @@
-import type { FormBuilderConfig, ListInput } from "@/form-builder";
+import type { FormBuilderConfig, ListInput } from "@/types";
 
 const listInputGuard = <TConfig extends FormBuilderConfig>(
   input: unknown,

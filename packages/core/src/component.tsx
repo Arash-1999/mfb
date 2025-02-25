@@ -1,15 +1,3 @@
-import type { FieldValues } from "react-hook-form";
-
-import { listInputGuard, mergeName } from "@/utils";
-import { eventNames } from "@/utils/events";
-import { useCallback, useEffect } from "react";
-import {
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useFormContext,
-} from "react-hook-form";
-
 import type {
   BasicBuilderProps,
   BuilderProps,
@@ -21,7 +9,18 @@ import type {
   GetInputs,
   InputMapperProps,
   RenderInputOptions,
-} from "./types";
+} from "@/types";
+import type { FieldValues } from "react-hook-form";
+
+import { listInputGuard, mergeName } from "@/utils";
+import { eventNames } from "@/utils/events";
+import { useCallback, useEffect } from "react";
+import {
+  FormProvider,
+  useFieldArray,
+  useForm,
+  useFormContext,
+} from "react-hook-form";
 
 // PERF: move logic to separate functions in a better folder structure
 class FormBuilder<TConfig extends FormBuilderConfig>

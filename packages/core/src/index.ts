@@ -1,3 +1,3 @@
-export { FormBuilder } from "./form-builder";
-export type * from "./form-builder/types";
-export { dispatchFieldArray } from "./utils/events";
+export { default as FormBuilder } from "./component";
+export type * from "@/types";
+export { dispatchFieldArray } from "@/utils/events";
