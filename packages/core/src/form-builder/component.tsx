@@ -1,6 +1,8 @@
 import type { FieldValues } from "react-hook-form";
 
 import { listInputGuard, mergeName } from "@/utils";
+import { eventNames } from "@/utils/events";
+import { useCallback, useEffect } from "react";
 import {
   FormProvider,
   useFieldArray,
@@ -11,16 +13,15 @@ import {
 import type {
   BasicBuilderProps,
   BuilderProps,
+  FieldArrayEvent,
   FieldArrayProps,
+  FormAction,
   FormBuilderConfig,
   FormBuilderProps,
   GetInputs,
   InputMapperProps,
-  MfbState,
   RenderInputOptions,
 } from "./types";
-
-import { useMfbSubject } from "./hooks/use-mfb-subject";
 
 // PERF: move logic to separate functions in a better folder structure
 class FormBuilder<TConfig extends FormBuilderConfig>
@@ -85,17 +86,64 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     } = this.config;
     const { InputMapper } = this;
 
-    const { fields } = useFieldArray<TFields>({
+    const { fields, ...methods } = useFieldArray<TFields>({
       name,
     });
 
-    const action = (state: MfbState) => {
-      if(state) {
-        console.log(state);
-      }
-    };
+    const action = useCallback(
+      (event: FormAction<TFields>) => {
+        switch (event.type) {
+          case "append":
+            methods.append(...event.params);
+            break;
 
-    useMfbSubject({ action, name });
+          case "insert":
+            methods.insert(...event.params);
+            break;
+
+          case "move":
+            methods.move(...event.params);
+            break;
+
+          case "prepend":
+            methods.prepend(...event.params);
+            break;
+
+          case "remove":
+            methods.remove(...event.params);
+            break;
+
+          case "replace":
+            methods.replace(...event.params);
+            break;
+
+          case "swap":
+            methods.swap(...event.params);
+            break;
+
+          case "update":
+            methods.update(...event.params);
+            break;
+        }
+      },
+      [methods]
+    );
+
+    useEffect(() => {
+      const handler = (event: CustomEventInit<FieldArrayEvent<TFields>>) => {
+        const { detail } = event;
+        // TODO: check form id (it will have conflict in multiple mounted form in one page)
+        if (detail && detail.name === name) {
+          action(detail.action);
+        }
+      };
+
+      window.addEventListener(eventNames["field-array"], handler);
+
+      return () => {
+        window.removeEventListener(eventNames["field-array"], handler);
+      };
+    }, [action, name]);
 
     return (
       <GridItem {...gridProps}>

@@ -1,5 +1,6 @@
 import { FB } from "./form-builder";
-import { dispatchArrayAction } from "@mfb/core";
+// import { dispatchArrayAction } from "@mfb/core";
+import { dispatchFieldArray } from "@mfb/core";
 
 type TestPageForm = {
   akbar: Array<Record<`input-${1 | 2 | 3}`, string>>;
@@ -12,20 +13,17 @@ const TestPage = () => {
 
       <button
         onClick={() => {
-          dispatchArrayAction<TestPageForm>(
-            {
-              type: "append",
-              params: [
-                {
-                  "input-1": "value 1",
-                  "input-2": "value 2",
-                  "input-3": "value 3",
-                },
-                {shouldFocus: false,}
-              ],
-            },
-            "akbar"
-          );
+          dispatchFieldArray<TestPageForm>("akbar", {
+            type: "append",
+            params: [
+              {
+                "input-1": "value 1",
+                "input-2": "value 2",
+                "input-3": "value 3",
+              },
+              { shouldFocus: false },
+            ],
+          });
         }}
       >
         APPEND TO AKBAR
