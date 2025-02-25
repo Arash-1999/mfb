@@ -1,7 +1,7 @@
 import type { ArrayPath, FieldValues, UseFieldArrayReturn } from "react-hook-form";
 
-type FieldArrayActions<TData extends FieldValues> = Omit<
-  UseFieldArrayReturn<TData>,
+type FieldArrayActions<TFields extends FieldValues> = Omit<
+  UseFieldArrayReturn<TFields>,
   "fields"
 >;
 
@@ -10,12 +10,12 @@ type FieldArrayEvent<TFields extends FieldValues> = {
   name: ArrayPath<TFields>;
 };
 
-type FormAction<TData extends FieldValues = FieldValues> = {
-  [TAction in keyof FieldArrayActions<TData>]: {
-    params: Parameters<FieldArrayActions<TData>[TAction]>;
+type FormAction<TFields extends FieldValues = FieldValues> = {
+  [TAction in keyof FieldArrayActions<TFields>]: {
+    params: Parameters<FieldArrayActions<TFields>[TAction]>;
     type: TAction;
   };
-}[keyof FieldArrayActions<TData>];
+}[keyof FieldArrayActions<TFields>];
 
 type MfbState = FormAction | null;
 

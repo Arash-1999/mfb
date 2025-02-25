@@ -17,7 +17,7 @@ import { eventNames } from "@/utils/events";
 import { useCallback } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
-// PERF: move logic to separate functions in a better folder structure
+// NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<TConfig extends FormBuilderConfig>
   implements FormBuilderProps<TConfig>
 {
@@ -52,14 +52,14 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     );
   };
 
-  public Builder = <TData extends FieldValues>({
+  public Builder = <TFields extends FieldValues>({
     inputs,
   }: BuilderProps<TConfig>) => {
     const {
       layout: { "grid-container": GridContainer },
     } = this.config;
     const { InputMapper } = this;
-    const formMethods = useForm<TData>();
+    const formMethods = useForm<TFields>();
 
     return (
       <GridContainer>
@@ -84,7 +84,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     const handler = useCallback(
       (event: CustomEventInit<FieldArrayEvent<TFields>>) => {
         const { detail } = event;
-        // TODO: check form id (it will have conflict in multiple mounted form in one page)
+        // FIX: check form id (it will have conflict in multiple mounted form in one page)
         if (detail && detail.name === name) {
           action(detail.action);
         }

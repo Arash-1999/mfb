@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import type { ListInput } from "./components";
+import type { ActionInput, ListInput } from "./components";
 import type { FormBuilderConfig } from "./config";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,6 +38,10 @@ type InputArray<TConfig extends FormBuilderConfig> = Array<GetInputs<TConfig>>;
 
 type LayoutKey = "field" | "grid-container" | "grid-item";
 
+type ListInputArray<TConfig extends FormBuilderConfig> = Array<
+  ActionInput | GetInputs<TConfig>
+>;
+
 export type {
   BaseComponent,
   FbComponent,
@@ -45,4 +49,5 @@ export type {
   GetLayoutProps,
   InputArray,
   LayoutKey,
+  ListInputArray,
 };
