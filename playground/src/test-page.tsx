@@ -1,3 +1,4 @@
+import { Button } from "@mui/material";
 import { FB } from "./form-builder";
 // import { dispatchArrayAction } from "@mfb/core";
 import { dispatchFieldArray } from "@mfb/core";
@@ -11,7 +12,9 @@ const TestPage = () => {
     <>
       <h3>Microkernel From Builder</h3>
 
-      <button
+      <Button
+        variant="outlined"
+        sx={{ mb: 2 }}
         onClick={() => {
           dispatchFieldArray<TestPageForm>("akbar", {
             type: "append",
@@ -27,7 +30,19 @@ const TestPage = () => {
         }}
       >
         APPEND TO AKBAR
-      </button>
+      </Button>
+      <Button
+        variant="outlined"
+        sx={{ mb: 2 }}
+        onClick={() => {
+          dispatchFieldArray<TestPageForm>("akbar", {
+            type: "remove",
+            params: [-1],
+          });
+        }}
+      >
+        REMOVE FROM AKBAR
+      </Button>
       <FB.BasicBuilder
         gridContainerProps={{
           spacing: 2,

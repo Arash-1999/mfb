@@ -1,11 +1,9 @@
 import { FormBuilder, FormBuilderConfig, GetInputs } from "@mfb/core";
 import { getInput } from "./input";
 import { getLayout } from "./layout";
-import { FormField } from "./layout/field";
 
 const config = {
   input: { components: getInput(), defaultValues: { text: "" } },
-  field: FormField,
   layout: getLayout(),
 } satisfies FormBuilderConfig;
 
