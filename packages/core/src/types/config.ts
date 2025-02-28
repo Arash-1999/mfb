@@ -1,7 +1,10 @@
 import type { BaseComponent, FbComponent, LayoutKey } from "./utils";
 
 interface FormBuilderConfig {
-  field: BaseComponent;
+  card: {
+    group?: FbComponent;
+    simple: FbComponent;
+  };
   input: {
     components: FbComponent;
     defaultValues: Record<PropertyKey, unknown>;

@@ -1,5 +1,6 @@
 import type { ArrayPath, FieldValues, UseFormReturn } from "react-hook-form";
 
+import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
 import type { GetLayoutProps, InputArray } from "./utils";
 
@@ -9,7 +10,7 @@ type BasicBuilderProps<TConfig extends FormBuilderConfig> = {
 };
 
 type BuilderProps<TConfig extends FormBuilderConfig> = {
-  inputs: InputArray<TConfig>;
+  cards: Array<GetCards<TConfig>>;
 };
 type FieldArrayProps<
   TConfig extends FormBuilderConfig,

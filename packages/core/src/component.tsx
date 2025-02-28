@@ -14,7 +14,7 @@ import type { FieldValues } from "react-hook-form";
 import { useMfbFieldArray, useMfbGlobalEvent } from "@/hooks";
 import { listInputGuard, mergeName } from "@/utils";
 import { eventNames } from "@/utils/events";
-import { useCallback } from "react";
+import { Fragment, useCallback } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 // NOTE: move logic to separate functions in a better folder structure
@@ -53,18 +53,35 @@ class FormBuilder<TConfig extends FormBuilderConfig>
   };
 
   public Builder = <TFields extends FieldValues>({
-    inputs,
+    cards,
   }: BuilderProps<TConfig>) => {
+    const formMethods = useForm<TFields>();
     const {
       layout: { "grid-container": GridContainer },
     } = this.config;
-    const { InputMapper } = this;
-    const formMethods = useForm<TFields>();
+    // const { InputMapper } = this;
+
+    const onSubmit = (value: TFields) => {
+      console.log(value);
+    };
 
     return (
-      <GridContainer>
-        <InputMapper formMethods={formMethods} inputs={inputs} />
-      </GridContainer>
+      <FormProvider {...formMethods}>
+        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+          <GridContainer>
+            {cards.map((card, index) => {
+              if (card.isGroup) {
+                return <Fragment key={index}></Fragment>;
+              } else {
+                return <Fragment key={index}></Fragment>;
+              }
+            })}
+          </GridContainer>
+          {/* <GridContainer> */}
+          {/*   <InputMapper formMethods={formMethods} inputs={inputs} /> */}
+          {/* </GridContainer> */}
+        </form>
+      </FormProvider>
     );
   };
 
@@ -89,7 +106,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
           action(detail.action);
         }
       },
-      [action, name]
+      [action, name],
     );
 
     useMfbGlobalEvent({ eventName: eventNames["field-array"], handler });
@@ -123,7 +140,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
           Object.assign({}, input, {
             name: mergeName(name || "", input.name),
           }),
-          { formMethods }
+          { formMethods },
         )}
       </GridItem>
     ));
@@ -131,7 +148,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, true>,
-    options: RenderInputOptions<TFields>
+    options: RenderInputOptions<TFields>,
   ) {
     if (listInputGuard<TConfig>(input)) {
       const { FieldArray } = this;
