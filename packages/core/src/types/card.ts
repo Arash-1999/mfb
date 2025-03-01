@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { JSX, ReactNode } from "react";
 
 import type { FormBuilderConfig } from "./config";
 import type { GetInputs, GetLayoutProps } from "./utils";
@@ -12,7 +12,8 @@ type GetCards<TConfig extends FormBuilderConfig> =
         }[keyof TConfig["card"]["group"]])
   | {
       [TCard in keyof TConfig["card"]["simple"]]: {
-        gridProps: GetLayoutProps<TConfig, "grid-item">;
+        gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+        gridProps?: GetLayoutProps<TConfig, "grid-item">;
         // TODO: move header logic to component props (in base strucuture for simple card)
         header: Header | string;
         inputs: Array<GetInputs<TConfig>>;
@@ -39,4 +40,11 @@ type GroupCardSingle<TConfig extends FormBuilderConfig> = {
 
 type Header = Record<"center" | "left" | "right", ReactNode>;
 
-export type { GetCards };
+type SimpleCardBase = (props: SimpleCardProps) => JSX.Element;
+
+type SimpleCardProps = {
+  children: ReactNode;
+  header: Header | string;
+};
+
+export type { GetCards, SimpleCardBase, SimpleCardProps };

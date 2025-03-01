@@ -11,6 +11,7 @@ type BasicBuilderProps<TConfig extends FormBuilderConfig> = {
 
 type BuilderProps<TConfig extends FormBuilderConfig> = {
   cards: Array<GetCards<TConfig>>;
+  gridProps?: GetLayoutProps<TConfig, "grid-container">;
 };
 type FieldArrayProps<
   TConfig extends FormBuilderConfig,

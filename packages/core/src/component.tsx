@@ -54,12 +54,13 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
   public Builder = <TFields extends FieldValues>({
     cards,
+    gridProps,
   }: BuilderProps<TConfig>) => {
     const formMethods = useForm<TFields>();
     const {
-      layout: { "grid-container": GridContainer },
+      layout: { "grid-container": GridContainer, "grid-item": GridItem },
     } = this.config;
-    // const { InputMapper } = this;
+    const { InputMapper } = this;
 
     const onSubmit = (value: TFields) => {
       console.log(value);
@@ -68,18 +69,38 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     return (
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          <GridContainer>
+          <GridContainer {...(gridProps || {})}>
             {cards.map((card, index) => {
               if (card.isGroup) {
                 return <Fragment key={index}></Fragment>;
               } else {
-                return <Fragment key={index}></Fragment>;
+                const {
+                  card: { simple },
+                } = this.config;
+
+                const renderCard = simple[card.type];
+
+                return (
+                  <GridItem key={index} {...(card.gridProps || {})}>
+                    {renderCard({
+                      children: (
+                        <GridContainer {...(card.gridContainerProps || {})}>
+                          <InputMapper
+                            formMethods={formMethods}
+                            inputs={card.inputs}
+                            name={card.name}
+                          />
+                        </GridContainer>
+                      ),
+                      header: card.header,
+                    })}
+                  </GridItem>
+                );
               }
             })}
           </GridContainer>
-          {/* <GridContainer> */}
-          {/*   <InputMapper formMethods={formMethods} inputs={inputs} /> */}
-          {/* </GridContainer> */}
+          {/* TODO: remove this submit button as configurable option */}
+          <button type="submit">SUBMIT</button>
         </form>
       </FormProvider>
     );
@@ -106,7 +127,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
           action(detail.action);
         }
       },
-      [action, name],
+      [action, name]
     );
 
     useMfbGlobalEvent({ eventName: eventNames["field-array"], handler });
@@ -140,7 +161,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
           Object.assign({}, input, {
             name: mergeName(name || "", input.name),
           }),
-          { formMethods },
+          { formMethods }
         )}
       </GridItem>
     ));
@@ -148,7 +169,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, true>,
-    options: RenderInputOptions<TFields>,
+    options: RenderInputOptions<TFields>
   ) {
     if (listInputGuard<TConfig>(input)) {
       const { FieldArray } = this;
