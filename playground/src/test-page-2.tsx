@@ -1,0 +1,190 @@
+import { Button } from "@mui/material";
+import { FB } from "./form-builder";
+// import { dispatchArrayAction } from "@mfb/core";
+import { dispatchFieldArray } from "@mfb/core";
+
+type TestPageForm = {
+  "card-1": {
+    akbar: Array<Record<`input-${1 | 2 | 3}`, string>>;
+  };
+  "card-2": {
+    akbar: Array<Record<`input-${1 | 2 | 3}`, string>>;
+  };
+};
+
+const TestPage2 = () => {
+  return (
+    <>
+      <h3>Microkernel From Builder</h3>
+
+      <Button
+        variant="outlined"
+        sx={{ mb: 2 }}
+        onClick={() => {
+          dispatchFieldArray<TestPageForm>(
+            Math.floor(Math.random() * 2) + 1 > 1
+              ? "card-2.akbar"
+              : "card-1.akbar",
+            {
+              type: "append",
+              params: [
+                {
+                  "input-1": "value 1",
+                  "input-2": "value 2",
+                  "input-3": "value 3",
+                },
+                { shouldFocus: false },
+              ],
+            }
+          );
+        }}
+      >
+        APPEND TO AKBAR
+      </Button>
+      <Button
+        variant="outlined"
+        sx={{ mb: 2 }}
+        onClick={() => {
+          dispatchFieldArray<TestPageForm>(
+            Math.floor(Math.random() * 2) + 1 > 1
+              ? "card-2.akbar"
+              : "card-1.akbar",
+            {
+              type: "remove",
+              params: [-1],
+            }
+          );
+        }}
+      >
+        REMOVE FROM AKBAR
+      </Button>
+      <FB.Builder<TestPageForm>
+        gridProps={{
+          spacing: 2,
+        }}
+        cards={[
+          {
+            gridProps: { size: 12 },
+            header: "First Card (akbar)",
+            name: "card-1",
+            type: "paper",
+            inputs: [
+              {
+                gridProps: {
+                  size: 12,
+                },
+                gridContainerProps: {
+                  spacing: 1,
+                },
+                type: "list",
+                name: "akbar",
+                inputs: [
+                  {
+                    type: "text",
+                    gridProps: {
+                      size: 12,
+                    },
+                    name: "input-1",
+                    props: {
+                      textFieldProps: {
+                        placeholder: "First Input",
+                        size: "small",
+                      },
+                    },
+                  },
+                  {
+                    type: "text",
+                    gridProps: {
+                      size: 12,
+                    },
+                    name: "input-2",
+                    props: {
+                      textFieldProps: {
+                        placeholder: "Second Input",
+                        size: "small",
+                      },
+                    },
+                  },
+                  {
+                    type: "text",
+                    gridProps: {
+                      size: 12,
+                    },
+                    name: "input-3",
+                    props: {
+                      textFieldProps: {
+                        placeholder: "Third Input",
+                        size: "small",
+                      },
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            gridProps: { size: 12 },
+            header: "First Card (asghar)",
+            name: "card-2",
+            type: "accordion",
+            inputs: [
+              {
+                gridProps: {
+                  size: 12,
+                },
+                gridContainerProps: {
+                  spacing: 1,
+                },
+                type: "list",
+                name: "akbar",
+                inputs: [
+                  {
+                    type: "text",
+                    gridProps: {
+                      size: { xs: 12, sm: 4 },
+                    },
+                    name: "input-1",
+                    props: {
+                      textFieldProps: {
+                        placeholder: "First Input",
+                        size: "small",
+                      },
+                    },
+                  },
+                  {
+                    type: "text",
+                    gridProps: {
+                      size: { xs: 12, sm: 4 },
+                    },
+                    name: "input-2",
+                    props: {
+                      textFieldProps: {
+                        placeholder: "Second Input",
+                        size: "small",
+                      },
+                    },
+                  },
+                  {
+                    type: "text",
+                    gridProps: {
+                      size: { xs: 12, sm: 4 },
+                    },
+                    name: "input-3",
+                    props: {
+                      textFieldProps: {
+                        placeholder: "Third Input",
+                        size: "small",
+                      },
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ]}
+      />
+    </>
+  );
+};
+
+export default TestPage2;
