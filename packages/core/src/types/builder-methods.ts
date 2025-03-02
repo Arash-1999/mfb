@@ -28,10 +28,8 @@ interface FormBuilderProps<TConfig extends FormBuilderConfig> {
 }
 
 type InputMapperProps<
-  TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
+  TConfig extends FormBuilderConfig
 > = {
-  formMethods: UseFormReturn<TFields>;
   inputs: InputArray<TConfig>;
   name?: string;
 };

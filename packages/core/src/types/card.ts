@@ -28,13 +28,24 @@ type GroupCardBase<TKey extends PropertyKey> = {
   type: TKey;
 };
 
+type GroupCardComponent = (props: GroupCardComponentProps) => JSX.Element;
+
+type GroupCardComponentProps = {
+  addGrid: (node: ReactNode, index: number) => ReactNode;
+  nodes: Array<{ children: ReactNode; title: Header | string }>;
+};
+
 type GroupCardList<TConfig extends FormBuilderConfig> = {
   inputs: Array<GetInputs<TConfig>>;
   variant: "list";
 };
 
 type GroupCardSingle<TConfig extends FormBuilderConfig> = {
-  inputs: Array<Array<GetInputs<TConfig>>>;
+  gridProps?: GetLayoutProps<TConfig, "grid-item">;
+  inputs: Array<{
+    list: Array<GetInputs<TConfig>>;
+    title: Header | string;
+  }>;
   variant?: "simple";
 };
 
@@ -47,4 +58,11 @@ type SimpleCardProps = {
   header: Header | string;
 };
 
-export type { GetCards, SimpleCardBase, SimpleCardProps };
+export type {
+  GetCards,
+  GroupCardComponent,
+  GroupCardComponentProps,
+  Header,
+  SimpleCardBase,
+  SimpleCardProps,
+};

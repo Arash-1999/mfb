@@ -43,7 +43,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <GridContainer {...gridContainerProps}>
-            <InputMapper formMethods={formMethods} inputs={inputs} />
+            <InputMapper inputs={inputs} />
           </GridContainer>
           {/* TODO: remove this submit button as configurable option */}
           <button type="submit">SUBMIT</button>
@@ -72,7 +72,40 @@ class FormBuilder<TConfig extends FormBuilderConfig>
           <GridContainer {...(gridProps || {})}>
             {cards.map((card, index) => {
               if (card.isGroup) {
-                return <Fragment key={index}></Fragment>;
+                if (card.variant === "list") {
+                  return <Fragment key={index}>List Group</Fragment>;
+                }
+
+                // TODO: move this logic to another function and use it for list variant
+                const {
+                  card: { group },
+                } = this.config;
+
+                if (!group) return null;
+                const renderGroup = group[card.type];
+
+                return (
+                  <Fragment key={index}>
+                    {renderGroup({
+                      addGrid: (node, index) => (
+                        <GridItem
+                          key={`grid-item-${index}`}
+                          {...card.gridProps}
+                        >
+                          {node}
+                        </GridItem>
+                      ),
+                      nodes: card.inputs.map(({ list, title }) => ({
+                        children: (
+                          <GridContainer>
+                            <InputMapper inputs={list} />
+                          </GridContainer>
+                        ),
+                        title,
+                      })),
+                    })}
+                  </Fragment>
+                );
               } else {
                 const {
                   card: { simple },
@@ -85,11 +118,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
                     {renderCard({
                       children: (
                         <GridContainer {...(card.gridContainerProps || {})}>
-                          <InputMapper
-                            formMethods={formMethods}
-                            inputs={card.inputs}
-                            name={card.name}
-                          />
+                          <InputMapper inputs={card.inputs} name={card.name} />
                         </GridContainer>
                       ),
                       header: card.header,
@@ -112,7 +141,6 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     inputs,
     name,
   }: FieldArrayProps<TConfig, TFields>) => {
-    const formMethods = useFormContext<TFields>();
     const {
       layout: { "grid-container": GridContainer, "grid-item": GridItem },
     } = this.config;
@@ -136,12 +164,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
       <GridItem {...gridProps}>
         <GridContainer {...gridContainerProps}>
           {fields.map((field, i) => (
-            <InputMapper
-              formMethods={formMethods}
-              inputs={inputs}
-              key={field.id}
-              name={`${name}.${i}`}
-            />
+            <InputMapper inputs={inputs} key={field.id} name={`${name}.${i}`} />
           ))}
         </GridContainer>
       </GridItem>
@@ -149,10 +172,10 @@ class FormBuilder<TConfig extends FormBuilderConfig>
   };
 
   private InputMapper = <TFields extends FieldValues>({
-    formMethods,
     inputs,
     name, // should passed in list input. optional in card or flat mode inputs.
-  }: InputMapperProps<TConfig, TFields>) => {
+  }: InputMapperProps<TConfig>) => {
+    const formMethods = useFormContext<TFields>();
     const { "grid-item": GridItem } = this.config.layout;
 
     return inputs.map((input, i) => (
