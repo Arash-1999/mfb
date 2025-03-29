@@ -1,4 +1,9 @@
-import type { ArrayPath, FieldValues, UseFormReturn } from "react-hook-form";
+import type { ReactNode } from "react";
+import type {
+  FieldValues,
+  UseFieldArrayReturn,
+  UseFormReturn,
+} from "react-hook-form";
 
 import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
@@ -13,23 +18,18 @@ type BuilderProps<TConfig extends FormBuilderConfig> = {
   cards: Array<GetCards<TConfig>>;
   gridProps?: GetLayoutProps<TConfig, "grid-container">;
 };
-type FieldArrayProps<
-  TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
-> = {
-  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-  gridProps?: GetLayoutProps<TConfig, "grid-item">;
-  inputs: InputArray<TConfig>;
-  name: ArrayPath<TFields>;
+
+type FieldArrayProps<TFields extends FieldValues> = {
+  // TODO: use ArrayPath generic type instead of string
+  name: string;
+  render: (fields: UseFieldArrayReturn<TFields>["fields"]) => ReactNode;
 };
 
 interface FormBuilderProps<TConfig extends FormBuilderConfig> {
   config: TConfig;
 }
 
-type InputMapperProps<
-  TConfig extends FormBuilderConfig
-> = {
+type InputMapperProps<TConfig extends FormBuilderConfig> = {
   inputs: InputArray<TConfig>;
   name?: string;
 };

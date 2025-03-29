@@ -18,7 +18,7 @@ type GetCards<TConfig extends FormBuilderConfig> =
         header: Header | string;
         inputs: Array<GetInputs<TConfig>>;
         isGroup?: false;
-        name: string;
+        name?: string;
         type: TCard;
       };
     }[keyof TConfig["card"]["simple"]];
@@ -36,7 +36,9 @@ type GroupCardComponentProps = {
 };
 
 type GroupCardList<TConfig extends FormBuilderConfig> = {
+  gridProps?: GetLayoutProps<TConfig, "grid-item">;
   inputs: Array<GetInputs<TConfig>>;
+  name: string;
   variant: "list";
 };
 

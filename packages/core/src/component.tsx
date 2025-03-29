@@ -9,7 +9,7 @@ import type {
   InputMapperProps,
   RenderInputOptions,
 } from "@/types";
-import type { FieldValues } from "react-hook-form";
+import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import { useMfbFieldArray, useMfbGlobalEvent } from "@/hooks";
 import { listInputGuard, mergeName } from "@/utils";
@@ -60,7 +60,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     const {
       layout: { "grid-container": GridContainer, "grid-item": GridItem },
     } = this.config;
-    const { InputMapper } = this;
+    const { FieldArray, InputMapper } = this;
 
     const onSubmit = (value: TFields) => {
       console.log(value);
@@ -72,11 +72,6 @@ class FormBuilder<TConfig extends FormBuilderConfig>
           <GridContainer {...(gridProps || {})}>
             {cards.map((card, index) => {
               if (card.isGroup) {
-                if (card.variant === "list") {
-                  return <Fragment key={index}>List Group</Fragment>;
-                }
-
-                // TODO: move this logic to another function and use it for list variant
                 const {
                   card: { group },
                 } = this.config;
@@ -84,6 +79,38 @@ class FormBuilder<TConfig extends FormBuilderConfig>
                 if (!group) return null;
                 const renderGroup = group[card.type];
 
+                if (card.variant === "list") {
+                  return (
+                    <FieldArray<TFields>
+                      key={index}
+                      name={card.name}
+                      render={(fields) => {
+                        return renderGroup({
+                          addGrid: (node, index) => (
+                            <GridItem key={`grid-item-${index}`} {...gridProps}>
+                              {node}
+                            </GridItem>
+                          ),
+                          nodes: fields.map((field, i) => ({
+                            children: (
+                              <GridContainer>
+                                <InputMapper
+                                  inputs={card.inputs}
+                                  key={field.id}
+                                  name={`${card.name}.${i}`}
+                                />
+                              </GridContainer>
+                            ),
+                            // TODO: add titleFn to group card(list variant) for generating title
+                            title: `List Item ${i + 1}`,
+                          })),
+                        });
+                      }}
+                    />
+                  );
+                }
+
+                // TODO: move this logic to another function and use it for list variant
                 return (
                   <Fragment key={index}>
                     {renderGroup({
@@ -136,16 +163,12 @@ class FormBuilder<TConfig extends FormBuilderConfig>
   };
 
   private FieldArray = <TFields extends FieldValues>({
-    gridContainerProps = {},
-    gridProps = {},
-    inputs,
     name,
-  }: FieldArrayProps<TConfig, TFields>) => {
-    const {
-      layout: { "grid-container": GridContainer, "grid-item": GridItem },
-    } = this.config;
-    const { InputMapper } = this;
-    const { action, fields } = useMfbFieldArray<TFields>({ name });
+    render,
+  }: FieldArrayProps<TFields>) => {
+    const { action, fields } = useMfbFieldArray<TFields>({
+      name: name as ArrayPath<TFields>,
+    });
 
     const handler = useCallback(
       (event: CustomEventInit<FieldArrayEvent<TFields>>) => {
@@ -155,20 +178,13 @@ class FormBuilder<TConfig extends FormBuilderConfig>
           action(detail.action);
         }
       },
-      [action, name]
+
+      [action, name],
     );
 
     useMfbGlobalEvent({ eventName: eventNames["field-array"], handler });
 
-    return (
-      <GridItem {...gridProps}>
-        <GridContainer {...gridContainerProps}>
-          {fields.map((field, i) => (
-            <InputMapper inputs={inputs} key={field.id} name={`${name}.${i}`} />
-          ))}
-        </GridContainer>
-      </GridItem>
-    );
+    return render(fields);
   };
 
   private InputMapper = <TFields extends FieldValues>({
@@ -184,7 +200,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
           Object.assign({}, input, {
             name: mergeName(name || "", input.name),
           }),
-          { formMethods }
+          { formMethods },
         )}
       </GridItem>
     ));
@@ -192,17 +208,30 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, true>,
-    options: RenderInputOptions<TFields>
+    options: RenderInputOptions<TFields>,
   ) {
     if (listInputGuard<TConfig>(input)) {
-      const { FieldArray } = this;
+      const { FieldArray, InputMapper } = this;
+      const {
+        layout: { "grid-container": GridContainer, "grid-item": GridItem },
+      } = this.config;
 
       return (
         <FieldArray
-          gridContainerProps={input.gridContainerProps}
-          gridProps={input.gridProps}
-          inputs={input.inputs}
           name={input.name}
+          render={(fields) => (
+            <GridItem {...input.gridProps}>
+              <GridContainer {...input.gridContainerProps}>
+                {fields.map((field, i) => (
+                  <InputMapper
+                    inputs={input.inputs}
+                    key={field.id}
+                    name={`${input.name}.${i}`}
+                  />
+                ))}
+              </GridContainer>
+            </GridItem>
+          )}
         />
       );
     }
