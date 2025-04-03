@@ -3,6 +3,8 @@ import { FB } from "./form-builder";
 // import { dispatchArrayAction } from "@mfb/core";
 import { dispatchFieldArray } from "@mfb/core";
 
+const TEST_PAGE_2_FORM_ID = "TEST_PAGE_2_FORM_ID";
+
 type TestPageForm = {
   "card-1": {
     akbar: Array<Record<`input-${1 | 2 | 3}`, string>>;
@@ -22,6 +24,7 @@ const TestPage2 = () => {
         sx={{ mb: 2 }}
         onClick={() => {
           dispatchFieldArray<TestPageForm>(
+            TEST_PAGE_2_FORM_ID,
             Math.floor(Math.random() * 2) + 1 > 1
               ? "card-2.akbar"
               : "card-1.akbar",
@@ -35,7 +38,7 @@ const TestPage2 = () => {
                 },
                 { shouldFocus: false },
               ],
-            }
+            },
           );
         }}
       >
@@ -46,13 +49,14 @@ const TestPage2 = () => {
         sx={{ mb: 2 }}
         onClick={() => {
           dispatchFieldArray<TestPageForm>(
+            TEST_PAGE_2_FORM_ID,
             Math.floor(Math.random() * 2) + 1 > 1
               ? "card-2.akbar"
               : "card-1.akbar",
             {
               type: "remove",
               params: [-1],
-            }
+            },
           );
         }}
       >
@@ -62,6 +66,7 @@ const TestPage2 = () => {
         gridProps={{
           spacing: 2,
         }}
+        id={TEST_PAGE_2_FORM_ID}
         cards={[
           {
             gridProps: { size: 12 },

@@ -2,6 +2,8 @@ import { Button, Container } from "@mui/material";
 import { FB } from "./form-builder";
 import { dispatchFieldArray } from "@mfb/core";
 
+const TEST_PAGE_3_FORM_ID = "TEST_PAGE_3_FORM_ID";
+
 type TestPageForm = {
   [key in `input-${1 | 2 | 3 | 4 | 5 | 6}`]: string;
 } & {
@@ -17,7 +19,7 @@ const TestPage3 = () => {
         variant="outlined"
         sx={{ mb: 2 }}
         onClick={() => {
-          dispatchFieldArray<TestPageForm>("tabs", {
+          dispatchFieldArray<TestPageForm>(TEST_PAGE_3_FORM_ID, "tabs", {
             type: "append",
             params: [
               {
@@ -36,7 +38,7 @@ const TestPage3 = () => {
         variant="outlined"
         sx={{ mb: 2 }}
         onClick={() => {
-          dispatchFieldArray<TestPageForm>("tabs", {
+          dispatchFieldArray<TestPageForm>(TEST_PAGE_3_FORM_ID, "tabs", {
             type: "remove",
             params: [-1],
           });
@@ -49,6 +51,7 @@ const TestPage3 = () => {
         gridProps={{
           spacing: 2,
         }}
+        id={TEST_PAGE_3_FORM_ID}
         cards={[
           {
             isGroup: true,

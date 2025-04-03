@@ -3,6 +3,8 @@ import { FB } from "./form-builder";
 // import { dispatchArrayAction } from "@mfb/core";
 import { dispatchFieldArray } from "@mfb/core";
 
+const TEST_PAGE_FORM_ID = "TEST_PAGE_FORM_ID";
+
 type TestPageForm = {
   akbar: Array<Record<`input-${1 | 2 | 3}`, string>>;
 };
@@ -16,7 +18,7 @@ const TestPage = () => {
         variant="outlined"
         sx={{ mb: 2 }}
         onClick={() => {
-          dispatchFieldArray<TestPageForm>("akbar", {
+          dispatchFieldArray<TestPageForm>(TEST_PAGE_FORM_ID, "akbar", {
             type: "append",
             params: [
               {
@@ -35,7 +37,7 @@ const TestPage = () => {
         variant="outlined"
         sx={{ mb: 2 }}
         onClick={() => {
-          dispatchFieldArray<TestPageForm>("akbar", {
+          dispatchFieldArray<TestPageForm>(TEST_PAGE_FORM_ID, "akbar", {
             type: "remove",
             params: [-1],
           });
@@ -47,6 +49,7 @@ const TestPage = () => {
         gridContainerProps={{
           spacing: 2,
         }}
+        id={TEST_PAGE_FORM_ID}
         inputs={[
           {
             gridProps: {

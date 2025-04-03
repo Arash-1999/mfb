@@ -4,17 +4,19 @@ import type {
   FieldArrayEvent,
   FieldArrayProps,
   FormBuilderConfig,
+  FormBuilderContext,
   FormBuilderProps,
   GetInputs,
   InputMapperProps,
   RenderInputOptions,
 } from "@/types";
+import type { Context } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import { useMfbFieldArray, useMfbGlobalEvent } from "@/hooks";
 import { DisabledHoC, listInputGuard, mergeName, RenderHoC } from "@/utils";
 import { eventNames } from "@/utils/events";
-import { Fragment, useCallback } from "react";
+import { createContext, Fragment, useCallback, useContext } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 // NOTE: move logic to separate functions in a better folder structure
@@ -22,16 +24,21 @@ class FormBuilder<TConfig extends FormBuilderConfig>
   implements FormBuilderProps<TConfig>
 {
   config: TConfig;
+  Context: Context<FormBuilderContext>;
 
   constructor(config: TConfig) {
     this.config = config;
+    this.Context = createContext<FormBuilderContext>({
+      id: "",
+    });
   }
 
   BasicBuilder = <TFields extends FieldValues>({
     gridContainerProps,
+    id,
     inputs,
   }: BasicBuilderProps<TConfig, TFields>) => {
-    const { InputMapper } = this;
+    const { Context, InputMapper } = this;
     const { "grid-container": GridContainer } = this.config.layout;
     const formMethods = useForm<TFields>();
 
@@ -40,126 +47,150 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     };
 
     return (
-      <FormProvider {...formMethods}>
-        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          <GridContainer {...gridContainerProps}>
-            <InputMapper inputs={inputs} />
-          </GridContainer>
-          {/* TODO: remove this submit button as configurable option */}
-          <button type="submit">SUBMIT</button>
-        </form>
-      </FormProvider>
+      <Context.Provider
+        value={{
+          id,
+        }}
+      >
+        <FormProvider {...formMethods}>
+          <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+            <GridContainer {...gridContainerProps}>
+              <InputMapper inputs={inputs} />
+            </GridContainer>
+            {/* TODO: remove this submit button as configurable option */}
+            <button type="submit">SUBMIT</button>
+          </form>
+        </FormProvider>
+      </Context.Provider>
     );
   };
 
   public Builder = <TFields extends FieldValues>({
     cards,
     gridProps,
+    id,
   }: BuilderProps<TConfig, TFields>) => {
     const formMethods = useForm<TFields>();
     const {
       layout: { "grid-container": GridContainer, "grid-item": GridItem },
     } = this.config;
-    const { FieldArray, InputMapper } = this;
+    const { Context, FieldArray, InputMapper } = this;
 
     const onSubmit = (value: TFields) => {
       console.log(value);
     };
 
     return (
-      <FormProvider {...formMethods}>
-        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          <GridContainer {...(gridProps || {})}>
-            {cards.map((card, index) => {
-              if (card.isGroup) {
-                const {
-                  card: { group },
-                } = this.config;
+      <Context.Provider
+        value={{
+          id,
+        }}
+      >
+        <FormProvider {...formMethods}>
+          <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+            <GridContainer {...(gridProps || {})}>
+              {cards.map((card, index) => {
+                if (card.isGroup) {
+                  const {
+                    card: { group },
+                  } = this.config;
 
-                if (!group) return null;
-                const renderGroup = group[card.type];
+                  if (!group) return null;
+                  const renderGroup = group[card.type];
 
-                if (card.variant === "list") {
-                  return (
-                    <FieldArray<TFields>
-                      key={index}
-                      name={card.name}
-                      render={(fields) => {
-                        return renderGroup({
-                          addGrid: (node, index) => (
-                            <GridItem key={`grid-item-${index}`} {...gridProps}>
-                              {node}
-                            </GridItem>
-                          ),
-                          nodes: fields.map((field, i) => ({
-                            children: (
-                              <GridContainer>
-                                <InputMapper
-                                  inputs={card.inputs}
-                                  key={field.id}
-                                  name={`${card.name}.${i}`}
-                                />
-                              </GridContainer>
+                  if (card.variant === "list") {
+                    return (
+                      <FieldArray<TFields>
+                        key={index}
+                        name={card.name}
+                        render={(fields) => {
+                          return renderGroup({
+                            addGrid: (node, index) => (
+                              <GridItem
+                                key={`grid-item-${index}`}
+                                {...gridProps}
+                              >
+                                {node}
+                              </GridItem>
                             ),
-                            // TODO: add titleFn to group card(list variant) for generating title
-                            title: `List Item ${i + 1}`,
-                          })),
-                        });
-                      }}
-                    />
-                  );
-                }
+                            nodes: fields.map((field, i) => ({
+                              children: (
+                                <GridContainer>
+                                  <InputMapper
+                                    inputs={card.inputs}
+                                    key={field.id}
+                                    name={`${card.name}.${i}`}
+                                  />
+                                </GridContainer>
+                              ),
+                              // TODO: add titleFn to group card(list variant) for generating title
+                              title: `List Item ${i + 1}`,
+                            })),
+                          });
+                        }}
+                      />
+                    );
+                  }
 
-                // TODO: move this logic to another function and use it for list variant
-                return (
-                  <Fragment key={index}>
-                    {renderGroup({
-                      addGrid: (node, index) => (
-                        <GridItem
-                          key={`grid-item-${index}`}
-                          {...card.gridProps}
-                        >
-                          {node}
-                        </GridItem>
-                      ),
-                      nodes: card.inputs.map(({ list, title }) => ({
+                  // TODO: move this logic to another function and use it for list variant
+                  return (
+                    <Fragment key={index}>
+                      {renderGroup({
+                        addGrid: (node, index) => (
+                          <GridItem
+                            key={`grid-item-${index}`}
+                            {...card.gridProps}
+                          >
+                            {node}
+                          </GridItem>
+                        ),
+                        nodes: card.inputs.map(({ list, title }) => ({
+                          children: (
+                            <GridContainer>
+                              <InputMapper inputs={list} />
+                            </GridContainer>
+                          ),
+                          title,
+                        })),
+                      })}
+                    </Fragment>
+                  );
+                } else {
+                  const {
+                    card: { simple },
+                  } = this.config;
+
+                  const renderCard = simple[card.type];
+
+                  return (
+                    <GridItem key={index} {...(card.gridProps || {})}>
+                      {renderCard({
                         children: (
-                          <GridContainer>
-                            <InputMapper inputs={list} />
+                          <GridContainer {...(card.gridContainerProps || {})}>
+                            <InputMapper
+                              inputs={card.inputs}
+                              name={card.name}
+                            />
                           </GridContainer>
                         ),
-                        title,
-                      })),
-                    })}
-                  </Fragment>
-                );
-              } else {
-                const {
-                  card: { simple },
-                } = this.config;
-
-                const renderCard = simple[card.type];
-
-                return (
-                  <GridItem key={index} {...(card.gridProps || {})}>
-                    {renderCard({
-                      children: (
-                        <GridContainer {...(card.gridContainerProps || {})}>
-                          <InputMapper inputs={card.inputs} name={card.name} />
-                        </GridContainer>
-                      ),
-                      header: card.header,
-                    })}
-                  </GridItem>
-                );
-              }
-            })}
-          </GridContainer>
-          {/* TODO: remove this submit button as configurable option */}
-          <button type="submit">SUBMIT</button>
-        </form>
-      </FormProvider>
+                        header: card.header,
+                      })}
+                    </GridItem>
+                  );
+                }
+              })}
+            </GridContainer>
+            {/* TODO: remove this submit button as configurable option */}
+            <button type="submit">SUBMIT</button>
+          </form>
+        </FormProvider>
+      </Context.Provider>
     );
+  };
+
+  private useMfbContext = () => {
+    const { Context } = this;
+    return useContext(Context);
   };
 
   private FieldArray = <TFields extends FieldValues>({
@@ -169,17 +200,17 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     const { action, fields } = useMfbFieldArray<TFields>({
       name: name as ArrayPath<TFields>,
     });
+    const { id } = this.useMfbContext();
 
     const handler = useCallback(
       (event: CustomEventInit<FieldArrayEvent<TFields>>) => {
         const { detail } = event;
-        // FIX: check form id (it will have conflict in multiple mounted form in one page)
-        if (detail && detail.name === name) {
+        if (detail && detail.id === id && detail.name === name) {
           action(detail.action);
         }
       },
 
-      [action, name],
+      [action, id, name],
     );
 
     useMfbGlobalEvent({ eventName: eventNames["field-array"], handler });

@@ -14,6 +14,7 @@ type BasicBuilderProps<
   TFields extends FieldValues,
 > = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+  id: string;
   inputs: InputArray<TConfig, TFields>;
 };
 
@@ -23,6 +24,7 @@ type BuilderProps<
 > = {
   cards: Array<GetCards<TConfig, TFields>>;
   gridProps?: GetLayoutProps<TConfig, "grid-container">;
+  id: string;
 };
 
 type FieldArrayProps<TFields extends FieldValues> = {

@@ -18,7 +18,6 @@ const TextFieldInput = <TFields extends FieldValues>({
   }
 >) => {
   const { control } = useFormContext();
-  console.log(name, disabled);
 
   return (
     <Controller
