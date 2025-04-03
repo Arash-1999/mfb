@@ -9,13 +9,19 @@ import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
 import type { GetLayoutProps, InputArray } from "./utils";
 
-type BasicBuilderProps<TConfig extends FormBuilderConfig> = {
+type BasicBuilderProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-  inputs: InputArray<TConfig>;
+  inputs: InputArray<TConfig, TFields>;
 };
 
-type BuilderProps<TConfig extends FormBuilderConfig> = {
-  cards: Array<GetCards<TConfig>>;
+type BuilderProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
+  cards: Array<GetCards<TConfig, TFields>>;
   gridProps?: GetLayoutProps<TConfig, "grid-container">;
 };
 
@@ -29,8 +35,11 @@ interface FormBuilderProps<TConfig extends FormBuilderConfig> {
   config: TConfig;
 }
 
-type InputMapperProps<TConfig extends FormBuilderConfig> = {
-  inputs: InputArray<TConfig>;
+type InputMapperProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
+  inputs: InputArray<TConfig, TFields>;
   name?: string;
 };
 

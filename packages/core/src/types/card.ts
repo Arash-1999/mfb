@@ -1,14 +1,19 @@
 import type { JSX, ReactNode } from "react";
+import type { FieldValues } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
-import type { GetInputs, GetLayoutProps } from "./utils";
+import type { GetInputs } from "./input";
+import type { GetLayoutProps } from "./utils";
 
-type GetCards<TConfig extends FormBuilderConfig> =
+type GetCards<TConfig extends FormBuilderConfig, TFields extends FieldValues> =
   | (TConfig["card"]["group"] extends undefined
       ? never
       : {
           [TCard in keyof TConfig["card"]["group"]]: GroupCardBase<TCard> &
-            (GroupCardList<TConfig> | GroupCardSingle<TConfig>);
+            (
+              | GroupCardList<TConfig, TFields>
+              | GroupCardSingle<TConfig, TFields>
+            );
         }[keyof TConfig["card"]["group"]])
   | {
       [TCard in keyof TConfig["card"]["simple"]]: {
@@ -16,7 +21,7 @@ type GetCards<TConfig extends FormBuilderConfig> =
         gridProps?: GetLayoutProps<TConfig, "grid-item">;
         // TODO: move header logic to component props (in base strucuture for simple card)
         header: Header | string;
-        inputs: Array<GetInputs<TConfig>>;
+        inputs: Array<GetInputs<TConfig, TFields>>;
         isGroup?: false;
         name?: string;
         type: TCard;
@@ -35,17 +40,23 @@ type GroupCardComponentProps = {
   nodes: Array<{ children: ReactNode; title: Header | string }>;
 };
 
-type GroupCardList<TConfig extends FormBuilderConfig> = {
+type GroupCardList<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
-  inputs: Array<GetInputs<TConfig>>;
+  inputs: Array<GetInputs<TConfig, TFields>>;
   name: string;
   variant: "list";
 };
 
-type GroupCardSingle<TConfig extends FormBuilderConfig> = {
+type GroupCardSingle<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   inputs: Array<{
-    list: Array<GetInputs<TConfig>>;
+    list: Array<GetInputs<TConfig, TFields>>;
     title: Header | string;
   }>;
   variant?: "simple";

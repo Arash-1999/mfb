@@ -1,51 +1,34 @@
 import type { JSX } from "react";
+import type { FieldValues } from "react-hook-form";
 
-import type { ActionInput, ListInput } from "./components";
+import type { ActionInput } from "./components";
 import type { FormBuilderConfig } from "./config";
+import type { GetInputs } from "./input";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BaseComponent = (props: any) => JSX.Element;
-type FbComponent = Record<PropertyKey, BaseComponent>;
-
-type GetInputParameter<
-  TConfig extends FormBuilderConfig,
-  TInput extends PropertyKey,
-> = Parameters<TConfig["input"]["components"][TInput]>[0];
-
-type GetInputs<
-  TConfig extends FormBuilderConfig,
-  TInternal extends boolean = false,
-> =
-  | ListInput<TConfig>
-  | {
-      [TInput in keyof TConfig["input"]["components"]]: {
-        field?: GetLayoutProps<TConfig, "field">;
-        gridProps?: GetLayoutProps<TConfig, "grid-item">;
-        name: string;
-        props: TInternal extends false
-          ? Omit<GetInputParameter<TConfig, TInput>, "formMethods" | "name">
-          : GetInputParameter<TConfig, TInput>;
-        type: TInput;
-      };
-    }[keyof TConfig["input"]["components"]];
+//
+// type FbComponent = Record<PropertyKey, BaseComponent>;
 
 type GetLayoutProps<
   TConfig extends FormBuilderConfig,
   TItem extends LayoutKey,
 > = Parameters<TConfig["layout"][TItem]>[0];
 
-type InputArray<TConfig extends FormBuilderConfig> = Array<GetInputs<TConfig>>;
+type InputArray<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = Array<GetInputs<TConfig, TFields>>;
 
 type LayoutKey = "field" | "grid-container" | "grid-item";
 
-type ListInputArray<TConfig extends FormBuilderConfig> = Array<
-  ActionInput | GetInputs<TConfig>
->;
+type ListInputArray<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = Array<ActionInput | GetInputs<TConfig, TFields>>;
 
 export type {
   BaseComponent,
-  FbComponent,
-  GetInputs,
   GetLayoutProps,
   InputArray,
   LayoutKey,

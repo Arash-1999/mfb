@@ -1,5 +1,6 @@
 import type { GroupCardComponent, SimpleCardBase } from "./card";
-import type { BaseComponent, FbComponent, LayoutKey } from "./utils";
+import type { InputObject } from "./input";
+import type { BaseComponent, LayoutKey } from "./utils";
 
 interface FormBuilderConfig {
   card: {
@@ -7,7 +8,7 @@ interface FormBuilderConfig {
     simple: Record<PropertyKey, SimpleCardBase>;
   };
   input: {
-    components: FbComponent;
+    components: InputObject;
     defaultValues: Record<PropertyKey, unknown>;
   };
   layout: Record<LayoutKey, BaseComponent>;
