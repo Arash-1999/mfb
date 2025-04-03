@@ -1,3 +1,5 @@
+import type { FieldValues } from "react-hook-form";
+
 import { FormBuilder, FormBuilderConfig, GetInputs } from "@mfb/core";
 import { getInput } from "./input";
 import { getLayout } from "./layout";
@@ -12,7 +14,7 @@ const config = {
   layout: getLayout(),
 } satisfies FormBuilderConfig;
 
-type MfbInput = GetInputs<typeof config>;
+type MfbInput<TFields extends FieldValues> = GetInputs<typeof config, TFields>;
 
 const FB = new FormBuilder(config);
 

@@ -45,7 +45,7 @@ const TestPage3 = () => {
         REMOVE FROM AKBAR
       </Button>
 
-      <FB.Builder
+      <FB.Builder<TestPageForm>
         gridProps={{
           spacing: 2,
         }}
@@ -62,6 +62,12 @@ const TestPage3 = () => {
                   {
                     type: "text",
                     name: "input-1",
+                    dependsOn: {
+                      path: "input-2",
+                      type: "disable",
+                      condition: "not-eq",
+                      value: "something",
+                    },
                     props: {
                       textFieldProps: {
                         size: "small",
@@ -90,6 +96,12 @@ const TestPage3 = () => {
                         label: "Third Input",
                         placeholder: "Third Input",
                       },
+                    },
+                    dependsOn: {
+                      type: "visibility",
+                      path: "input-1",
+                      condition: "eq",
+                      value: "something",
                     },
                   },
                 ],
