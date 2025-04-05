@@ -1,6 +1,7 @@
 import type {
   BasicBuilderProps,
   BuilderProps,
+  DependencyManagerProps,
   FieldArrayEvent,
   FieldArrayProps,
   FormBuilderConfig,
@@ -14,10 +15,15 @@ import type { Context } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import { useMfbFieldArray, useMfbGlobalEvent } from "@/hooks";
-import { DisabledHoC, listInputGuard, mergeName, RenderHoC } from "@/utils";
+import { DisabledHoC, listInputGuard, mergeName } from "@/utils";
 import { eventNames } from "@/utils/events";
 import { createContext, Fragment, useCallback, useContext } from "react";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import {
+  FormProvider,
+  useForm,
+  useFormContext,
+  useWatch,
+} from "react-hook-form";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<TConfig extends FormBuilderConfig>
@@ -145,6 +151,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
                           </GridItem>
                         ),
                         nodes: card.inputs.map(({ list, title }) => ({
+                          // TODO: add gridContainerProps
                           children: (
                             <GridContainer>
                               <InputMapper inputs={list} />
@@ -188,6 +195,37 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     );
   };
 
+  private DependencyManager = <TFields extends FieldValues>({
+    dependsOn,
+    input,
+  }: DependencyManagerProps<TConfig, TFields>) => {
+    const {
+      layout: { "grid-item": GridItem },
+    } = this.config;
+    const formMethods = useFormContext<TFields>();
+    const value = useWatch<TFields>({
+      control: formMethods.control,
+      name: dependsOn.path,
+    });
+
+    // TODO: handle different type of dependencies here
+    const node = (
+      <GridItem {...(input.gridProps || {})}>
+        {listInputGuard<TConfig, TFields>(input)
+          ? this.renderInput(input, { formMethods })
+          : this.renderInput(
+              Object.assign({}, input, {
+                props: Object.assign({}, input.props, { deps: {
+                  [dependsOn.id]: value,
+                } }),
+              }),
+              { formMethods }
+            )}
+      </GridItem>
+    );
+    return node;
+  };
+
   private useMfbContext = () => {
     const { Context } = this;
     return useContext(Context);
@@ -210,7 +248,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
         }
       },
 
-      [action, id, name],
+      [action, id, name]
     );
 
     useMfbGlobalEvent({ eventName: eventNames["field-array"], handler });
@@ -222,6 +260,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     inputs,
     name, // should passed in list input. optional in card or flat mode inputs.
   }: InputMapperProps<TConfig, TFields>) => {
+    const { DependencyManager } = this;
     const formMethods = useFormContext<TFields>();
     const { "grid-item": GridItem } = this.config.layout;
 
@@ -236,26 +275,34 @@ class FormBuilder<TConfig extends FormBuilderConfig>
             Object.assign({}, input, {
               name: mergeName(name || "", input.name),
             }),
-            { formMethods },
+            { formMethods }
           )}
         </GridItem>
       );
+
       if (typeof dependency === "undefined") {
         return node;
-      } else if (dependency.type === "visibility") {
+      } else {
         return (
-          <RenderHoC dependency={dependency} key={key}>
-            {node}
-          </RenderHoC>
+          <DependencyManager dependsOn={dependency} input={input} key={key} />
         );
       }
-      return node;
+      // if (typeof dependency === "undefined") {
+      //   return node;
+      // } else if (dependency.type === "visibility") {
+      //   return (
+      //     <RenderHoC dependency={dependency} key={key}>
+      //       {node}
+      //     </RenderHoC>
+      //   );
+      // }
+      // return node;
     });
   };
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, TFields, true>,
-    options: RenderInputOptions<TFields>,
+    options: RenderInputOptions<TFields>
   ) {
     if (listInputGuard<TConfig, TFields>(input)) {
       const { FieldArray, InputMapper } = this;
