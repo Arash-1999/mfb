@@ -7,13 +7,23 @@ import type { GetInputs } from "./input";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BaseComponent = (props: any) => JSX.Element;
-//
-// type FbComponent = Record<PropertyKey, BaseComponent>;
+
+type BaseInput = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  props: any & BaseInputParameters
+) => JSX.Element;
+
+type BaseInputParameters = {
+  disabled?: boolean;
+};
 
 type GetLayoutProps<
   TConfig extends FormBuilderConfig,
   TItem extends LayoutKey,
 > = Parameters<TConfig["layout"][TItem]>[0];
+
+type HasDependencyField<TInput extends BaseInput> =
+  'deps' extends keyof Parameters<TInput>[0] ? false : true;
 
 type InputArray<
   TConfig extends FormBuilderConfig,
@@ -29,7 +39,10 @@ type ListInputArray<
 
 export type {
   BaseComponent,
+  BaseInput,
+  BaseInputParameters,
   GetLayoutProps,
+  HasDependencyField,
   InputArray,
   LayoutKey,
   ListInputArray,

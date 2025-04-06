@@ -215,9 +215,11 @@ class FormBuilder<TConfig extends FormBuilderConfig>
           ? this.renderInput(input, { formMethods })
           : this.renderInput(
               Object.assign({}, input, {
-                props: Object.assign({}, input.props, { deps: {
-                  [dependsOn.id]: value,
-                } }),
+                props: Object.assign({}, input.props, {
+                  deps: {
+                    [dependsOn.id]: value,
+                  },
+                }),
               }),
               { formMethods }
             )}

@@ -7,7 +7,7 @@ import type {
 
 import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
-import type { BindValueDependency, DependsOn } from "./dependency-management";
+import type { DependsOn } from "./dependency-management";
 import type { GetInputs } from "./input";
 import type { GetLayoutProps, InputArray } from "./utils";
 
@@ -33,7 +33,7 @@ type DependencyManagerProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > = {
-  dependsOn: BindValueDependency<TFields> | DependsOn<TFields>;
+  dependsOn: DependsOn<TFields>;
   input: GetInputs<TConfig, TFields>;
 };
 

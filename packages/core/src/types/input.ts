@@ -1,28 +1,14 @@
-import type { JSX } from "react";
 import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
 import type { ListInput } from "./components";
 import type { FormBuilderConfig } from "./config";
-import type { BindValueDependency, Dependency } from "./dependency-management";
-import type { GetLayoutProps } from "./utils";
-
-type BaseInput = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  props: any & BaseInputParameters
-) => JSX.Element;
-
-type BaseInputParameters = {
-  disabled?: boolean;
-};
-
-type GetBindValueDependency<
-  TFields extends FieldValues,
-  TInput extends BaseInput,
-> = Parameters<TInput>[0]["deps"] extends undefined
-  ? Dependency<TFields>
-  : Dependency<TFields> | {
-      dependsOn?: BindValueDependency<TFields>;
-    };
+import type { Dependency } from "./dependency-management";
+import type {
+  BaseInput,
+  BaseInputParameters,
+  GetLayoutProps,
+  HasDependencyField,
+} from "./utils";
 
 type GetInputParameter<
   TConfig extends FormBuilderConfig,
@@ -36,9 +22,9 @@ type GetInputs<
 > =
   | (Dependency<TFields> & ListInput<TConfig, TFields>)
   | {
-      [TInput in keyof TConfig["input"]["components"]]: GetBindValueDependency<
+      [TInput in keyof TConfig["input"]["components"]]: Dependency<
         TFields,
-        TConfig["input"]["components"][TInput]
+        HasDependencyField<TConfig["input"]["components"][TInput]>
       > & {
         field?: GetLayoutProps<TConfig, "field">;
         gridProps?: GetLayoutProps<TConfig, "grid-item">;
