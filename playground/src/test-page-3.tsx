@@ -63,6 +63,9 @@ const TestPage3 = () => {
             },
             inputs: [
               {
+                gridContainerProps: {
+                  spacing: 2,
+                },
                 list: [
                   {
                     type: "text",
@@ -164,6 +167,9 @@ const TestPage3 = () => {
                 title: "Group Item 1",
               },
               {
+                gridContainerProps: {
+                  spacing: 2,
+                },
                 list: [
                   {
                     type: "text",
