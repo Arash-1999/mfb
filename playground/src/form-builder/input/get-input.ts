@@ -1,7 +1,11 @@
 import TextFieldInput from "./text-field";
+import SelectInput from "./select";
 
 const getInput = () => {
-  return { text: TextFieldInput };
+  return { 
+    select: SelectInput,
+    text: TextFieldInput,
+   };
 };
 
 export { getInput };

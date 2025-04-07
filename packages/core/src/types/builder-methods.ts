@@ -7,6 +7,8 @@ import type {
 
 import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
+import type { DependsOn } from "./dependency-management";
+import type { GetInputs } from "./input";
 import type { GetLayoutProps, InputArray } from "./utils";
 
 type BasicBuilderProps<
@@ -25,6 +27,14 @@ type BuilderProps<
   cards: Array<GetCards<TConfig, TFields>>;
   gridProps?: GetLayoutProps<TConfig, "grid-container">;
   id: string;
+};
+
+type DependencyManagerProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
+  dependsOn: DependsOn<TFields>;
+  input: GetInputs<TConfig, TFields>;
 };
 
 type FieldArrayProps<TFields extends FieldValues> = {
@@ -52,6 +62,7 @@ type RenderInputOptions<TFields extends FieldValues> = {
 export type {
   BasicBuilderProps,
   BuilderProps,
+  DependencyManagerProps,
   FieldArrayProps,
   FormBuilderConfig,
   FormBuilderProps,

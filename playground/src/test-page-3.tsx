@@ -7,6 +7,8 @@ const TEST_PAGE_3_FORM_ID = "TEST_PAGE_3_FORM_ID";
 type TestPageForm = {
   [key in `input-${1 | 2 | 3 | 4 | 5 | 6}`]: string;
 } & {
+  country: string;
+  state: string;
   tabs: Array<{
     [key in `input-${1 | 2 | 3}`]: string;
   }>;
@@ -65,11 +67,15 @@ const TestPage3 = () => {
                   {
                     type: "text",
                     name: "input-1",
+                    gridProps: {
+                      size: 3,
+                    },
                     dependsOn: {
                       path: "input-2",
                       type: "disable",
                       condition: "not-eq",
                       value: "something",
+                      id: "input-2",
                     },
                     props: {
                       textFieldProps: {
@@ -77,6 +83,52 @@ const TestPage3 = () => {
                         label: "First Input",
                         placeholder: "First Input",
                       },
+                    },
+                  },
+                  {
+                    type: "select",
+                    name: "country",
+                    gridProps: {
+                      size: 6,
+                    },
+                    props: {
+                      selectProps: {
+                        label: "Country",
+                        size: "small",
+                      },
+                      options: [
+                        { label: "Iran", value: "ir" },
+                        { label: "United States of America", value: "usa" },
+                        { label: "France", value: "fr" },
+                        { label: "Germany", value: "de" },
+                        { label: "Italy", value: "it" },
+                      ],
+                    },
+                  },
+                  {
+                    type: "select",
+                    name: "state",
+                    gridProps: {
+                      size: 6,
+                    },
+                    dependsOn: [
+                      {
+                        type: "bind-value",
+                        path: "country",
+                        id: "country",
+                      },
+                      {
+                        type: "bind-value",
+                        path: "input-1",
+                        id: "input-1",
+                      },
+                    ],
+                    props: {
+                      selectProps: {
+                        label: "State",
+                        size: "small",
+                      },
+                      options: [],
                     },
                   },
                   {
@@ -105,6 +157,7 @@ const TestPage3 = () => {
                       path: "input-1",
                       condition: "eq",
                       value: "something",
+                      id: "input-1",
                     },
                   },
                 ],

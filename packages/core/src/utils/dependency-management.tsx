@@ -1,64 +1,28 @@
-// import type { FormBuilderConfig } from "@/types";
-import type { BaseInputParameters } from "@/types";
 import type {
   Condition,
+  DependencyStructure,
   DependsOn,
-  DisableDependency,
-  VisibilityDependency,
+  DependsOnSingle,
 } from "@/types/dependency-management";
-import type { JSX, PropsWithChildren } from "react";
-import type { FieldValues } from "react-hook-form";
+import type { PropsWithChildren } from "react";
+import type { FieldValues, Path, PathValue } from "react-hook-form";
 
-import { useFormContext, useWatch } from "react-hook-form";
-
-type RenderHoCProps<
-  // TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
-> = PropsWithChildren<{
-  dependency: DependsOn<TFields> & VisibilityDependency;
+type RenderHoCProps<TFields extends FieldValues> = PropsWithChildren<{
+  dependency: DependencyStructure<TFields>["visibility"];
 }>;
 
-const RenderHoC = <
-  // TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
->({
+const RenderHoC = <TFields extends FieldValues>({
   children,
   dependency,
 }: RenderHoCProps<TFields>) => {
-  const form = useFormContext<TFields>();
-  const value = useWatch<TFields>({
-    control: form.control,
-    name: dependency.path,
-  });
-
-  const condition = conditionCalculator(dependency, value);
+  const condition = conditionArrayCalculator(dependency);
 
   return condition ? children : null;
 };
 
-type DisableHoCProps<TFields extends FieldValues> = {
-  dependency: DependsOn<TFields> & DisableDependency;
-  render: (props: BaseInputParameters) => JSX.Element;
-};
-
-const DisabledHoC = <TFields extends FieldValues>({
-  dependency,
-  render,
-}: DisableHoCProps<TFields>) => {
-  const form = useFormContext<TFields>();
-  const value = useWatch<TFields>({
-    control: form.control,
-    name: dependency.path,
-  });
-
-  const condition = conditionCalculator(dependency, value);
-
-  return render({ disabled: condition });
-};
-
 const conditionCalculator = (
   { condition, value }: Condition,
-  currentValue: number | string,
+  currentValue: unknown
 ): boolean => {
   let result: boolean = false;
 
@@ -73,4 +37,58 @@ const conditionCalculator = (
   return result;
 };
 
-export { conditionCalculator, DisabledHoC, RenderHoC };
+const conditionArrayCalculator = (
+  list: Array<Condition & { current: unknown }>
+) => {
+  return (
+    list.length === 0 ||
+    list.every((dep) => conditionCalculator(dep, dep.current))
+  );
+};
+
+const pushDependency = <TFields extends FieldValues>(
+  target: DependencyStructure<TFields>,
+  dependsOn: DependsOnSingle<TFields>,
+  value: PathValue<TFields, Path<TFields>> | undefined
+) => {
+  switch (dependsOn.type) {
+    case "bind-value": {
+      target[dependsOn.type].push({ ...dependsOn, current: value });
+      break;
+    }
+    case "disable":
+      target[dependsOn.type].push({ ...dependsOn, current: value });
+      break;
+
+    case "visibility":
+      target[dependsOn.type].push({ ...dependsOn, current: value });
+      break;
+  }
+};
+const createDependencyStructure = <TFields extends FieldValues>(
+  dependsOn: DependsOn<TFields>,
+  value: readonly PathValue<TFields, Path<TFields>>[]
+) => {
+  const base: DependencyStructure<TFields> = {
+    "bind-value": [],
+    disable: [],
+    visibility: [],
+  };
+
+  if (Array.isArray(dependsOn)) {
+    return dependsOn.reduce((acc, cur, index) => {
+      pushDependency(acc, cur, value[index]);
+      return acc;
+    }, base);
+  } else {
+    pushDependency(base, dependsOn, value[0]);
+  }
+  return base;
+};
+
+export {
+  conditionArrayCalculator,
+  conditionCalculator,
+  createDependencyStructure,
+  RenderHoC,
+};
