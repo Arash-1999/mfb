@@ -15,9 +15,21 @@ import type { Context } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import { useMfbFieldArray, useMfbGlobalEvent } from "@/hooks";
-import { DisabledHoC, listInputGuard, mergeName } from "@/utils";
+import {
+  conditionArrayCalculator,
+  createDependencyStructure,
+  listInputGuard,
+  mergeName,
+  RenderHoC,
+} from "@/utils";
 import { eventNames } from "@/utils/events";
-import { createContext, Fragment, useCallback, useContext } from "react";
+import {
+  createContext,
+  Fragment,
+  useCallback,
+  useContext,
+  useMemo,
+} from "react";
 import {
   FormProvider,
   useForm,
@@ -205,27 +217,42 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     const formMethods = useFormContext<TFields>();
     const value = useWatch<TFields>({
       control: formMethods.control,
-      name: dependsOn.path,
+      name: Array.isArray(dependsOn)
+        ? dependsOn.map((dep) => dep.path)
+        : [dependsOn.path],
     });
 
-    // TODO: handle different type of dependencies here
-    const node = (
-      <GridItem {...(input.gridProps || {})}>
-        {listInputGuard<TConfig, TFields>(input)
-          ? this.renderInput(input, { formMethods })
-          : this.renderInput(
-              Object.assign({}, input, {
-                props: Object.assign({}, input.props, {
-                  deps: {
-                    [dependsOn.id]: value,
-                  },
+    const dependencies = useMemo(() => {
+      return createDependencyStructure<TFields>(dependsOn, value);
+    }, [value, dependsOn]);
+
+    return (
+      <RenderHoC dependency={dependencies["visibility"]}>
+        <GridItem>
+          {listInputGuard<TConfig, TFields>(input)
+            ? this.renderInput(input, { formMethods })
+            : this.renderInput(
+                Object.assign({}, input, {
+                  props: Object.assign({}, input.props, {
+                    deps: Array.isArray(dependsOn)
+                      ? dependsOn.reduce<Record<string, unknown>>(
+                          (acc, cur, i) => ({
+                            ...acc,
+                            [cur.id]: value[i],
+                          }),
+                          {}
+                        )
+                      : {
+                          [dependsOn.id]: value[0],
+                        },
+                    disabled: conditionArrayCalculator(dependencies["disable"]),
+                  }),
                 }),
-              }),
-              { formMethods }
-            )}
-      </GridItem>
+                { formMethods }
+              )}
+        </GridItem>
+      </RenderHoC>
     );
-    return node;
   };
 
   private useMfbContext = () => {
@@ -267,7 +294,6 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     const { "grid-item": GridItem } = this.config.layout;
 
     return inputs.map((input, i) => {
-      // TODO: handle dependency logic
       const dependency = input.dependsOn;
       const key = `input-${i}`;
 
@@ -286,19 +312,15 @@ class FormBuilder<TConfig extends FormBuilderConfig>
         return node;
       } else {
         return (
-          <DependencyManager dependsOn={dependency} input={input} key={key} />
+          <DependencyManager
+            dependsOn={dependency}
+            input={Object.assign({}, input, {
+              name: mergeName(name || "", input.name),
+            })}
+            key={key}
+          />
         );
       }
-      // if (typeof dependency === "undefined") {
-      //   return node;
-      // } else if (dependency.type === "visibility") {
-      //   return (
-      //     <RenderHoC dependency={dependency} key={key}>
-      //       {node}
-      //     </RenderHoC>
-      //   );
-      // }
-      // return node;
     });
   };
 
@@ -319,28 +341,6 @@ class FormBuilder<TConfig extends FormBuilderConfig>
             <GridItem {...input.gridProps}>
               <GridContainer {...input.gridContainerProps}>
                 {fields.map((field, i) => {
-                  const dependency = input.dependsOn;
-
-                  if (typeof dependency === "undefined") {
-                    return (
-                      <InputMapper
-                        inputs={input.inputs}
-                        key={field.id}
-                        name={`${input.name}.${i}`}
-                      />
-                    );
-                  } else if (dependency.type === "disable") {
-                    return (
-                      <InputMapper
-                        inputs={input.inputs.map((item) => ({
-                          ...item,
-                          dependsOn: input.dependsOn,
-                        }))}
-                        key={field.id}
-                        name={`${input.name}.${i}`}
-                      />
-                    );
-                  }
                   return (
                     <InputMapper
                       inputs={input.inputs}
@@ -362,24 +362,6 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     const inputFn = components[input.type];
 
     if (typeof inputFn === "function" && typeof input.props === "object") {
-      const dependency = input.dependsOn;
-
-      if (typeof dependency !== "undefined" && dependency.type === "disable") {
-        return (
-          <DisabledHoC
-            dependency={dependency}
-            render={(props) =>
-              inputFn({
-                formMethods: options.formMethods,
-                name: input.name,
-                ...input.props,
-                ...props,
-              })
-            }
-          />
-        );
-      }
-
       const renderedInput = inputFn({
         formMethods: options.formMethods,
         name: input.name,

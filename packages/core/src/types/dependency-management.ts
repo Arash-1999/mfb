@@ -16,16 +16,31 @@ type Dependency<
   dependsOn?: DependsOn<TFields, TOnlyBoolean>;
 };
 
+type DependencyStructure<TFields extends FieldValues> = {
+  [TKey in DependsOnUnion as TKey["type"]]: Array<
+    DependsOnBase<TFields> &
+      TKey & {
+        current: unknown;
+      }
+  >;
+};
+
 type DependsOn<
   TFields extends FieldValues,
   TOnlyBoolean extends boolean = false,
-> = DependsOnBase<TFields> & DependsOnUnion<TOnlyBoolean>;
+> =
+  | Array<DependsOnSingle<TFields, TOnlyBoolean>>
+  | DependsOnSingle<TFields, TOnlyBoolean>;
 
 type DependsOnBase<TFields extends FieldValues> = {
-  // TODO: make id optional(if it's not provided use path as dependency id)
   id: string;
   path: Path<TFields>;
 };
+
+type DependsOnSingle<
+  TFields extends FieldValues,
+  TOnlyBoolean extends boolean = false,
+> = DependsOnBase<TFields> & DependsOnUnion<TOnlyBoolean>;
 
 type DependsOnUnion<TOnlyBoolean extends boolean = false> =
   | DisableDependency
@@ -44,7 +59,10 @@ export type {
   BindValueDependency,
   Condition,
   Dependency,
+  DependencyStructure,
   DependsOn,
+  DependsOnBase,
+  DependsOnSingle,
   DisableDependency,
   VisibilityDependency,
 };
