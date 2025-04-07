@@ -67,12 +67,15 @@ const TestPage3 = () => {
                   {
                     type: "text",
                     name: "input-1",
+                    gridProps: {
+                      size: 3,
+                    },
                     dependsOn: {
                       path: "input-2",
                       type: "disable",
                       condition: "not-eq",
                       value: "something",
-                      id: 'input-2',
+                      id: "input-2",
                     },
                     props: {
                       textFieldProps: {
@@ -90,8 +93,8 @@ const TestPage3 = () => {
                     },
                     props: {
                       selectProps: {
-                        label: 'Country',
-                        size: 'small',
+                        label: "Country",
+                        size: "small",
                       },
                       options: [
                         { label: "Iran", value: "ir" },
@@ -108,17 +111,24 @@ const TestPage3 = () => {
                     gridProps: {
                       size: 6,
                     },
-                    dependsOn: {
-                      type: 'bind-value',
-                      path: 'country',
-                      id: 'country',
-                    },
+                    dependsOn: [
+                      {
+                        type: "bind-value",
+                        path: "country",
+                        id: "country",
+                      },
+                      {
+                        type: "bind-value",
+                        path: "input-1",
+                        id: "input-1",
+                      },
+                    ],
                     props: {
                       selectProps: {
-                        label: 'State',
-                        size: 'small',
+                        label: "State",
+                        size: "small",
                       },
-                      options: []
+                      options: [],
                     },
                   },
                   {
@@ -147,7 +157,7 @@ const TestPage3 = () => {
                       path: "input-1",
                       condition: "eq",
                       value: "something",
-                      id: 'input-1',
+                      id: "input-1",
                     },
                   },
                 ],
