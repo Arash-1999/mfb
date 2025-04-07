@@ -44,6 +44,7 @@ type GroupCardList<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > = {
+  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   inputs: Array<GetInputs<TConfig, TFields>>;
   name: string;
@@ -56,6 +57,7 @@ type GroupCardSingle<
 > = {
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   inputs: Array<{
+    gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
     list: Array<GetInputs<TConfig, TFields>>;
     title: Header | string;
   }>;

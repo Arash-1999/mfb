@@ -126,14 +126,14 @@ class FormBuilder<TConfig extends FormBuilderConfig>
                             addGrid: (node, index) => (
                               <GridItem
                                 key={`grid-item-${index}`}
-                                {...gridProps}
+                                {...card.gridProps}
                               >
                                 {node}
                               </GridItem>
                             ),
                             nodes: fields.map((field, i) => ({
                               children: (
-                                <GridContainer>
+                                <GridContainer {...card.gridContainerProps}>
                                   <InputMapper
                                     inputs={card.inputs}
                                     key={field.id}
@@ -162,15 +162,17 @@ class FormBuilder<TConfig extends FormBuilderConfig>
                             {node}
                           </GridItem>
                         ),
-                        nodes: card.inputs.map(({ list, title }) => ({
-                          // TODO: add gridContainerProps
-                          children: (
-                            <GridContainer>
-                              <InputMapper inputs={list} />
-                            </GridContainer>
-                          ),
-                          title,
-                        })),
+                        nodes: card.inputs.map(
+                          ({ gridContainerProps, list, title }) => ({
+                            // TODO: add gridContainerProps
+                            children: (
+                              <GridContainer {...gridContainerProps}>
+                                <InputMapper inputs={list} />
+                              </GridContainer>
+                            ),
+                            title,
+                          }),
+                        ),
                       })}
                     </Fragment>
                   );
@@ -228,7 +230,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
     return (
       <RenderHoC dependency={dependencies["visibility"]}>
-        <GridItem>
+        <GridItem {...input.gridProps}>
           {listInputGuard<TConfig, TFields>(input)
             ? this.renderInput(input, { formMethods })
             : this.renderInput(
@@ -240,15 +242,17 @@ class FormBuilder<TConfig extends FormBuilderConfig>
                             ...acc,
                             [cur.id]: value[i],
                           }),
-                          {}
+                          {},
                         )
                       : {
                           [dependsOn.id]: value[0],
                         },
-                    disabled: conditionArrayCalculator(dependencies["disable"]),
+                    disabled:
+                      dependencies["disable"].length > 0 &&
+                      conditionArrayCalculator(dependencies["disable"]),
                   }),
                 }),
-                { formMethods }
+                { formMethods },
               )}
         </GridItem>
       </RenderHoC>
@@ -277,7 +281,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
         }
       },
 
-      [action, id, name]
+      [action, id, name],
     );
 
     useMfbGlobalEvent({ eventName: eventNames["field-array"], handler });
@@ -303,7 +307,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
             Object.assign({}, input, {
               name: mergeName(name || "", input.name),
             }),
-            { formMethods }
+            { formMethods },
           )}
         </GridItem>
       );
@@ -326,7 +330,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, TFields, true>,
-    options: RenderInputOptions<TFields>
+    options: RenderInputOptions<TFields>,
   ) {
     if (listInputGuard<TConfig, TFields>(input)) {
       const { FieldArray, InputMapper } = this;

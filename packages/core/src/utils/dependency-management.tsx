@@ -15,14 +15,15 @@ const RenderHoC = <TFields extends FieldValues>({
   children,
   dependency,
 }: RenderHoCProps<TFields>) => {
-  const condition = conditionArrayCalculator(dependency);
+  const condition =
+    dependency.length === 0 || conditionArrayCalculator(dependency);
 
   return condition ? children : null;
 };
 
 const conditionCalculator = (
   { condition, value }: Condition,
-  currentValue: unknown
+  currentValue: unknown,
 ): boolean => {
   let result: boolean = false;
 
@@ -38,18 +39,15 @@ const conditionCalculator = (
 };
 
 const conditionArrayCalculator = (
-  list: Array<Condition & { current: unknown }>
+  list: Array<Condition & { current: unknown }>,
 ) => {
-  return (
-    list.length === 0 ||
-    list.every((dep) => conditionCalculator(dep, dep.current))
-  );
+  return list.every((dep) => conditionCalculator(dep, dep.current));
 };
 
 const pushDependency = <TFields extends FieldValues>(
   target: DependencyStructure<TFields>,
   dependsOn: DependsOnSingle<TFields>,
-  value: PathValue<TFields, Path<TFields>> | undefined
+  value: PathValue<TFields, Path<TFields>> | undefined,
 ) => {
   switch (dependsOn.type) {
     case "bind-value": {
@@ -67,7 +65,7 @@ const pushDependency = <TFields extends FieldValues>(
 };
 const createDependencyStructure = <TFields extends FieldValues>(
   dependsOn: DependsOn<TFields>,
-  value: readonly PathValue<TFields, Path<TFields>>[]
+  value: readonly PathValue<TFields, Path<TFields>>[],
 ) => {
   const base: DependencyStructure<TFields> = {
     "bind-value": [],
