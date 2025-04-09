@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type {
   FieldValues,
+  SubmitHandler,
   UseFieldArrayReturn,
   UseFormReturn,
 } from "react-hook-form";
@@ -18,6 +19,7 @@ type BasicBuilderProps<
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   id: string;
   inputs: InputArray<TConfig, TFields>;
+  onSubmit: SubmitHandler<TFields>;
 };
 
 type BuilderProps<
@@ -27,6 +29,7 @@ type BuilderProps<
   cards: Array<GetCards<TConfig, TFields>>;
   gridProps?: GetLayoutProps<TConfig, "grid-container">;
   id: string;
+  onSubmit: SubmitHandler<TFields>;
 };
 
 type DependencyManagerProps<

@@ -55,14 +55,11 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     gridContainerProps,
     id,
     inputs,
+    onSubmit,
   }: BasicBuilderProps<TConfig, TFields>) => {
     const { Context, InputMapper } = this;
     const { "grid-container": GridContainer } = this.config.layout;
     const formMethods = useForm<TFields>();
-
-    const onSubmit = (value: TFields) => {
-      console.log(value);
-    };
 
     return (
       <Context.Provider
@@ -87,16 +84,13 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     cards,
     gridProps,
     id,
+    onSubmit,
   }: BuilderProps<TConfig, TFields>) => {
     const formMethods = useForm<TFields>();
     const {
       layout: { "grid-container": GridContainer, "grid-item": GridItem },
     } = this.config;
     const { Context, FieldArray, InputMapper } = this;
-
-    const onSubmit = (value: TFields) => {
-      console.log(value);
-    };
 
     return (
       <Context.Provider
