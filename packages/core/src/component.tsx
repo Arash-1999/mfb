@@ -71,7 +71,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
         }}
       >
         <FormProvider {...formMethods}>
-          <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+          <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...gridContainerProps}>
               <InputMapper inputs={inputs} />
             </GridContainer>
@@ -105,7 +105,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
         }}
       >
         <FormProvider {...formMethods}>
-          <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+          <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...(gridProps || {})}>
               {cards.map((card, index) => {
                 if (card.isGroup) {
