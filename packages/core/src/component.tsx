@@ -38,17 +38,17 @@ import {
 } from "react-hook-form";
 
 // NOTE: move logic to separate functions in a better folder structure
-class FormBuilder<TConfig extends FormBuilderConfig>
-  implements FormBuilderProps<TConfig>
+class FormBuilder<
+  TConfig extends FormBuilderConfig,
+  TFormId extends string = string,
+> implements FormBuilderProps<TConfig>
 {
   config: TConfig;
-  Context: Context<FormBuilderContext>;
+  Context: Context<FormBuilderContext<TFormId> | null>;
 
   constructor(config: TConfig) {
     this.config = config;
-    this.Context = createContext<FormBuilderContext>({
-      id: "",
-    });
+    this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
   }
 
   BasicBuilder = <TFields extends FieldValues>({
@@ -56,7 +56,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     id,
     inputs,
     onSubmit,
-  }: BasicBuilderProps<TConfig, TFields>) => {
+  }: BasicBuilderProps<TConfig, TFields, TFormId>) => {
     const { Context, InputMapper } = this;
     const { "grid-container": GridContainer } = this.config.layout;
     const formMethods = useForm<TFields>();
@@ -85,7 +85,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     gridProps,
     id,
     onSubmit,
-  }: BuilderProps<TConfig, TFields>) => {
+  }: BuilderProps<TConfig, TFields, TFormId>) => {
     const formMethods = useForm<TFields>();
     const {
       layout: { "grid-container": GridContainer, "grid-item": GridItem },
@@ -165,7 +165,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
                               </GridContainer>
                             ),
                             title,
-                          }),
+                          })
                         ),
                       })}
                     </Fragment>
@@ -236,7 +236,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
                             ...acc,
                             [cur.id]: value[i],
                           }),
-                          {},
+                          {}
                         )
                       : {
                           [dependsOn.id]: value[0],
@@ -246,7 +246,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
                       conditionArrayCalculator(dependencies["disable"]),
                   }),
                 }),
-                { formMethods },
+                { formMethods }
               )}
         </GridItem>
       </RenderHoC>
@@ -265,20 +265,22 @@ class FormBuilder<TConfig extends FormBuilderConfig>
     const { action, fields } = useMfbFieldArray<TFields>({
       name: name as ArrayPath<TFields>,
     });
-    const { id } = this.useMfbContext();
+    const { id } = this.useMfbContext() || { id: "" };
 
     const handler = useCallback(
-      (event: CustomEventInit<FieldArrayEvent<TFields>>) => {
+      (event: CustomEventInit<FieldArrayEvent<TFields, TFormId>>) => {
         const { detail } = event;
         if (detail && detail.id === id && detail.name === name) {
           action(detail.action);
         }
       },
-
-      [action, id, name],
+      [action, id, name]
     );
 
-    useMfbGlobalEvent({ eventName: eventNames["field-array"], handler });
+    useMfbGlobalEvent<TFields, TFormId>({
+      eventName: eventNames["field-array"],
+      handler,
+    });
 
     return render(fields);
   };
@@ -301,7 +303,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
             Object.assign({}, input, {
               name: mergeName(name || "", input.name),
             }),
-            { formMethods },
+            { formMethods }
           )}
         </GridItem>
       );
@@ -324,7 +326,7 @@ class FormBuilder<TConfig extends FormBuilderConfig>
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, TFields, true>,
-    options: RenderInputOptions<TFields>,
+    options: RenderInputOptions<TFields>
   ) {
     if (listInputGuard<TConfig, TFields>(input)) {
       const { FieldArray, InputMapper } = this;

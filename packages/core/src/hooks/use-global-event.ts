@@ -4,12 +4,15 @@ import type { FieldValues } from "react-hook-form";
 
 import { useEffect } from "react";
 
-const useMfbGlobalEvent = <TFields extends FieldValues>({
+const useMfbGlobalEvent = <
+  TFields extends FieldValues,
+  TFormId extends string = string,
+>({
   eventName,
   handler,
 }: {
   eventName: EventName;
-  handler: (event: CustomEventInit<FieldArrayEvent<TFields>>) => void;
+  handler: (event: CustomEventInit<FieldArrayEvent<TFields, TFormId>>) => void;
 }) => {
   useEffect(() => {
     window.addEventListener(eventName, handler);

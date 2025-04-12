@@ -14,9 +14,8 @@ interface FormBuilderConfig {
   layout: Record<LayoutKey, BaseComponent>;
 }
 
-// TODO: use generic type for all valid form IDs
-interface FormBuilderContext {
-  id: string;
+interface FormBuilderContext<TFormId extends string = string> {
+  id: TFormId;
 }
 
 export type { FormBuilderConfig, FormBuilderContext };

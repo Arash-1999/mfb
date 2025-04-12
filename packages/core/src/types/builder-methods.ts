@@ -15,9 +15,10 @@ import type { GetLayoutProps, InputArray } from "./utils";
 type BasicBuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
+  TFormId extends string = string,
 > = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-  id: string;
+  id: TFormId;
   inputs: InputArray<TConfig, TFields>;
   onSubmit: SubmitHandler<TFields>;
 };
@@ -25,10 +26,11 @@ type BasicBuilderProps<
 type BuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = {
+  TFormId extends string = string,
+  > = {
   cards: Array<GetCards<TConfig, TFields>>;
   gridProps?: GetLayoutProps<TConfig, "grid-container">;
-  id: string;
+  id: TFormId;
   onSubmit: SubmitHandler<TFields>;
 };
 

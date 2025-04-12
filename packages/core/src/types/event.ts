@@ -9,9 +9,12 @@ type FieldArrayActions<TFields extends FieldValues> = Omit<
   "fields"
 >;
 
-type FieldArrayEvent<TFields extends FieldValues> = {
+type FieldArrayEvent<
+  TFields extends FieldValues,
+  TFormId extends string = string,
+> = {
   action: FormAction<TFields>;
-  id: string;
+  id: TFormId;
   name: ArrayPath<TFields>;
 };
 
