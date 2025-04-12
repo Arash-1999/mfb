@@ -56,10 +56,11 @@ class FormBuilder<
     id,
     inputs,
     onSubmit,
+    options,
   }: BasicBuilderProps<TConfig, TFields, TFormId>) => {
     const { Context, InputMapper } = this;
     const { "grid-container": GridContainer } = this.config.layout;
-    const formMethods = useForm<TFields>();
+    const formMethods = useForm<TFields>(options);
 
     return (
       <Context.Provider
@@ -85,8 +86,9 @@ class FormBuilder<
     gridProps,
     id,
     onSubmit,
+    options,
   }: BuilderProps<TConfig, TFields, TFormId>) => {
-    const formMethods = useForm<TFields>();
+    const formMethods = useForm<TFields>(options);
     const {
       layout: { "grid-container": GridContainer, "grid-item": GridItem },
     } = this.config;

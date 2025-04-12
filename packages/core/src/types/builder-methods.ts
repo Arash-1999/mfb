@@ -3,6 +3,7 @@ import type {
   FieldValues,
   SubmitHandler,
   UseFieldArrayReturn,
+  UseFormProps,
   UseFormReturn,
 } from "react-hook-form";
 
@@ -21,17 +22,19 @@ type BasicBuilderProps<
   id: TFormId;
   inputs: InputArray<TConfig, TFields>;
   onSubmit: SubmitHandler<TFields>;
+  options?: UseFormProps<TFields>;
 };
 
 type BuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormId extends string = string,
-  > = {
+> = {
   cards: Array<GetCards<TConfig, TFields>>;
   gridProps?: GetLayoutProps<TConfig, "grid-container">;
   id: TFormId;
   onSubmit: SubmitHandler<TFields>;
+  options?: UseFormProps<TFields>;
 };
 
 type DependencyManagerProps<
