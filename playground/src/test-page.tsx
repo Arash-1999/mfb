@@ -49,6 +49,9 @@ const TestPage = () => {
         gridContainerProps={{
           spacing: 2,
         }}
+        onSubmit={(data) => {
+          console.log(data);
+        }}
         id={TEST_PAGE_FORM_ID}
         inputs={[
           {

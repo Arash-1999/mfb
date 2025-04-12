@@ -16,7 +16,11 @@ const config = {
 
 type MfbInput<TFields extends FieldValues> = GetInputs<typeof config, TFields>;
 
-const FB = new FormBuilder(config);
+type Config = typeof config;
+
+type FormId = "TEST_PAGE_FORM_ID";
+
+const FB = new FormBuilder<Config, FormId>(config);
 
 export { FB };
 export type { MfbInput };
