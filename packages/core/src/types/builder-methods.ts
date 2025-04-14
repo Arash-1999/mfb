@@ -13,6 +13,16 @@ import type { DependsOn } from "./dependency-management";
 import type { GetInputs } from "./input";
 import type { GetLayoutProps, InputArray } from "./utils";
 
+type AdvancedBuilderProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TFormId extends string = string,
+> = BuilderBaseProps<TConfig, TFields, TFormId> & {
+  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+  id: TFormId;
+  list: Array<unknown>;
+};
+
 type BasicBuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
@@ -24,6 +34,15 @@ type BasicBuilderProps<
   onSubmit: SubmitHandler<TFields>;
   options?: UseFormProps<TFields>;
 };
+
+type BuilderBaseProps<TConfig extends FormBuilderConfig, TFields extends FieldValues, 
+TFormId extends string = string,
+> = {
+  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+  id: TFormId;
+  onSubmit: SubmitHandler<TFields>;
+  options?: UseFormProps<TFields>;
+}
 
 type BuilderProps<
   TConfig extends FormBuilderConfig,
@@ -68,6 +87,7 @@ type RenderInputOptions<TFields extends FieldValues> = {
 };
 
 export type {
+  AdvancedBuilderProps,
   BasicBuilderProps,
   BuilderProps,
   DependencyManagerProps,

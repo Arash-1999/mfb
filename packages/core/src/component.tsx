@@ -1,4 +1,5 @@
 import type {
+  AdvancedBuilderProps,
   BasicBuilderProps,
   BuilderProps,
   DependencyManagerProps,
@@ -49,6 +50,34 @@ class FormBuilder<
   constructor(config: TConfig) {
     this.config = config;
     this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
+  }
+
+  AdvancedBuilder = <TFields extends FieldValues>({
+    gridContainerProps,
+    id,
+    onSubmit,
+    options,
+  }: AdvancedBuilderProps<TConfig, TFields, TFormId>) => {
+    const { Context,  } = this;
+    const { "grid-container": GridContainer } = this.config.layout;
+    const formMethods = useForm<TFields>(options);
+    
+    return (
+      <Context.Provider
+        value={{
+          id,
+        }}
+      >
+        <FormProvider {...formMethods}>
+          <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
+            <GridContainer {...gridContainerProps}>
+            </GridContainer>
+            {/* TODO: remove this submit button as configurable option */}
+            <button type="submit">SUBMIT</button>
+          </form>
+        </FormProvider>
+      </Context.Provider>
+    );
   }
 
   BasicBuilder = <TFields extends FieldValues>({
