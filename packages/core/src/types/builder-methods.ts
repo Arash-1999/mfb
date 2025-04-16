@@ -18,8 +18,7 @@ type AdvancedBuilderProps<
   TFields extends FieldValues,
   TFormId extends string = string,
 > = BuilderBaseProps<TConfig, TFields, TFormId> & {
-  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-  id: TFormId;
+  // TODO: change unknown type
   list: Array<unknown>;
 };
 
@@ -35,14 +34,16 @@ type BasicBuilderProps<
   options?: UseFormProps<TFields>;
 };
 
-type BuilderBaseProps<TConfig extends FormBuilderConfig, TFields extends FieldValues, 
-TFormId extends string = string,
+type BuilderBaseProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TFormId extends string = string,
 > = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   id: TFormId;
   onSubmit: SubmitHandler<TFields>;
   options?: UseFormProps<TFields>;
-}
+};
 
 type BuilderProps<
   TConfig extends FormBuilderConfig,

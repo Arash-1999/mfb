@@ -16,6 +16,18 @@ type ActionRenderProps<TFields extends FieldValues> = {
   methods: FieldArrayActions<TFields>;
 };
 
+type AdvancedList<
+  TConfig extends FormBuilderConfig,
+  // TFields extends FieldValues,
+> = {
+  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+  gridProps?: GetLayoutProps<TConfig, "grid-item">;
+  // TODO: change unknown type
+  list?: Array<unknown>;
+  name: string;
+  type: 'advanced-list';
+}
+
 // TODO: add ActionInput type to ListInput inputs
 type ListInput<
   TConfig extends FormBuilderConfig,
@@ -24,8 +36,10 @@ type ListInput<
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   inputs: Array<GetInputs<TConfig, TFields>>;
+  list?: Array<unknown>;
   name: string;
   type: "list";
 };
 
-export type { ActionInput, ListInput };
+
+export type { ActionInput, AdvancedList, ListInput };

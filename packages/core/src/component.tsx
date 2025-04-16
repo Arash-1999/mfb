@@ -55,13 +55,14 @@ class FormBuilder<
   AdvancedBuilder = <TFields extends FieldValues>({
     gridContainerProps,
     id,
+    list,
     onSubmit,
     options,
   }: AdvancedBuilderProps<TConfig, TFields, TFormId>) => {
-    const { Context,  } = this;
+    const { Context } = this;
     const { "grid-container": GridContainer } = this.config.layout;
     const formMethods = useForm<TFields>(options);
-    
+
     return (
       <Context.Provider
         value={{
@@ -71,6 +72,10 @@ class FormBuilder<
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...gridContainerProps}>
+              {list.map((item, index) => {
+                console.log(item, index);
+                return null;
+              })}
             </GridContainer>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
@@ -78,7 +83,7 @@ class FormBuilder<
         </FormProvider>
       </Context.Provider>
     );
-  }
+  };
 
   BasicBuilder = <TFields extends FieldValues>({
     gridContainerProps,

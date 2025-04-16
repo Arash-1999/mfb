@@ -6,27 +6,34 @@ import type { GetInputs } from "./input";
 import type { GetLayoutProps } from "./utils";
 
 type GetCards<TConfig extends FormBuilderConfig, TFields extends FieldValues> =
-  | (TConfig["card"]["group"] extends undefined
-      ? never
-      : {
-          [TCard in keyof TConfig["card"]["group"]]: GroupCardBase<TCard> &
-            (
-              | GroupCardList<TConfig, TFields>
-              | GroupCardSingle<TConfig, TFields>
-            );
-        }[keyof TConfig["card"]["group"]])
-  | {
-      [TCard in keyof TConfig["card"]["simple"]]: {
-        gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-        gridProps?: GetLayoutProps<TConfig, "grid-item">;
-        // TODO: move header logic to component props (in base strucuture for simple card)
-        header: Header | string;
-        inputs: Array<GetInputs<TConfig, TFields>>;
-        isGroup?: false;
-        name?: string;
-        type: TCard;
-      };
-    }[keyof TConfig["card"]["simple"]];
+  | GetGroupCard<TConfig, TFields>
+  | GetSimpleCard<TConfig, TFields>;
+
+type GetGroupCard<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = TConfig["card"]["group"] extends undefined
+  ? never
+  : {
+      [TCard in keyof TConfig["card"]["group"]]: GroupCardBase<TCard> &
+        (GroupCardList<TConfig, TFields> | GroupCardSingle<TConfig, TFields>);
+    }[keyof TConfig["card"]["group"]];
+
+type GetSimpleCard<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
+  [TCard in keyof TConfig["card"]["simple"]]: {
+    gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+    gridProps?: GetLayoutProps<TConfig, "grid-item">;
+    // TODO: move header logic to component props (in base strucuture for simple card)
+    header: Header | string;
+    inputs: Array<GetInputs<TConfig, TFields>>;
+    isGroup?: false;
+    name?: string;
+    type: TCard;
+  };
+}[keyof TConfig["card"]["simple"]];
 
 type GroupCardBase<TKey extends PropertyKey> = {
   isGroup: true;
