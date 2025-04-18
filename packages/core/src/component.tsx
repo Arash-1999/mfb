@@ -24,6 +24,7 @@ import {
   RenderHoC,
 } from "@/utils";
 import { eventNames } from "@/utils/events";
+import { advancedCardGuard } from "@/utils/type-gaurd";
 import {
   createContext,
   Fragment,
@@ -72,8 +73,12 @@ class FormBuilder<
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...gridContainerProps}>
-              {list.map((item, index) => {
-                console.log(item, index);
+              {list.map((item) => {
+                if (advancedCardGuard(item)) {
+                  console.log("card: ", item);
+                  return null;
+                }
+                console.log("input: ", item);
                 return null;
               })}
             </GridContainer>
@@ -117,7 +122,7 @@ class FormBuilder<
 
   public Builder = <TFields extends FieldValues>({
     cards,
-    gridProps,
+    gridContainerProps,
     id,
     onSubmit,
     options,
@@ -136,7 +141,7 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <GridContainer {...(gridProps || {})}>
+            <GridContainer {...(gridContainerProps || {})}>
               {cards.map((card, index) => {
                 if (card.isGroup) {
                   const {
@@ -201,7 +206,7 @@ class FormBuilder<
                               </GridContainer>
                             ),
                             title,
-                          })
+                          }),
                         ),
                       })}
                     </Fragment>
@@ -272,7 +277,7 @@ class FormBuilder<
                             ...acc,
                             [cur.id]: value[i],
                           }),
-                          {}
+                          {},
                         )
                       : {
                           [dependsOn.id]: value[0],
@@ -282,7 +287,7 @@ class FormBuilder<
                       conditionArrayCalculator(dependencies["disable"]),
                   }),
                 }),
-                { formMethods }
+                { formMethods },
               )}
         </GridItem>
       </RenderHoC>
@@ -310,7 +315,7 @@ class FormBuilder<
           action(detail.action);
         }
       },
-      [action, id, name]
+      [action, id, name],
     );
 
     useMfbGlobalEvent<TFields, TFormId>({
@@ -339,7 +344,7 @@ class FormBuilder<
             Object.assign({}, input, {
               name: mergeName(name || "", input.name),
             }),
-            { formMethods }
+            { formMethods },
           )}
         </GridItem>
       );
@@ -362,7 +367,7 @@ class FormBuilder<
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, TFields, true>,
-    options: RenderInputOptions<TFields>
+    options: RenderInputOptions<TFields>,
   ) {
     if (listInputGuard<TConfig, TFields>(input)) {
       const { FieldArray, InputMapper } = this;

@@ -18,8 +18,7 @@ type AdvancedBuilderProps<
   TFields extends FieldValues,
   TFormId extends string = string,
 > = BuilderBaseProps<TConfig, TFields, TFormId> & {
-  // TODO: change unknown type
-  list: Array<unknown>;
+  list: Array<GetCards<TConfig, TFields, true> | GetInputs<TConfig, TFields>>;
 };
 
 type BasicBuilderProps<
@@ -49,12 +48,8 @@ type BuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormId extends string = string,
-> = {
+> = BuilderBaseProps<TConfig, TFields, TFormId> & {
   cards: Array<GetCards<TConfig, TFields>>;
-  gridProps?: GetLayoutProps<TConfig, "grid-container">;
-  id: TFormId;
-  onSubmit: SubmitHandler<TFields>;
-  options?: UseFormProps<TFields>;
 };
 
 type DependencyManagerProps<
