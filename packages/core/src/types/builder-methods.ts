@@ -11,14 +11,23 @@ import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
 import type { DependsOn } from "./dependency-management";
 import type { GetInputs } from "./input";
-import type { GetLayoutProps, InputArray } from "./utils";
+import type { AdvancedList, GetLayoutProps, InputArray } from "./utils";
 
 type AdvancedBuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormId extends string = string,
 > = BuilderBaseProps<TConfig, TFields, TFormId> & {
-  list: Array<GetCards<TConfig, TFields, true> | GetInputs<TConfig, TFields>>;
+  list: AdvancedList<TConfig, TFields>;
+  // list: Array<GetCards<TConfig, TFields, true> | GetInputs<TConfig, TFields>>;
+};
+
+type AdvancedMapperProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
+  list: AdvancedList<TConfig, TFields>;
+  name?: string;
 };
 
 type BasicBuilderProps<
@@ -70,6 +79,10 @@ interface FormBuilderProps<TConfig extends FormBuilderConfig> {
   config: TConfig;
 }
 
+type InputMapFnOptions = {
+  name?: string;
+};
+
 type InputMapperProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
@@ -78,18 +91,34 @@ type InputMapperProps<
   name?: string;
 };
 
+type RenderCardProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> =
+  | {
+      advanced: false;
+      card: GetCards<TConfig, TFields, false>;
+    }
+  | {
+      advanced: true;
+      card: GetCards<TConfig, TFields, true>;
+    };
+
 type RenderInputOptions<TFields extends FieldValues> = {
   formMethods: UseFormReturn<TFields>;
 };
 
 export type {
   AdvancedBuilderProps,
+  AdvancedMapperProps,
   BasicBuilderProps,
   BuilderProps,
   DependencyManagerProps,
   FieldArrayProps,
   FormBuilderConfig,
   FormBuilderProps,
+  InputMapFnOptions,
   InputMapperProps,
+  RenderCardProps,
   RenderInputOptions,
 };

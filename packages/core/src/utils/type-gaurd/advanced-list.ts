@@ -7,23 +7,26 @@ const advancedCardGuard = <
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 >(
-  obj: unknown,
+  obj: unknown
 ): obj is GetCards<TConfig, TFields, true> => {
   return (
     !!obj && typeof obj === "object" && "type" in obj && obj.type !== "list"
   );
-  // return Boolean(
-  //   obj && typeof obj === "object" && "list" in obj && Array.isArray(obj.list),
-  // );
 };
 
 const advancedInputGuard = <
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 >(
-  obj: unknown,
+  obj: unknown
 ): obj is GetInputs<TConfig, TFields> => {
-  return false;
+  return (
+    !!obj &&
+    typeof obj === "object" &&
+    "type" in obj &&
+    ((obj.type === "list" && ("list" in obj || "inputs" in obj)) ||
+      (obj.type !== "list" && !("list" in obj && "inputs" in obj)))
+  );
 };
 
 export { advancedCardGuard, advancedInputGuard };

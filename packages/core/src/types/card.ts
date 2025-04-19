@@ -3,7 +3,7 @@ import type { FieldValues } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
 import type { GetInputs } from "./input";
-import type { GetLayoutProps } from "./utils";
+import type { AdvancedList, GetLayoutProps } from "./utils";
 
 type GetCardBase<
   TConfig extends FormBuilderConfig,
@@ -24,7 +24,7 @@ type GetCardBase<
       list: TNormalGroup extends false
         ? Array<{
             gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-            list: Array<unknown>;
+            list: AdvancedList<TConfig, TFields>;
             title: Header | string;
           }>
         : Array<
