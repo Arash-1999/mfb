@@ -109,6 +109,8 @@ type Header = Record<"center" | "left" | "right", ReactNode>;
 
 type SimpleCardBase = (props: SimpleCardProps) => JSX.Element;
 
+type SimpleCardObject = Record<PropertyKey, SimpleCardBase>;
+
 type SimpleCardProps = {
   children: ReactNode;
   header: Header | string;
@@ -120,5 +122,6 @@ export type {
   GroupCardComponentProps,
   Header,
   SimpleCardBase,
+  SimpleCardObject,
   SimpleCardProps,
 };

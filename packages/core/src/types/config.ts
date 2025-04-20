@@ -1,11 +1,11 @@
-import type { GroupCardComponent, SimpleCardBase } from "./card";
+import type { GroupCardComponent, SimpleCardObject } from "./card";
 import type { InputObject } from "./input";
 import type { BaseComponent, LayoutKey } from "./utils";
 
 interface FormBuilderConfig {
   card: {
     group?: Record<PropertyKey, GroupCardComponent>;
-    simple: Record<PropertyKey, SimpleCardBase>;
+    simple: SimpleCardObject;
   };
   input: {
     components: InputObject;
@@ -19,3 +19,4 @@ interface FormBuilderContext<TFormId extends string = string> {
 }
 
 export type { FormBuilderConfig, FormBuilderContext };
+

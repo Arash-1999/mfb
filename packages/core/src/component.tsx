@@ -10,10 +10,12 @@ import type {
   FormBuilderContext,
   FormBuilderProps,
   GetInputs,
+  GroupCardComponent,
   InputMapFnOptions,
   InputMapperProps,
   RenderCardProps,
   RenderInputOptions,
+  SimpleCardBase,
 } from "@/types";
 import type { Context } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
@@ -243,13 +245,16 @@ class FormBuilder<
     list,
     name,
   }: AdvancedMapperProps<TConfig, TFields>) => {
+    const formMethods = useFormContext<TFields>();
+    const { inputMapFn, renderCard } = this;
+
     return list.map((item, i) => {
       let node = null;
-      
-      if (advancedCardGuard<TConfig, TFields>(item)) {
-        node = this.renderCard({ advanced: true, card: item });
-      } else if (advancedInputGuard<TConfig, TFields>(item)) {
-        node = this.inputMapFn(item, i, { name });
+
+      if (advancedInputGuard<TConfig, TFields>(item)) {
+        node = inputMapFn(item, i, { formMethods, name });
+      } else if (advancedCardGuard<TConfig, TFields>(item)) {
+        node = renderCard({ advanced: true, card: item });
       }
 
       return <Fragment key={`advanced-item-${i}`}>{node}</Fragment>;
@@ -341,13 +346,12 @@ class FormBuilder<
   private inputMapFn = <TFields extends FieldValues>(
     input: GetInputs<TConfig, TFields>,
     index: number,
-    { name }: InputMapFnOptions
+    { formMethods, name }: InputMapFnOptions<TFields>
   ) => {
     const { DependencyManager } = this;
     const {
       layout: { "grid-item": GridItem },
     } = this.config;
-    const formMethods = useFormContext<TFields>();
 
     const dependency = input.dependsOn;
     const key = `input-${index}`;
@@ -382,7 +386,11 @@ class FormBuilder<
     inputs,
     name, // should passed in list input. optional in card or flat mode inputs.
   }: InputMapperProps<TConfig, TFields>) => {
-    return inputs.map((input, i) => this.inputMapFn(input, i, { name }));
+    const formMethods = useFormContext<TFields>();
+
+    return inputs.map((input, i) =>
+      this.inputMapFn(input, i, { formMethods, name })
+    );
   };
 
   private renderCard = <
@@ -404,20 +412,21 @@ class FormBuilder<
       } = this.config;
 
       if (!group) return null;
-      const renderGroup = group[card.type];
+      // TODO: check why type assertion is needed.
+      const RenderGroupCard = group[card.type] as GroupCardComponent;
 
       if (card.variant === "list") {
         return (
           <FieldArray<TFields>
             name={card.name}
-            render={(fields) => {
-              return renderGroup({
-                addGrid: (node, index) => (
+            render={(fields) => (
+              <RenderGroupCard
+                addGrid={(node, index) => (
                   <GridItem key={`grid-item-${index}`} {...card.gridProps}>
                     {node}
                   </GridItem>
-                ),
-                nodes: fields.map((field, i) => ({
+                )}
+                nodes={fields.map((field, i) => ({
                   children: (
                     <GridContainer {...card.gridContainerProps}>
                       {/* TODO: change mapper component depend on card type */}
@@ -438,39 +447,41 @@ class FormBuilder<
                   ),
                   // TODO: add titleFn to group card(list variant) for generating title
                   title: `List Item ${i + 1}`,
-                })),
-              });
-            }}
+                }))}
+              />
+            )}
           />
         );
       }
 
       return (
         <Fragment>
-          {renderGroup({
-            addGrid: (node, index) => (
+          <RenderGroupCard
+            addGrid={(node, index) => (
               <GridItem key={`grid-item-${index}`} {...card.gridProps}>
                 {node}
               </GridItem>
-            ),
-            nodes: advanced
-              ? card.list.map(({ gridContainerProps, list, title }) => ({
-                  children: (
-                    <GridContainer {...gridContainerProps}>
-                      <AdvancedMapper list={list} />
-                    </GridContainer>
-                  ),
-                  title,
-                }))
-              : card.inputs.map(({ gridContainerProps, list, title }) => ({
-                  children: (
-                    <GridContainer {...gridContainerProps}>
-                      <InputMapper inputs={list} />
-                    </GridContainer>
-                  ),
-                  title,
-                })),
-          })}
+            )}
+            nodes={
+              advanced
+                ? card.list.map(({ gridContainerProps, list, title }) => ({
+                    children: (
+                      <GridContainer {...gridContainerProps}>
+                        <AdvancedMapper list={list} />
+                      </GridContainer>
+                    ),
+                    title,
+                  }))
+                : card.inputs.map(({ gridContainerProps, list, title }) => ({
+                    children: (
+                      <GridContainer {...gridContainerProps}>
+                        <InputMapper inputs={list} />
+                      </GridContainer>
+                    ),
+                    title,
+                  }))
+            }
+          />
         </Fragment>
       );
     }
@@ -479,12 +490,13 @@ class FormBuilder<
       card: { simple },
     } = this.config;
 
-    const renderCard = simple[card.type];
+    // TODO: check why type assertion is needed.
+    const RenderSimpleCard = simple[card.type] as SimpleCardBase;
 
-    return (
-      <GridItem {...(card.gridProps || {})}>
-        {renderCard({
-          children: (
+    if (typeof RenderSimpleCard === "function") {
+      return (
+        <>
+          <RenderSimpleCard header={card.header}>
             <GridContainer {...(card.gridContainerProps || {})}>
               {advanced ? (
                 <AdvancedMapper list={card.list} name={card.name} />
@@ -492,11 +504,11 @@ class FormBuilder<
                 <InputMapper inputs={card.inputs} name={card.name} />
               )}
             </GridContainer>
-          ),
-          header: card.header,
-        })}
-      </GridItem>
-    );
+          </RenderSimpleCard>
+        </>
+      );
+    }
+    return null;
   };
 
   private renderInput<TFields extends FieldValues>(
@@ -535,14 +547,16 @@ class FormBuilder<
       input: { components },
       layout: { field: Field },
     } = this.config;
-    const inputFn = components[input.type];
+    const InputFn = components[input.type];
 
-    if (typeof inputFn === "function" && typeof input.props === "object") {
-      const renderedInput = inputFn({
-        formMethods: options.formMethods,
-        name: input.name,
-        ...input.props,
-      });
+    if (typeof InputFn === "function" && typeof input.props === "object") {
+      const renderedInput = (
+        <InputFn
+          formMethods={options.formMethods}
+          name={input.name}
+          {...input.props}
+        />
+      );
       return input.field ? (
         <Field {...input.field}>{renderedInput}</Field>
       ) : (

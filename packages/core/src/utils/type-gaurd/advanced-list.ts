@@ -25,7 +25,7 @@ const advancedInputGuard = <
     typeof obj === "object" &&
     "type" in obj &&
     ((obj.type === "list" && ("list" in obj || "inputs" in obj)) ||
-      (obj.type !== "list" && !("list" in obj && "inputs" in obj)))
+      (obj.type !== "list" && !("list" in obj) && !("inputs" in obj)))
   );
 };
 

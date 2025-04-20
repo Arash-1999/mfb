@@ -79,7 +79,8 @@ interface FormBuilderProps<TConfig extends FormBuilderConfig> {
   config: TConfig;
 }
 
-type InputMapFnOptions = {
+type InputMapFnOptions<TFields extends FieldValues> = {
+  formMethods: UseFormReturn<TFields>;
   name?: string;
 };
 
