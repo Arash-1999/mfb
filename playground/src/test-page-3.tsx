@@ -50,7 +50,7 @@ const TestPage3 = () => {
       </Button>
 
       <FB.Builder<TestPageForm>
-        gridProps={{
+        gridContainerProps={{
           spacing: 2,
         }}
         id={TEST_PAGE_3_FORM_ID}
@@ -60,7 +60,7 @@ const TestPage3 = () => {
         cards={[
           {
             isGroup: true,
-            variant: "simple",
+            variant: "normal",
             gridProps: {
               size: 12,
             },
