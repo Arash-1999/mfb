@@ -24,6 +24,8 @@ const TabsGroup = ({ addGrid, nodes }: GroupCardComponentProps) => {
     setValue(newValue);
   };
 
+  // TODO: handle value when selected tab is deleted
+
   //   const active = useMemo(() => {
   //     return nodes[value].children;
   //   }, [value, nodes]);
@@ -32,7 +34,12 @@ const TabsGroup = ({ addGrid, nodes }: GroupCardComponentProps) => {
     <>
       {addGrid(
         <>
-          <Tabs value={value} onChange={handleChange}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            variant="scrollable"
+            scrollButtons="auto"
+          >
             {nodes.map((node, index) => {
               const title =
                 typeof node.title === "string" ? node.title : node.title.left;
@@ -46,11 +53,11 @@ const TabsGroup = ({ addGrid, nodes }: GroupCardComponentProps) => {
             })}
           </Tabs>
 
-          {Array.isArray(nodes) && nodes.length > 0 ? (
-            <Paper sx={{ p: 2, mt: 2 }}>{nodes[value].children}</Paper>
+          {Array.isArray(nodes) && nodes.length > 0 && value < nodes.length ? (
+            <Paper sx={{ p: 2, mt: 2 }}>{nodes[value]?.children}</Paper>
           ) : null}
         </>,
-        0,
+        0
       )}
     </>
   );
@@ -84,3 +91,4 @@ const AccordionGroup = ({ nodes, addGrid }: GroupCardComponentProps) => {
 };
 
 export { AccordionGroup, TabsGroup };
+
