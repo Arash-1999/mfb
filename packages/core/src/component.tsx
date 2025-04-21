@@ -10,12 +10,10 @@ import type {
   FormBuilderContext,
   FormBuilderProps,
   GetInputs,
-  GroupCardComponent,
   InputMapFnOptions,
   InputMapperProps,
   RenderCardProps,
   RenderInputOptions,
-  SimpleCardBase,
 } from "@/types";
 import type { Context } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
@@ -32,6 +30,7 @@ import { eventNames } from "@/utils/events";
 import { advancedCardGuard, advancedInputGuard } from "@/utils/type-gaurd";
 import {
   createContext,
+  createElement,
   Fragment,
   useCallback,
   useContext,
@@ -413,20 +412,20 @@ class FormBuilder<
 
       if (!group) return null;
       // TODO: check why type assertion is needed.
-      const RenderGroupCard = group[card.type] as GroupCardComponent;
+      const RenderGroupCard = group[card.type];
 
       if (card.variant === "list") {
         return (
           <FieldArray<TFields>
             name={card.name}
-            render={(fields) => (
-              <RenderGroupCard
-                addGrid={(node, index) => (
+            render={(fields) =>
+              createElement(RenderGroupCard, {
+                addGrid: (node, index) => (
                   <GridItem key={`grid-item-${index}`} {...card.gridProps}>
                     {node}
                   </GridItem>
-                )}
-                nodes={fields.map((field, i) => ({
+                ),
+                nodes: fields.map((field, i) => ({
                   children: (
                     <GridContainer {...card.gridContainerProps}>
                       {/* TODO: change mapper component depend on card type */}
@@ -447,65 +446,58 @@ class FormBuilder<
                   ),
                   // TODO: add titleFn to group card(list variant) for generating title
                   title: `List Item ${i + 1}`,
-                }))}
-              />
-            )}
+                })),
+              })
+            }
           />
         );
       }
 
-      return (
-        <Fragment>
-          <RenderGroupCard
-            addGrid={(node, index) => (
-              <GridItem key={`grid-item-${index}`} {...card.gridProps}>
-                {node}
-              </GridItem>
-            )}
-            nodes={
-              advanced
-                ? card.list.map(({ gridContainerProps, list, title }) => ({
-                    children: (
-                      <GridContainer {...gridContainerProps}>
-                        <AdvancedMapper list={list} />
-                      </GridContainer>
-                    ),
-                    title,
-                  }))
-                : card.inputs.map(({ gridContainerProps, list, title }) => ({
-                    children: (
-                      <GridContainer {...gridContainerProps}>
-                        <InputMapper inputs={list} />
-                      </GridContainer>
-                    ),
-                    title,
-                  }))
-            }
-          />
-        </Fragment>
-      );
+      return createElement(RenderGroupCard, {
+        addGrid: (node, index) => (
+          <GridItem key={`grid-item-${index}`} {...card.gridProps}>
+            {node}
+          </GridItem>
+        ),
+        nodes: advanced
+          ? card.list.map(({ gridContainerProps, list, title }) => ({
+              children: (
+                <GridContainer {...gridContainerProps}>
+                  <AdvancedMapper list={list} />
+                </GridContainer>
+              ),
+              title,
+            }))
+          : card.inputs.map(({ gridContainerProps, list, title }) => ({
+              children: (
+                <GridContainer {...gridContainerProps}>
+                  <InputMapper inputs={list} />
+                </GridContainer>
+              ),
+              title,
+            })),
+      });
     }
 
     const {
       card: { simple },
     } = this.config;
 
-    // TODO: check why type assertion is needed.
-    const RenderSimpleCard = simple[card.type] as SimpleCardBase;
+    const RenderSimpleCard = simple[card.type];
 
     if (typeof RenderSimpleCard === "function") {
-      return (
-        <>
-          <RenderSimpleCard header={card.header}>
-            <GridContainer {...(card.gridContainerProps || {})}>
-              {advanced ? (
-                <AdvancedMapper list={card.list} name={card.name} />
-              ) : (
-                <InputMapper inputs={card.inputs} name={card.name} />
-              )}
-            </GridContainer>
-          </RenderSimpleCard>
-        </>
+      return createElement(
+        RenderSimpleCard,
+        {
+          header: card.header,
+        },
+        <GridContainer {...(card.gridContainerProps || {})}>
+          {advanced ? (
+            <AdvancedMapper list={card.list} name={card.name} />
+          ) : (
+            <InputMapper inputs={card.inputs} name={card.name} />
+          )}
+        </GridContainer>
       );
     }
     return null;

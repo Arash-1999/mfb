@@ -1,4 +1,4 @@
-import type { JSX, ReactNode } from "react";
+import type { JSX, PropsWithChildren, ReactNode } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
@@ -111,10 +111,9 @@ type SimpleCardBase = (props: SimpleCardProps) => JSX.Element;
 
 type SimpleCardObject = Record<PropertyKey, SimpleCardBase>;
 
-type SimpleCardProps = {
-  children: ReactNode;
+type SimpleCardProps = PropsWithChildren<{
   header: Header | string;
-};
+}>;
 
 export type {
   GetCards,
