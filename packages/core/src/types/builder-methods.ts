@@ -95,7 +95,9 @@ type InputMapperProps<
 type RenderCardProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> =
+> = {
+  index: number;
+} & (
   | {
       advanced: false;
       card: GetCards<TConfig, TFields, false>;
@@ -103,7 +105,8 @@ type RenderCardProps<
   | {
       advanced: true;
       card: GetCards<TConfig, TFields, true>;
-    };
+    }
+);
 
 type RenderInputOptions<TFields extends FieldValues> = {
   formMethods: UseFormReturn<TFields>;

@@ -31,7 +31,6 @@ import { advancedCardGuard, advancedInputGuard } from "@/utils/type-gaurd";
 import {
   createContext,
   createElement,
-  Fragment,
   useCallback,
   useContext,
   useMemo,
@@ -126,9 +125,9 @@ class FormBuilder<
   }: BuilderProps<TConfig, TFields, TFormId>) => {
     const formMethods = useForm<TFields>(options);
     const {
-      layout: { "grid-container": GridContainer, "grid-item": GridItem },
+      layout: { "grid-container": GridContainer },
     } = this.config;
-    const { Context, FieldArray, InputMapper } = this;
+    const { Context } = this;
 
     return (
       <Context.Provider
@@ -139,98 +138,9 @@ class FormBuilder<
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...(gridContainerProps || {})}>
-              {cards.map((card, index) => {
-                if (card.isGroup) {
-                  const {
-                    card: { group },
-                  } = this.config;
-
-                  if (!group) return null;
-                  const renderGroup = group[card.type];
-
-                  if (card.variant === "list") {
-                    return (
-                      <FieldArray<TFields>
-                        key={index}
-                        name={card.name}
-                        render={(fields) => {
-                          return renderGroup({
-                            addGrid: (node, index) => (
-                              <GridItem
-                                key={`grid-item-${index}`}
-                                {...card.gridProps}
-                              >
-                                {node}
-                              </GridItem>
-                            ),
-                            nodes: fields.map((field, i) => ({
-                              children: (
-                                <GridContainer {...card.gridContainerProps}>
-                                  <InputMapper
-                                    inputs={card.inputs}
-                                    key={field.id}
-                                    name={`${card.name}.${i}`}
-                                  />
-                                </GridContainer>
-                              ),
-                              // TODO: add titleFn to group card(list variant) for generating title
-                              title: `List Item ${i + 1}`,
-                            })),
-                          });
-                        }}
-                      />
-                    );
-                  }
-
-                  // TODO: move this logic to another function and use it for list variant
-                  return (
-                    <Fragment key={index}>
-                      {renderGroup({
-                        addGrid: (node, index) => (
-                          <GridItem
-                            key={`grid-item-${index}`}
-                            {...card.gridProps}
-                          >
-                            {node}
-                          </GridItem>
-                        ),
-                        nodes: card.inputs.map(
-                          ({ gridContainerProps, list, title }) => ({
-                            children: (
-                              <GridContainer {...gridContainerProps}>
-                                <InputMapper inputs={list} />
-                              </GridContainer>
-                            ),
-                            title,
-                          })
-                        ),
-                      })}
-                    </Fragment>
-                  );
-                } else {
-                  const {
-                    card: { simple },
-                  } = this.config;
-
-                  const renderCard = simple[card.type];
-
-                  return (
-                    <GridItem key={index} {...(card.gridProps || {})}>
-                      {renderCard({
-                        children: (
-                          <GridContainer {...(card.gridContainerProps || {})}>
-                            <InputMapper
-                              inputs={card.inputs}
-                              name={card.name}
-                            />
-                          </GridContainer>
-                        ),
-                        header: card.header,
-                      })}
-                    </GridItem>
-                  );
-                }
-              })}
+              {cards.map((card, index) =>
+                this.renderCard({ advanced: false, card, index })
+              )}
             </GridContainer>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
@@ -247,16 +157,13 @@ class FormBuilder<
     const formMethods = useFormContext<TFields>();
     const { inputMapFn, renderCard } = this;
 
-    return list.map((item, i) => {
-      let node = null;
-
+    return list.map((item, index) => {
       if (advancedInputGuard<TConfig, TFields>(item)) {
-        node = inputMapFn(item, i, { formMethods, name });
+        return inputMapFn(item, index, { formMethods, name });
       } else if (advancedCardGuard<TConfig, TFields>(item)) {
-        node = renderCard({ advanced: true, card: item });
+        return renderCard({ advanced: true, card: item, index });
       }
-
-      return <Fragment key={`advanced-item-${i}`}>{node}</Fragment>;
+      return null;
     });
   };
 
@@ -398,6 +305,7 @@ class FormBuilder<
   >({
     advanced,
     card,
+    index,
   }: RenderCardProps<TConfig, TFields>) => {
     // TODO: pass key to each return jsx element (like normal builder)
     const { "grid-container": GridContainer, "grid-item": GridItem } =
@@ -411,12 +319,12 @@ class FormBuilder<
       } = this.config;
 
       if (!group) return null;
-      // TODO: check why type assertion is needed.
       const RenderGroupCard = group[card.type];
 
       if (card.variant === "list") {
         return (
           <FieldArray<TFields>
+            key={`card-${index}`}
             name={card.name}
             render={(fields) =>
               createElement(RenderGroupCard, {
@@ -428,7 +336,6 @@ class FormBuilder<
                 nodes: fields.map((field, i) => ({
                   children: (
                     <GridContainer {...card.gridContainerProps}>
-                      {/* TODO: change mapper component depend on card type */}
                       {advanced ? (
                         <AdvancedMapper
                           key={field.id}
@@ -459,6 +366,7 @@ class FormBuilder<
             {node}
           </GridItem>
         ),
+        key: `card-${index}`,
         nodes: advanced
           ? card.list.map(({ gridContainerProps, list, title }) => ({
               children: (
@@ -490,6 +398,7 @@ class FormBuilder<
         RenderSimpleCard,
         {
           header: card.header,
+          key: `card-${index}`,
         },
         <GridContainer {...(card.gridContainerProps || {})}>
           {advanced ? (
