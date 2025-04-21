@@ -9,7 +9,10 @@ import type { GetInputs } from "./input";
 type AdvancedList<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = Array<GetCards<TConfig, TFields, true> | GetInputs<TConfig, TFields>>;
+> = Array<
+  | (GetCards<TConfig, TFields, true> & { mode: "card" })
+  | (GetInputs<TConfig, TFields> & { mode: "input" })
+>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BaseComponent = (props: any) => JSX.Element;

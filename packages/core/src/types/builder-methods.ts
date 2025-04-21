@@ -104,7 +104,7 @@ type RenderCardProps<
     }
   | {
       advanced: true;
-      card: GetCards<TConfig, TFields, true>;
+      card: GetCards<TConfig, TFields, true> & { mode: "card" };
     }
 );
 

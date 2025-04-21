@@ -27,9 +27,10 @@ type GetCardBase<
             list: AdvancedList<TConfig, TFields>;
             title: Header | string;
           }>
-        : Array<
-            GetCards<TConfig, TFields, TAdvanced> | GetInputs<TConfig, TFields>
-          >;
+        : AdvancedList<TConfig, TFields>;
+      // : Array<
+      //     GetCards<TConfig, TFields, TAdvanced> | GetInputs<TConfig, TFields>
+      //   >;
     };
 
 type GetCards<

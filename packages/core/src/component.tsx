@@ -27,7 +27,6 @@ import {
   RenderHoC,
 } from "@/utils";
 import { eventNames } from "@/utils/events";
-import { advancedCardGuard, advancedInputGuard } from "@/utils/type-gaurd";
 import {
   createContext,
   createElement,
@@ -158,10 +157,10 @@ class FormBuilder<
     const { inputMapFn, renderCard } = this;
 
     return list.map((item, index) => {
-      if (advancedInputGuard<TConfig, TFields>(item)) {
-        return inputMapFn(item, index, { formMethods, name });
-      } else if (advancedCardGuard<TConfig, TFields>(item)) {
+      if (item.mode === "card") {
         return renderCard({ advanced: true, card: item, index });
+      } else if (item.mode === "input") {
+        return inputMapFn(item, index, { formMethods, name });
       }
       return null;
     });
@@ -394,19 +393,22 @@ class FormBuilder<
     const RenderSimpleCard = simple[card.type];
 
     if (typeof RenderSimpleCard === "function") {
-      return createElement(
-        RenderSimpleCard,
-        {
-          header: card.header,
-          key: `card-${index}`,
-        },
-        <GridContainer {...(card.gridContainerProps || {})}>
-          {advanced ? (
-            <AdvancedMapper list={card.list} name={card.name} />
-          ) : (
-            <InputMapper inputs={card.inputs} name={card.name} />
+      return (
+        <GridItem key={index} {...(card.gridProps || {})}>
+          {createElement(
+            RenderSimpleCard,
+            {
+              header: card.header,
+            },
+            <GridContainer {...(card.gridContainerProps || {})}>
+              {advanced ? (
+                <AdvancedMapper list={card.list} name={card.name} />
+              ) : (
+                <InputMapper inputs={card.inputs} name={card.name} />
+              )}
+            </GridContainer>
           )}
-        </GridContainer>
+        </GridItem>
       );
     }
     return null;
