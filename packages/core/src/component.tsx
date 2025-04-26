@@ -1,4 +1,6 @@
 import type {
+  AdvancedBuilderProps,
+  AdvancedMapperProps,
   BasicBuilderProps,
   BuilderProps,
   DependencyManagerProps,
@@ -8,7 +10,9 @@ import type {
   FormBuilderContext,
   FormBuilderProps,
   GetInputs,
+  InputMapFnOptions,
   InputMapperProps,
+  RenderCardProps,
   RenderInputOptions,
 } from "@/types";
 import type { Context } from "react";
@@ -25,7 +29,7 @@ import {
 import { eventNames } from "@/utils/events";
 import {
   createContext,
-  Fragment,
+  createElement,
   useCallback,
   useContext,
   useMemo,
@@ -51,7 +55,37 @@ class FormBuilder<
     this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
   }
 
-  BasicBuilder = <TFields extends FieldValues>({
+  public AdvancedBuilder = <TFields extends FieldValues>({
+    gridContainerProps,
+    id,
+    list,
+    onSubmit,
+    options,
+  }: AdvancedBuilderProps<TConfig, TFields, TFormId>) => {
+    const { AdvancedMapper, Context } = this;
+    const { "grid-container": GridContainer } = this.config.layout;
+    const formMethods = useForm<TFields>(options);
+
+    return (
+      <Context.Provider
+        value={{
+          id,
+        }}
+      >
+        <FormProvider {...formMethods}>
+          <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
+            <GridContainer {...gridContainerProps}>
+              <AdvancedMapper list={list} />
+            </GridContainer>
+            {/* TODO: remove this submit button as configurable option */}
+            <button type="submit">SUBMIT</button>
+          </form>
+        </FormProvider>
+      </Context.Provider>
+    );
+  };
+
+  public BasicBuilder = <TFields extends FieldValues>({
     gridContainerProps,
     id,
     inputs,
@@ -83,16 +117,16 @@ class FormBuilder<
 
   public Builder = <TFields extends FieldValues>({
     cards,
-    gridProps,
+    gridContainerProps,
     id,
     onSubmit,
     options,
   }: BuilderProps<TConfig, TFields, TFormId>) => {
     const formMethods = useForm<TFields>(options);
     const {
-      layout: { "grid-container": GridContainer, "grid-item": GridItem },
+      layout: { "grid-container": GridContainer },
     } = this.config;
-    const { Context, FieldArray, InputMapper } = this;
+    const { Context } = this;
 
     return (
       <Context.Provider
@@ -102,100 +136,10 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <GridContainer {...(gridProps || {})}>
-              {cards.map((card, index) => {
-                if (card.isGroup) {
-                  const {
-                    card: { group },
-                  } = this.config;
-
-                  if (!group) return null;
-                  const renderGroup = group[card.type];
-
-                  if (card.variant === "list") {
-                    return (
-                      <FieldArray<TFields>
-                        key={index}
-                        name={card.name}
-                        render={(fields) => {
-                          return renderGroup({
-                            addGrid: (node, index) => (
-                              <GridItem
-                                key={`grid-item-${index}`}
-                                {...card.gridProps}
-                              >
-                                {node}
-                              </GridItem>
-                            ),
-                            nodes: fields.map((field, i) => ({
-                              children: (
-                                <GridContainer {...card.gridContainerProps}>
-                                  <InputMapper
-                                    inputs={card.inputs}
-                                    key={field.id}
-                                    name={`${card.name}.${i}`}
-                                  />
-                                </GridContainer>
-                              ),
-                              // TODO: add titleFn to group card(list variant) for generating title
-                              title: `List Item ${i + 1}`,
-                            })),
-                          });
-                        }}
-                      />
-                    );
-                  }
-
-                  // TODO: move this logic to another function and use it for list variant
-                  return (
-                    <Fragment key={index}>
-                      {renderGroup({
-                        addGrid: (node, index) => (
-                          <GridItem
-                            key={`grid-item-${index}`}
-                            {...card.gridProps}
-                          >
-                            {node}
-                          </GridItem>
-                        ),
-                        nodes: card.inputs.map(
-                          ({ gridContainerProps, list, title }) => ({
-                            // TODO: add gridContainerProps
-                            children: (
-                              <GridContainer {...gridContainerProps}>
-                                <InputMapper inputs={list} />
-                              </GridContainer>
-                            ),
-                            title,
-                          })
-                        ),
-                      })}
-                    </Fragment>
-                  );
-                } else {
-                  const {
-                    card: { simple },
-                  } = this.config;
-
-                  const renderCard = simple[card.type];
-
-                  return (
-                    <GridItem key={index} {...(card.gridProps || {})}>
-                      {renderCard({
-                        children: (
-                          <GridContainer {...(card.gridContainerProps || {})}>
-                            <InputMapper
-                              inputs={card.inputs}
-                              name={card.name}
-                            />
-                          </GridContainer>
-                        ),
-                        header: card.header,
-                      })}
-                    </GridItem>
-                  );
-                }
-              })}
+            <GridContainer {...(gridContainerProps || {})}>
+              {cards.map((card, index) =>
+                this.renderCard({ advanced: false, card, index })
+              )}
             </GridContainer>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
@@ -203,6 +147,23 @@ class FormBuilder<
         </FormProvider>
       </Context.Provider>
     );
+  };
+
+  private AdvancedMapper = <TFields extends FieldValues>({
+    list,
+    name,
+  }: AdvancedMapperProps<TConfig, TFields>) => {
+    const formMethods = useFormContext<TFields>();
+    const { inputMapFn, renderCard } = this;
+
+    return list.map((item, index) => {
+      if (item.mode === "card") {
+        return renderCard({ advanced: true, card: item, index });
+      } else if (item.mode === "input") {
+        return inputMapFn(item, index, { formMethods, name });
+      }
+      return null;
+    });
   };
 
   private DependencyManager = <TFields extends FieldValues>({
@@ -287,43 +248,170 @@ class FormBuilder<
     return render(fields);
   };
 
+  private inputMapFn = <TFields extends FieldValues>(
+    input: GetInputs<TConfig, TFields>,
+    index: number,
+    { formMethods, name }: InputMapFnOptions<TFields>
+  ) => {
+    const { DependencyManager } = this;
+    const {
+      layout: { "grid-item": GridItem },
+    } = this.config;
+
+    const dependency = input.dependsOn;
+    const key = `input-${index}`;
+
+    const node = (
+      <GridItem key={key} {...(input.gridProps || {})}>
+        {this.renderInput(
+          Object.assign({}, input, {
+            name: mergeName(name || "", input.name),
+          }),
+          { formMethods }
+        )}
+      </GridItem>
+    );
+
+    if (typeof dependency === "undefined") {
+      return node;
+    } else {
+      return (
+        <DependencyManager
+          dependsOn={dependency}
+          input={Object.assign({}, input, {
+            name: mergeName(name || "", input.name),
+          })}
+          key={key}
+        />
+      );
+    }
+  };
+
   private InputMapper = <TFields extends FieldValues>({
     inputs,
     name, // should passed in list input. optional in card or flat mode inputs.
   }: InputMapperProps<TConfig, TFields>) => {
-    const { DependencyManager } = this;
     const formMethods = useFormContext<TFields>();
-    const { "grid-item": GridItem } = this.config.layout;
 
-    return inputs.map((input, i) => {
-      const dependency = input.dependsOn;
-      const key = `input-${i}`;
+    return inputs.map((input, i) =>
+      this.inputMapFn(input, i, { formMethods, name })
+    );
+  };
 
-      const node = (
-        <GridItem key={key} {...(input.gridProps || {})}>
-          {this.renderInput(
-            Object.assign({}, input, {
-              name: mergeName(name || "", input.name),
-            }),
-            { formMethods }
-          )}
-        </GridItem>
-      );
+  private renderCard = <
+    TFields extends FieldValues,
+    // TAdvanced extends boolean = true,
+  >({
+    advanced,
+    card,
+    index,
+  }: RenderCardProps<TConfig, TFields>) => {
+    // TODO: pass key to each return jsx element (like normal builder)
+    const { "grid-container": GridContainer, "grid-item": GridItem } =
+      this.config.layout;
+    const { AdvancedMapper, InputMapper } = this;
 
-      if (typeof dependency === "undefined") {
-        return node;
-      } else {
+    if (card.isGroup) {
+      const { FieldArray } = this;
+      const {
+        card: { group },
+      } = this.config;
+
+      if (!group) return null;
+      const RenderGroupCard = group[card.type];
+
+      if (card.variant === "list") {
         return (
-          <DependencyManager
-            dependsOn={dependency}
-            input={Object.assign({}, input, {
-              name: mergeName(name || "", input.name),
-            })}
-            key={key}
+          <FieldArray<TFields>
+            key={`card-${index}`}
+            name={card.name}
+            render={(fields) =>
+              createElement(RenderGroupCard, {
+                addGrid: (node, index) => (
+                  <GridItem key={`grid-item-${index}`} {...card.gridProps}>
+                    {node}
+                  </GridItem>
+                ),
+                nodes: fields.map((field, i) => ({
+                  children: (
+                    <GridContainer {...card.gridContainerProps}>
+                      {advanced ? (
+                        <AdvancedMapper
+                          key={field.id}
+                          list={card.list}
+                          name={`${card.name}.${i}`}
+                        />
+                      ) : (
+                        <InputMapper
+                          inputs={card.inputs}
+                          key={field.id}
+                          name={`${card.name}.${i}`}
+                        />
+                      )}
+                    </GridContainer>
+                  ),
+                  // TODO: add titleFn to group card(list variant) for generating title
+                  title: `List Item ${i + 1}`,
+                })),
+              })
+            }
           />
         );
       }
-    });
+
+      return createElement(RenderGroupCard, {
+        addGrid: (node, index) => (
+          <GridItem key={`grid-item-${index}`} {...card.gridProps}>
+            {node}
+          </GridItem>
+        ),
+        key: `card-${index}`,
+        nodes: advanced
+          ? card.list.map(({ gridContainerProps, list, title }) => ({
+              children: (
+                <GridContainer {...gridContainerProps}>
+                  <AdvancedMapper list={list} />
+                </GridContainer>
+              ),
+              title,
+            }))
+          : card.inputs.map(({ gridContainerProps, list, title }) => ({
+              children: (
+                <GridContainer {...gridContainerProps}>
+                  <InputMapper inputs={list} />
+                </GridContainer>
+              ),
+              title,
+            })),
+      });
+    }
+
+    const {
+      card: { simple },
+    } = this.config;
+
+    const RenderSimpleCard = simple[card.type];
+
+    if (typeof RenderSimpleCard === "function") {
+      return (
+        <GridItem key={index} {...(card.gridProps || {})}>
+          {createElement(
+            RenderSimpleCard,
+            {
+              header: card.header,
+            },
+            <GridContainer {...(card.gridContainerProps || {})}>
+              {advanced ? (
+                <AdvancedMapper list={card.list} name={card.name} />
+              ) : (
+                <InputMapper inputs={card.inputs} name={card.name} />
+              )}
+            </GridContainer>
+          )}
+        </GridItem>
+      );
+    }
+    return null;
   };
 
   private renderInput<TFields extends FieldValues>(
@@ -343,6 +431,7 @@ class FormBuilder<
             <GridItem {...input.gridProps}>
               <GridContainer {...input.gridContainerProps}>
                 {fields.map((field, i) => {
+                  // TODO: add options to change InputMapper to AdvancedMapper
                   return (
                     <InputMapper
                       inputs={input.inputs}
@@ -361,14 +450,16 @@ class FormBuilder<
       input: { components },
       layout: { field: Field },
     } = this.config;
-    const inputFn = components[input.type];
+    const InputFn = components[input.type];
 
-    if (typeof inputFn === "function" && typeof input.props === "object") {
-      const renderedInput = inputFn({
-        formMethods: options.formMethods,
-        name: input.name,
-        ...input.props,
-      });
+    if (typeof InputFn === "function" && typeof input.props === "object") {
+      const renderedInput = (
+        <InputFn
+          formMethods={options.formMethods}
+          name={input.name}
+          {...input.props}
+        />
+      );
       return input.field ? (
         <Field {...input.field}>{renderedInput}</Field>
       ) : (

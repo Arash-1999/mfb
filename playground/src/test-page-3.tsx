@@ -2,7 +2,7 @@ import { Button, Container } from "@mui/material";
 import { FB } from "./form-builder";
 import { dispatchFieldArray } from "@mfb/core";
 
-const TEST_PAGE_3_FORM_ID = "TEST_PAGE_3_FORM_ID";
+const TEST_PAGE_3_FORM_ID = "TEST_PAGE_FORM_ID";
 
 type TestPageForm = {
   [key in `input-${1 | 2 | 3 | 4 | 5 | 6}`]: string;
@@ -50,14 +50,17 @@ const TestPage3 = () => {
       </Button>
 
       <FB.Builder<TestPageForm>
-        gridProps={{
+        gridContainerProps={{
           spacing: 2,
         }}
         id={TEST_PAGE_3_FORM_ID}
+        onSubmit={(data) => {
+          console.log(data);
+        }}
         cards={[
           {
             isGroup: true,
-            variant: "simple",
+            variant: "normal",
             gridProps: {
               size: 12,
             },

@@ -1,32 +1,78 @@
-import type { JSX, ReactNode } from "react";
+import type { JSX, PropsWithChildren, ReactNode } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
 import type { GetInputs } from "./input";
-import type { GetLayoutProps } from "./utils";
+import type { AdvancedList, GetLayoutProps } from "./utils";
 
-type GetCards<TConfig extends FormBuilderConfig, TFields extends FieldValues> =
-  | (TConfig["card"]["group"] extends undefined
-      ? never
-      : {
-          [TCard in keyof TConfig["card"]["group"]]: GroupCardBase<TCard> &
-            (
-              | GroupCardList<TConfig, TFields>
-              | GroupCardSingle<TConfig, TFields>
-            );
-        }[keyof TConfig["card"]["group"]])
-  | {
-      [TCard in keyof TConfig["card"]["simple"]]: {
-        gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-        gridProps?: GetLayoutProps<TConfig, "grid-item">;
-        // TODO: move header logic to component props (in base strucuture for simple card)
-        header: Header | string;
-        inputs: Array<GetInputs<TConfig, TFields>>;
-        isGroup?: false;
-        name?: string;
-        type: TCard;
-      };
-    }[keyof TConfig["card"]["simple"]];
+type GetCardBase<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TAdvanced extends boolean = false,
+  TNormalGroup extends boolean = false,
+> = TAdvanced extends false
+  ? {
+      inputs: TNormalGroup extends false
+        ? Array<{
+            gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+            list: Array<GetInputs<TConfig, TFields>>;
+            title: Header | string;
+          }>
+        : Array<GetInputs<TConfig, TFields>>;
+    }
+  : {
+      list: TNormalGroup extends false
+        ? Array<{
+            gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+            list: AdvancedList<TConfig, TFields>;
+            title: Header | string;
+          }>
+        : AdvancedList<TConfig, TFields>;
+      // : Array<
+      //     GetCards<TConfig, TFields, TAdvanced> | GetInputs<TConfig, TFields>
+      //   >;
+    };
+
+type GetCards<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TAdvanced extends boolean = false,
+> =
+  | GetGroupCard<TConfig, TFields, TAdvanced>
+  | GetSimpleCard<TConfig, TFields, TAdvanced>;
+
+type GetGroupCard<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TAdvanced extends boolean = false,
+> = TConfig["card"]["group"] extends undefined
+  ? never
+  : {
+      [TCard in keyof TConfig["card"]["group"]]: GroupCardBase<TCard> &
+        (
+          | (GetCardBase<TConfig, TFields, TAdvanced, true> &
+              GroupCardList<TConfig>)
+          | (GetCardBase<TConfig, TFields, TAdvanced> &
+              GroupCardNormal<TConfig>)
+        );
+    }[keyof TConfig["card"]["group"]];
+
+type GetSimpleCard<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TAdvanced extends boolean = false,
+> = GetCardBase<TConfig, TFields, TAdvanced, true> &
+  {
+    [TCard in keyof TConfig["card"]["simple"]]: {
+      gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+      gridProps?: GetLayoutProps<TConfig, "grid-item">;
+      // TODO: move header logic to component props (in base strucuture for simple card)
+      header: Header | string;
+      isGroup?: false;
+      name?: string;
+      type: TCard;
+    };
+  }[keyof TConfig["card"]["simple"]];
 
 type GroupCardBase<TKey extends PropertyKey> = {
   isGroup: true;
@@ -42,36 +88,33 @@ type GroupCardComponentProps = {
 
 type GroupCardList<
   TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
+  // TFields extends FieldValues,
 > = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
-  inputs: Array<GetInputs<TConfig, TFields>>;
+  // inputs: Array<GetInputs<TConfig, TFields>>;
   name: string;
   variant: "list";
 };
 
-type GroupCardSingle<
+type GroupCardNormal<
   TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
+  // TFields extends FieldValues,
 > = {
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
-  inputs: Array<{
-    gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-    list: Array<GetInputs<TConfig, TFields>>;
-    title: Header | string;
-  }>;
-  variant?: "simple";
+  // inputs: Array<{}>;
+  variant?: "normal";
 };
 
 type Header = Record<"center" | "left" | "right", ReactNode>;
 
 type SimpleCardBase = (props: SimpleCardProps) => JSX.Element;
 
-type SimpleCardProps = {
-  children: ReactNode;
+type SimpleCardObject = Record<PropertyKey, SimpleCardBase>;
+
+type SimpleCardProps = PropsWithChildren<{
   header: Header | string;
-};
+}>;
 
 export type {
   GetCards,
@@ -79,5 +122,6 @@ export type {
   GroupCardComponentProps,
   Header,
   SimpleCardBase,
+  SimpleCardObject,
   SimpleCardProps,
 };

@@ -18,7 +18,7 @@ type MfbInput<TFields extends FieldValues> = GetInputs<typeof config, TFields>;
 
 type Config = typeof config;
 
-type FormId = "TEST_PAGE_FORM_ID";
+type FormId = "TEST_PAGE_FORM_ID" | "ADVANCED_FORM_TEST_ID";
 
 const FB = new FormBuilder<Config, FormId>(config);
 
