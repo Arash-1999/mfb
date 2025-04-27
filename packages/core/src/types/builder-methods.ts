@@ -13,104 +13,109 @@ import type { DependsOn } from "./dependency-management";
 import type { GetInputs } from "./input";
 import type { AdvancedList, GetLayoutProps, InputArray } from "./utils";
 
-type AdvancedBuilderProps<
+interface AdvancedBuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormId extends string = string,
-> = BuilderBaseProps<TConfig, TFields, TFormId> & {
+> extends BuilderBaseProps<TConfig, TFields, TFormId> {
   list: AdvancedList<TConfig, TFields>;
-  // list: Array<GetCards<TConfig, TFields, true> | GetInputs<TConfig, TFields>>;
-};
+}
 
-type AdvancedMapperProps<
+interface AdvancedMapperProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = {
+> {
   list: AdvancedList<TConfig, TFields>;
   name?: string;
-};
+}
 
-type BasicBuilderProps<
+interface BasicBuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormId extends string = string,
-> = {
+> {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   id: TFormId;
   inputs: InputArray<TConfig, TFields>;
   onSubmit: SubmitHandler<TFields>;
   options?: UseFormProps<TFields>;
-};
+}
 
-type BuilderBaseProps<
+interface BuilderBaseProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormId extends string = string,
-> = {
+> {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   id: TFormId;
   onSubmit: SubmitHandler<TFields>;
   options?: UseFormProps<TFields>;
-};
+}
 
-type BuilderProps<
+interface BuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormId extends string = string,
-> = BuilderBaseProps<TConfig, TFields, TFormId> & {
+> extends BuilderBaseProps<TConfig, TFields, TFormId> {
   cards: Array<GetCards<TConfig, TFields>>;
-};
+}
 
-type DependencyManagerProps<
+interface DependencyManagerProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = {
+> {
   dependsOn: DependsOn<TFields>;
   input: GetInputs<TConfig, TFields>;
-};
+}
 
-type FieldArrayProps<TFields extends FieldValues> = {
+interface FieldArrayProps<TFields extends FieldValues> {
   // TODO: use ArrayPath generic type instead of string
   name: string;
   render: (fields: UseFieldArrayReturn<TFields>["fields"]) => ReactNode;
-};
+}
 
 interface FormBuilderProps<TConfig extends FormBuilderConfig> {
   config: TConfig;
 }
 
-type InputMapFnOptions<TFields extends FieldValues> = {
+interface InputMapFnOptions<TFields extends FieldValues> {
   formMethods: UseFormReturn<TFields>;
   name?: string;
-};
+}
 
-type InputMapperProps<
+interface InputMapperProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = {
+> {
   inputs: InputArray<TConfig, TFields>;
   name?: string;
-};
+}
 
 type RenderCardProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = {
-  index: number;
-} & (
-  | {
-      advanced: false;
-      card: GetCards<TConfig, TFields, false>;
-    }
-  | {
-      advanced: true;
-      card: GetCards<TConfig, TFields, true> & { mode: "card" };
-    }
-);
+> = RenderPropsAdvanced<TConfig, TFields> | RenderPropsNormal<TConfig, TFields>;
 
 type RenderInputOptions<TFields extends FieldValues> = {
   formMethods: UseFormReturn<TFields>;
 };
+interface RenderPropsAdvanced<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> extends RenderPropsBase {
+  advanced: false;
+  card: GetCards<TConfig, TFields, false>;
+}
+interface RenderPropsBase {
+  index: number;
+}
+interface RenderPropsNormal<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> extends RenderPropsBase {
+  advanced: true;
+  card: GetCards<TConfig, TFields, true> & { mode: "card" };
+}
 
 export type {
   AdvancedBuilderProps,
