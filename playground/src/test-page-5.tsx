@@ -1,9 +1,14 @@
+import { Button } from "@mui/material";
 import { FB } from "./form-builder";
+import { dispatchFieldArray } from "@mfb/core";
 
-interface TestPage4Fields {
-  filters: Array<{
+interface TestPageFields {
+  filters: {
     title: string;
-  }>;
+    items: Array<{
+      "fucking-input-1": string;
+    }>;
+  };
   appearance: {
     title: string;
     subtitle: string;
@@ -13,7 +18,28 @@ interface TestPage4Fields {
 const Page = () => {
   return (
     <>
-      <FB.AdvancedBuilder<TestPage4Fields>
+      <Button
+        variant="outlined"
+        sx={{ mb: 2 }}
+        onClick={() => {
+          dispatchFieldArray<TestPageFields>(
+            "ADVANCED_FORM_TEST_ID",
+            "filters.items",
+            {
+              type: "append",
+              params: [
+                {
+                  "fucking-input-1": "value 1",
+                },
+                { shouldFocus: false },
+              ],
+            }
+          );
+        }}
+      >
+        APPEND TO FILTER ITEMS
+      </Button>
+      <FB.AdvancedBuilder<TestPageFields>
         id="ADVANCED_FORM_TEST_ID"
         list={[
           {
@@ -30,6 +56,7 @@ const Page = () => {
                 gridContainerProps: {
                   spacing: 2,
                 },
+                name: "filters",
                 list: [
                   {
                     mode: "input",
@@ -52,6 +79,9 @@ const Page = () => {
                     header: "Accordion 1",
                     gridProps: {
                       size: 12,
+                    },
+                    gridContainerProps: {
+                      spacing: 2,
                     },
                     list: [
                       {
@@ -77,6 +107,44 @@ const Page = () => {
                             placeholder: "Nested 2",
                           },
                         },
+                      },
+                      {
+                        mode: "input",
+                        type: "list",
+                        name: "items",
+                        gridContainerProps: {
+                          spacing: 2,
+                        },
+                        gridProps: {
+                          size: 12,
+                        },
+                        list: [
+                          {
+                            mode: "card",
+                            header: "List Accordion",
+                            type: "accordion",
+                            gridProps: {
+                              size: 6,
+                            },
+                            list: [
+                              {
+                                mode: "input",
+                                type: "text",
+                                name: "fucking-input-1",
+                                gridProps: {
+                                  size: 12,
+                                },
+                                props: {
+                                  textFieldProps: {
+                                    size: "small",
+                                    label: "Input 1",
+                                    placeholder: "Input 1",
+                                  },
+                                },
+                              },
+                            ],
+                          },
+                        ],
                       },
                     ],
                   },
