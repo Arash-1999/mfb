@@ -108,6 +108,7 @@ interface RenderPropsAdvanced<
 }
 interface RenderPropsBase {
   index: number;
+  name?: string;
 }
 interface RenderPropsNormal<
   TConfig extends FormBuilderConfig,
