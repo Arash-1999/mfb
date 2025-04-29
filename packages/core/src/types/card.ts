@@ -25,6 +25,7 @@ type GetCardBase<
         ? Array<{
             gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
             list: AdvancedList<TConfig, TFields>;
+            name?: string;
             title: Header | string;
           }>
         : AdvancedList<TConfig, TFields>;
@@ -76,6 +77,7 @@ type GetSimpleCard<
 
 type GroupCardBase<TKey extends PropertyKey> = {
   isGroup: true;
+  name?: string;
   type: TKey;
 };
 

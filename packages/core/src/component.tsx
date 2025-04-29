@@ -158,7 +158,13 @@ class FormBuilder<
 
     return list.map((item, index) => {
       if (item.mode === "card") {
-        return renderCard({ advanced: true, card: item, index });
+        const resolvedName = name ? mergeName(name, item.name || "") : null;
+
+        return renderCard({
+          advanced: true,
+          card: Object.assign({}, item, { name: resolvedName }),
+          index,
+        });
       } else if (item.mode === "input") {
         return inputMapFn(item, index, { formMethods, name });
       }
@@ -320,6 +326,7 @@ class FormBuilder<
       if (!group) return null;
       const RenderGroupCard = group[card.type];
 
+      /* Card Group List */
       if (card.variant === "list") {
         return (
           <FieldArray<TFields>
@@ -359,6 +366,7 @@ class FormBuilder<
         );
       }
 
+      /* Card Group Normal*/
       return createElement(RenderGroupCard, {
         addGrid: (node, index) => (
           <GridItem key={`grid-item-${index}`} {...card.gridProps}>
@@ -367,10 +375,10 @@ class FormBuilder<
         ),
         key: `card-${index}`,
         nodes: advanced
-          ? card.list.map(({ gridContainerProps, list, title }) => ({
+          ? card.list.map(({ gridContainerProps, list, name, title }) => ({
               children: (
                 <GridContainer {...gridContainerProps}>
-                  <AdvancedMapper list={list} />
+                  <AdvancedMapper list={list} name={name} />
                 </GridContainer>
               ),
               title,
@@ -392,6 +400,7 @@ class FormBuilder<
 
     const RenderSimpleCard = simple[card.type];
 
+    /* Card Simple */
     if (typeof RenderSimpleCard === "function") {
       return (
         <GridItem key={index} {...(card.gridProps || {})}>
@@ -419,26 +428,36 @@ class FormBuilder<
     options: RenderInputOptions<TFields>
   ) {
     if (listInputGuard<TConfig, TFields>(input)) {
-      const { FieldArray, InputMapper } = this;
+      const { AdvancedMapper, FieldArray, InputMapper } = this;
       const {
         layout: { "grid-container": GridContainer, "grid-item": GridItem },
       } = this.config;
 
       return (
-        <FieldArray
+        <FieldArray<TFields>
           name={input.name}
           render={(fields) => (
             <GridItem {...input.gridProps}>
               <GridContainer {...input.gridContainerProps}>
                 {fields.map((field, i) => {
-                  // TODO: add options to change InputMapper to AdvancedMapper
-                  return (
-                    <InputMapper
-                      inputs={input.inputs}
-                      key={field.id}
-                      name={`${input.name}.${i}`}
-                    />
-                  );
+                  if ("inputs" in input) {
+                    return (
+                      <InputMapper
+                        inputs={input.inputs}
+                        key={field.id}
+                        name={`${input.name}.${i}`}
+                      />
+                    );
+                  } else if ("list" in input) {
+                    return (
+                      <AdvancedMapper
+                        key={field.id}
+                        list={input.list}
+                        name={`${input.name}.${i}`}
+                      />
+                    );
+                  }
+                  return null;
                 })}
               </GridContainer>
             </GridItem>

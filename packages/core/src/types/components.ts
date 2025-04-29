@@ -4,7 +4,7 @@ import type { FieldValues } from "react-hook-form";
 import type { FormBuilderConfig } from "./config";
 import type { FieldArrayActions } from "./event";
 import type { GetInputs } from "./input";
-import type { GetLayoutProps } from "./utils";
+import type { AdvancedList, GetLayoutProps } from "./utils";
 
 type ActionInput = {
   render: <TFields extends FieldValues>(
@@ -35,10 +35,15 @@ type ListInput<
 > = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
-  inputs: Array<GetInputs<TConfig, TFields>>;
-  // list?: Array<unknown>;
   name: string;
   type: "list";
-};
+} & (
+  | {
+      inputs: Array<GetInputs<TConfig, TFields>>;
+    }
+  | {
+      list: AdvancedList<TConfig, TFields>;
+    }
+);
 
 export type { ActionInput, ListInput };

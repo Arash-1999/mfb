@@ -23,7 +23,10 @@ const TextFieldInput = <TFields extends FieldValues>({
     <Controller
       control={control}
       name={name}
-      render={({ field: { ref, value, ...field } }) => (
+      render={({ field: { ref, value, ...field } }) => {
+        if(name.includes('fucking'))
+          console.log(name, value);
+        return (
         <TextField
           fullWidth
           inputRef={ref}
@@ -33,7 +36,7 @@ const TextFieldInput = <TFields extends FieldValues>({
           {...textFieldProps}
           {...field}
         />
-      )}
+      )}}
     />
   );
 };
