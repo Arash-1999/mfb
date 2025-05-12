@@ -20,6 +20,16 @@ type GetInputs<
   TFields extends FieldValues,
   TInternal extends boolean = false,
 > =
+  | (<TDeps extends FieldValues>(
+      props: InputFnProps<TDeps>,
+    ) => GetInputsImpl<TConfig, TFields, TInternal>)
+  | GetInputsImpl<TConfig, TFields, TInternal>;
+
+type GetInputsImpl<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TInternal extends boolean = false,
+> =
   | (Dependency<TFields> & ListInput<TConfig, TFields>)
   | {
       [TInput in keyof TConfig["input"]["components"]]: Dependency<
@@ -39,6 +49,10 @@ type GetInputs<
       };
     }[keyof TConfig["input"]["components"]];
 
+type InputFnProps<TDeps extends FieldValues> = {
+  deps: TDeps;
+};
+
 type InputObject = Record<PropertyKey, BaseInput>;
 
 type InputProps<TFields extends FieldValues, TProps> = BaseInputParameters &
@@ -47,4 +61,10 @@ type InputProps<TFields extends FieldValues, TProps> = BaseInputParameters &
     name: Path<TFields>;
   };
 
-export type { BaseInputParameters, GetInputs, InputObject, InputProps };
+export type {
+  BaseInputParameters,
+  GetInputs,
+  GetInputsImpl,
+  InputObject,
+  InputProps,
+};

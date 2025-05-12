@@ -10,6 +10,7 @@ import type {
   FormBuilderContext,
   FormBuilderProps,
   GetInputs,
+  GetInputsImpl,
   InputMapFnOptions,
   InputMapperProps,
   RenderCardProps,
@@ -138,7 +139,7 @@ class FormBuilder<
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...(gridContainerProps || {})}>
               {cards.map((card, index) =>
-                this.renderCard({ advanced: false, card, index })
+                this.renderCard({ advanced: false, card, index }),
               )}
             </GridContainer>
             {/* TODO: remove this submit button as configurable option */}
@@ -191,33 +192,46 @@ class FormBuilder<
       return createDependencyStructure<TFields>(dependsOn, value);
     }, [value, dependsOn]);
 
+    const resolvedInput = useMemo(() => {
+      if (typeof input === "function") {
+        return input({ deps: dependencies["bind-value"] });
+      }
+      return input;
+    }, [input, dependencies]);
+
+    let nodes = null;
+
+    if (listInputGuard<TConfig, TFields>(resolvedInput)) {
+      nodes = this.renderInput(resolvedInput, { formMethods });
+    } else {
+      // convert dependsOn to object based on given ids and paths
+      const depsField = Array.isArray(dependsOn)
+        ? dependsOn.reduce<Record<string, unknown>>(
+            (acc, cur, i) => ({
+              ...acc,
+              [cur.id]: value[i],
+            }),
+            {},
+          )
+        : {
+            [dependsOn.id]: value[0],
+          };
+      nodes = this.renderInput(
+        Object.assign({}, resolvedInput, {
+          props: Object.assign({}, resolvedInput.props, {
+            deps: depsField,
+            disabled:
+              dependencies["disable"].length > 0 &&
+              conditionArrayCalculator(dependencies["disable"]),
+          }),
+        }),
+        { formMethods },
+      );
+    }
+
     return (
       <RenderHoC dependency={dependencies["visibility"]}>
-        <GridItem {...input.gridProps}>
-          {listInputGuard<TConfig, TFields>(input)
-            ? this.renderInput(input, { formMethods })
-            : this.renderInput(
-                Object.assign({}, input, {
-                  props: Object.assign({}, input.props, {
-                    deps: Array.isArray(dependsOn)
-                      ? dependsOn.reduce<Record<string, unknown>>(
-                          (acc, cur, i) => ({
-                            ...acc,
-                            [cur.id]: value[i],
-                          }),
-                          {}
-                        )
-                      : {
-                          [dependsOn.id]: value[0],
-                        },
-                    disabled:
-                      dependencies["disable"].length > 0 &&
-                      conditionArrayCalculator(dependencies["disable"]),
-                  }),
-                }),
-                { formMethods }
-              )}
-        </GridItem>
+        <GridItem {...resolvedInput.gridProps}>{nodes}</GridItem>
       </RenderHoC>
     );
   };
@@ -243,7 +257,7 @@ class FormBuilder<
           action(detail.action);
         }
       },
-      [action, id, name]
+      [action, id, name],
     );
 
     useMfbGlobalEvent<TFields, TFormId>({
@@ -257,7 +271,7 @@ class FormBuilder<
   private inputMapFn = <TFields extends FieldValues>(
     input: GetInputs<TConfig, TFields>,
     index: number,
-    { formMethods, name }: InputMapFnOptions<TFields>
+    { formMethods, name }: InputMapFnOptions<TFields>,
   ) => {
     const { DependencyManager } = this;
     const {
@@ -273,7 +287,7 @@ class FormBuilder<
           Object.assign({}, input, {
             name: mergeName(name || "", input.name),
           }),
-          { formMethods }
+          { formMethods },
         )}
       </GridItem>
     );
@@ -300,7 +314,7 @@ class FormBuilder<
     const formMethods = useFormContext<TFields>();
 
     return inputs.map((input, i) =>
-      this.inputMapFn(input, i, { formMethods, name })
+      this.inputMapFn(input, i, { formMethods, name }),
     );
   };
 
@@ -415,7 +429,7 @@ class FormBuilder<
               ) : (
                 <InputMapper inputs={card.inputs} name={card.name} />
               )}
-            </GridContainer>
+            </GridContainer>,
           )}
         </GridItem>
       );
@@ -425,7 +439,7 @@ class FormBuilder<
 
   private renderInput<TFields extends FieldValues>(
     input: GetInputs<TConfig, TFields, true>,
-    options: RenderInputOptions<TFields>
+    options: RenderInputOptions<TFields>,
   ) {
     if (listInputGuard<TConfig, TFields>(input)) {
       const { AdvancedMapper, FieldArray, InputMapper } = this;
