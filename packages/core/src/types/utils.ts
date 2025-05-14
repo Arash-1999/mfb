@@ -9,10 +9,23 @@ import type { GetInputs } from "./input";
 type AdvancedList<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = Array<
+> =
+  | ((
+      api: DefineItemApi<AdvancedListItem<TConfig, TFields>>
+    ) => AdvancedListImpl<TConfig, TFields>)
+  | AdvancedListImpl<TConfig, TFields>;
+
+type AdvancedListImpl<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = Array<AdvancedListItem<TConfig, TFields>>;
+
+type AdvancedListItem<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> =
   | (GetCards<TConfig, TFields, true> & { mode: "card" })
-  | (GetInputs<TConfig, TFields> & { mode: "input" })
->;
+  | (GetInputs<TConfig, TFields> & { mode: "input" });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BaseComponent = (props: any) => JSX.Element;
@@ -25,6 +38,12 @@ type BaseInput = (
 type BaseInputParameters = {
   disabled?: boolean;
 };
+
+interface DefineItemApi<TItem> {
+  defineInput: <TDeps extends FieldValues>(
+    func: (deps: TDeps) => TItem
+  ) => (deps: TDeps) => TItem;
+}
 
 type GetLayoutProps<
   TConfig extends FormBuilderConfig,
@@ -48,9 +67,11 @@ type ListInputArray<
 
 export type {
   AdvancedList,
+  AdvancedListItem,
   BaseComponent,
   BaseInput,
   BaseInputParameters,
+  DefineItemApi,
   GetLayoutProps,
   HasDependencyField,
   InputArray,
