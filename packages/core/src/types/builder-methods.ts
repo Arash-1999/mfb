@@ -66,6 +66,7 @@ interface DependencyManagerProps<
 > {
   dependsOn: DependsOn<TFields>;
   input: GetInputs<TConfig, TFields>;
+  name?: string;
 }
 
 interface FieldArrayProps<TFields extends FieldValues> {

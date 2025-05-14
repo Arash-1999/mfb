@@ -21,19 +21,21 @@ type GetInputs<
   TInternal extends boolean = false,
 > =
   | (<TDeps extends FieldValues>(
-      props: InputFnProps<TDeps>,
-    ) => GetInputsImpl<TConfig, TFields, TInternal>)
+      props?: InputFnProps<TDeps>
+    ) => GetInputsImpl<TConfig, TFields, TInternal, true>)
   | GetInputsImpl<TConfig, TFields, TInternal>;
 
 type GetInputsImpl<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TInternal extends boolean = false,
+  TFunc extends boolean = false,
 > =
-  | (Dependency<TFields> & ListInput<TConfig, TFields>)
+  | (Dependency<TFields, TFunc> & ListInput<TConfig, TFields>)
   | {
       [TInput in keyof TConfig["input"]["components"]]: Dependency<
         TFields,
+        TFunc,
         HasDependencyField<TConfig["input"]["components"][TInput]>
       > & {
         field?: GetLayoutProps<TConfig, "field">;

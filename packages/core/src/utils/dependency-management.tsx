@@ -23,7 +23,7 @@ const RenderHoC = <TFields extends FieldValues>({
 
 const conditionCalculator = (
   { condition, value }: Condition,
-  currentValue: unknown,
+  currentValue: unknown
 ): boolean => {
   let result: boolean = false;
 
@@ -39,18 +39,22 @@ const conditionCalculator = (
 };
 
 const conditionArrayCalculator = (
-  list: Array<Condition & { current: unknown }>,
+  list: Array<Condition & { current: unknown }>
 ) => {
   return list.every((dep) => conditionCalculator(dep, dep.current));
 };
 
 const pushDependency = <TFields extends FieldValues>(
   target: DependencyStructure<TFields>,
-  dependsOn: DependsOnSingle<TFields>,
-  value: PathValue<TFields, Path<TFields>> | undefined,
+  dependsOn: DependsOnSingle<TFields, false, true>,
+  value: PathValue<TFields, Path<TFields>> | undefined
 ) => {
   switch (dependsOn.type) {
     case "bind-value": {
+      target[dependsOn.type].push({ ...dependsOn, current: value });
+      break;
+    }
+    case "def-props": {
       target[dependsOn.type].push({ ...dependsOn, current: value });
       break;
     }
@@ -65,10 +69,11 @@ const pushDependency = <TFields extends FieldValues>(
 };
 const createDependencyStructure = <TFields extends FieldValues>(
   dependsOn: DependsOn<TFields>,
-  value: readonly PathValue<TFields, Path<TFields>>[],
+  value: readonly PathValue<TFields, Path<TFields>>[]
 ) => {
   const base: DependencyStructure<TFields> = {
     "bind-value": [],
+    "def-props": [],
     disable: [],
     visibility: [],
   };

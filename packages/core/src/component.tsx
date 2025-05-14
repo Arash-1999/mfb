@@ -139,7 +139,7 @@ class FormBuilder<
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...(gridContainerProps || {})}>
               {cards.map((card, index) =>
-                this.renderCard({ advanced: false, card, index }),
+                this.renderCard({ advanced: false, card, index })
               )}
             </GridContainer>
             {/* TODO: remove this submit button as configurable option */}
@@ -176,11 +176,13 @@ class FormBuilder<
   private DependencyManager = <TFields extends FieldValues>({
     dependsOn,
     input,
+    name,
   }: DependencyManagerProps<TConfig, TFields>) => {
     const {
       layout: { "grid-item": GridItem },
     } = this.config;
     const formMethods = useFormContext<TFields>();
+
     const value = useWatch<TFields>({
       control: formMethods.control,
       name: Array.isArray(dependsOn)
@@ -194,7 +196,17 @@ class FormBuilder<
 
     const resolvedInput = useMemo(() => {
       if (typeof input === "function") {
-        return input({ deps: dependencies["bind-value"] });
+        // TODO: move this function to dependency manager file as a helper function
+        const resolvedDeps = dependencies["def-props"].reduce<
+          Record<string, unknown>
+        >(
+          (acc, cur) => ({
+            ...acc,
+            [cur.id]: cur.current,
+          }),
+          {}
+        );
+        return input({ deps: resolvedDeps });
       }
       return input;
     }, [input, dependencies]);
@@ -202,22 +214,40 @@ class FormBuilder<
     let nodes = null;
 
     if (listInputGuard<TConfig, TFields>(resolvedInput)) {
-      nodes = this.renderInput(resolvedInput, { formMethods });
-    } else {
-      // convert dependsOn to object based on given ids and paths
-      const depsField = Array.isArray(dependsOn)
-        ? dependsOn.reduce<Record<string, unknown>>(
-            (acc, cur, i) => ({
-              ...acc,
-              [cur.id]: value[i],
-            }),
-            {},
-          )
-        : {
-            [dependsOn.id]: value[0],
-          };
       nodes = this.renderInput(
         Object.assign({}, resolvedInput, {
+          name: mergeName(name || "", resolvedInput.name),
+        }),
+        { formMethods }
+      );
+    } else {
+      // convert dependsOn to object based on given ids and paths
+      // TODO: TEST comment
+      // FIX: it doesn't work properly when there are both def-props and bind-value dependencies (it should use convert helper function) (it should handle disabled and other similar dependency types)
+      // const depsField = Array.isArray(dependsOn)
+      //   ? dependsOn.reduce<Record<string, unknown>>(
+      //       (acc, cur, i) => ({
+      //         ...acc,
+      //         [cur.id]: value[i],
+      //       }),
+      //       {}
+      //     )
+      //   : {
+      //       [dependsOn.id]: value[0],
+      //     };
+      // TODO: use type of deps field in user input components and make path and id type safe.
+      const depsField = dependencies["bind-value"].reduce<
+        Record<string, unknown>
+      >(
+        (acc, cur) => ({
+          ...acc,
+          [cur.id]: cur.current,
+        }),
+        {}
+      );
+      nodes = this.renderInput(
+        Object.assign({}, resolvedInput, {
+          name: mergeName(name || "", resolvedInput.name),
           props: Object.assign({}, resolvedInput.props, {
             deps: depsField,
             disabled:
@@ -225,7 +255,7 @@ class FormBuilder<
               conditionArrayCalculator(dependencies["disable"]),
           }),
         }),
-        { formMethods },
+        { formMethods }
       );
     }
 
@@ -257,7 +287,7 @@ class FormBuilder<
           action(detail.action);
         }
       },
-      [action, id, name],
+      [action, id, name]
     );
 
     useMfbGlobalEvent<TFields, TFormId>({
@@ -271,40 +301,50 @@ class FormBuilder<
   private inputMapFn = <TFields extends FieldValues>(
     input: GetInputs<TConfig, TFields>,
     index: number,
-    { formMethods, name }: InputMapFnOptions<TFields>,
+    { formMethods, name }: InputMapFnOptions<TFields>
   ) => {
     const { DependencyManager } = this;
     const {
       layout: { "grid-item": GridItem },
     } = this.config;
 
-    const dependency = input.dependsOn;
     const key = `input-${index}`;
 
-    const node = (
+    if (typeof input === "function") {
+      const initialDependency = input().dependsOn;
+      return (
+        <DependencyManager
+          dependsOn={initialDependency}
+          input={input}
+          key={key}
+          name={name}
+        />
+      );
+    } else if (input.dependsOn) {
+      const dependency = input.dependsOn;
+      return (
+        <DependencyManager
+          dependsOn={dependency}
+          input={input}
+          // input={Object.assign({}, input, {
+          //   name: mergeName(name || "", input.name),
+          // })}
+          key={key}
+          name={name}
+        />
+      );
+    }
+
+    return (
       <GridItem key={key} {...(input.gridProps || {})}>
         {this.renderInput(
           Object.assign({}, input, {
             name: mergeName(name || "", input.name),
           }),
-          { formMethods },
+          { formMethods }
         )}
       </GridItem>
     );
-
-    if (typeof dependency === "undefined") {
-      return node;
-    } else {
-      return (
-        <DependencyManager
-          dependsOn={dependency}
-          input={Object.assign({}, input, {
-            name: mergeName(name || "", input.name),
-          })}
-          key={key}
-        />
-      );
-    }
   };
 
   private InputMapper = <TFields extends FieldValues>({
@@ -314,7 +354,7 @@ class FormBuilder<
     const formMethods = useFormContext<TFields>();
 
     return inputs.map((input, i) =>
-      this.inputMapFn(input, i, { formMethods, name }),
+      this.inputMapFn(input, i, { formMethods, name })
     );
   };
 
@@ -429,7 +469,7 @@ class FormBuilder<
               ) : (
                 <InputMapper inputs={card.inputs} name={card.name} />
               )}
-            </GridContainer>,
+            </GridContainer>
           )}
         </GridItem>
       );
@@ -438,8 +478,8 @@ class FormBuilder<
   };
 
   private renderInput<TFields extends FieldValues>(
-    input: GetInputs<TConfig, TFields, true>,
-    options: RenderInputOptions<TFields>,
+    input: GetInputsImpl<TConfig, TFields, true>,
+    options: RenderInputOptions<TFields>
   ) {
     if (listInputGuard<TConfig, TFields>(input)) {
       const { AdvancedMapper, FieldArray, InputMapper } = this;
