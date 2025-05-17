@@ -20,9 +20,7 @@ type GetInputs<
   TFields extends FieldValues,
   TInternal extends boolean = false,
 > =
-  | (<TDeps extends FieldValues>(
-      props?: InputFnProps<TDeps>
-    ) => GetInputsImpl<TConfig, TFields, TInternal, true>)
+  | ((props?: InputFnProps) => GetInputsImpl<TConfig, TFields, TInternal, true>)
   | GetInputsImpl<TConfig, TFields, TInternal>;
 
 type GetInputsImpl<
@@ -51,9 +49,9 @@ type GetInputsImpl<
       };
     }[keyof TConfig["input"]["components"]];
 
-type InputFnProps<TDeps extends FieldValues> = {
-  deps: TDeps;
-};
+interface InputFnProps {
+  deps: never;
+}
 
 type InputObject = Record<PropertyKey, BaseInput>;
 

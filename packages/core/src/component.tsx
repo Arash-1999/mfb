@@ -97,6 +97,15 @@ class FormBuilder<
     const { "grid-container": GridContainer } = this.config.layout;
     const formMethods = useForm<TFields>(options);
 
+    const resolvedInputs = useMemo(() => {
+      if (typeof inputs === "function") {
+        return inputs({
+          define:
+            this.defineItem<GetInputsImpl<TConfig, TFields, false, true>>(),
+        });
+      } else return inputs;
+    }, [inputs]);
+
     return (
       <Context.Provider
         value={{
@@ -106,7 +115,7 @@ class FormBuilder<
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...gridContainerProps}>
-              <InputMapper inputs={inputs} />
+              <InputMapper inputs={resolvedInputs} />
             </GridContainer>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
@@ -173,6 +182,12 @@ class FormBuilder<
     });
   };
 
+  private defineItem =
+    <TItem,>() =>
+    <TDeps extends FieldValues>(func: (props?: { deps: TDeps }) => TItem) => {
+      return func;
+    };
+
   private DependencyManager = <TFields extends FieldValues>({
     dependsOn,
     input,
@@ -206,7 +221,7 @@ class FormBuilder<
           }),
           {}
         );
-        return input({ deps: resolvedDeps });
+        return input({ deps: resolvedDeps as never });
       }
       return input;
     }, [input, dependencies]);
@@ -326,9 +341,6 @@ class FormBuilder<
         <DependencyManager
           dependsOn={dependency}
           input={input}
-          // input={Object.assign({}, input, {
-          //   name: mergeName(name || "", input.name),
-          // })}
           key={key}
           name={name}
         />

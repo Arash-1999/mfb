@@ -10,7 +10,7 @@ import type {
 import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
 import type { DependsOn } from "./dependency-management";
-import type { GetInputs } from "./input";
+import type { GetInputs, GetInputsImpl } from "./input";
 import type { AdvancedList, GetLayoutProps, InputArray } from "./utils";
 
 interface AdvancedBuilderProps<
@@ -36,7 +36,17 @@ interface BasicBuilderProps<
 > {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   id: TFormId;
-  inputs: InputArray<TConfig, TFields>;
+  inputs:
+    | ((api: {
+        define: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetInputsImpl<TConfig, TFields, false, true>
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetInputsImpl<TConfig, TFields, false, true>;
+      }) => InputArray<TConfig, TFields>)
+    | InputArray<TConfig, TFields>;
   onSubmit: SubmitHandler<TFields>;
   options?: UseFormProps<TFields>;
 }

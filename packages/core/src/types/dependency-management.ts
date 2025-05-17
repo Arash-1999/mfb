@@ -28,7 +28,7 @@ interface DependencyObject<
 }
 
 type DependencyStructure<TFields extends FieldValues> = {
-  [TKey in DependsOnUnion<false, true> as TKey["type"]]: Array<
+  [TKey in DependsOnUnion<false> as TKey["type"]]: Array<
     DependsOnBase<TFields> &
       TKey & {
         current: unknown;
@@ -51,15 +51,11 @@ type DependsOnBase<TFields extends FieldValues> = {
 type DependsOnSingle<
   TFields extends FieldValues,
   TOnlyBoolean extends boolean = false,
-  TFunc extends boolean = false,
-> = DependsOnBase<TFields> & DependsOnUnion<TOnlyBoolean, TFunc>;
+> = DependsOnBase<TFields> & DependsOnUnion<TOnlyBoolean>;
 
-type DependsOnUnion<
-  TOnlyBoolean extends boolean = false,
-  TFunc extends boolean = false,
-> =
+type DependsOnUnion<TOnlyBoolean extends boolean = false> =
+  | DefPropsDependency
   | DisableDependency
-  | (TFunc extends true ? DefPropsDependency : never)
   | (TOnlyBoolean extends false ? BindValueDependency : never)
   | VisibilityDependency;
 
