@@ -15,7 +15,7 @@ const Page = () => {
           mt: 8,
           p: 2,
         }}
-        inputs={[
+        inputs={(api) => [
           {
             type: "text",
             name: "is_multiple",
@@ -27,29 +27,26 @@ const Page = () => {
               },
             },
           },
-          (api?: { deps?: { is_multiple?: string } }) => {
-            console.log(api?.deps);
-            return {
-              type: "text",
-              name: "value",
-              dependsOn: [
-                {
-                  type: "def-props",
-                  path: "is_multiple",
-                  id: "is_multiple",
-                },
-              ],
-              props: {
-                textFieldProps: {
-                  size: "small",
-                  label:
-                    api?.deps?.is_multiple?.toLowerCase() === "yes"
-                      ? "Multiple Value"
-                      : "Single Value",
-                },
+          api.define<{ is_multiple: string }>((props) => ({
+            type: "text",
+            name: "value",
+            dependsOn: [
+              {
+                type: "def-props",
+                path: "is_multiple",
+                id: "is_multiple",
               },
-            };
-          },
+            ],
+            props: {
+              textFieldProps: {
+                size: "small",
+                label:
+                  props?.deps.is_multiple?.toLowerCase() === "yes"
+                    ? "Multiple Value"
+                    : "Single Value",
+              },
+            },
+          })),
         ]}
         onSubmit={(data) => {
           console.log(data);
