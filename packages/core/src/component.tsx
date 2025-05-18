@@ -97,6 +97,7 @@ class FormBuilder<
     const { "grid-container": GridContainer } = this.config.layout;
     const formMethods = useForm<TFields>(options);
 
+    // TODO: move useMemo into a custom hook with generic type for TItem (and list/inputs)
     const resolvedInputs = useMemo(() => {
       if (typeof inputs === "function") {
         return inputs({
@@ -360,13 +361,14 @@ class FormBuilder<
   };
 
   private InputMapper = <TFields extends FieldValues>({
+    deps,
     inputs,
     name, // should passed in list input. optional in card or flat mode inputs.
   }: InputMapperProps<TConfig, TFields>) => {
     const formMethods = useFormContext<TFields>();
 
     return inputs.map((input, i) =>
-      this.inputMapFn(input, i, { formMethods, name })
+      this.inputMapFn(input, i, { deps, formMethods, name })
     );
   };
 
@@ -493,6 +495,7 @@ class FormBuilder<
     input: GetInputsImpl<TConfig, TFields, true>,
     options: RenderInputOptions<TFields>
   ) {
+    console.log(input.name, input);
     if (listInputGuard<TConfig, TFields>(input)) {
       const { AdvancedMapper, FieldArray, InputMapper } = this;
       const {
@@ -507,8 +510,19 @@ class FormBuilder<
               <GridContainer {...input.gridContainerProps}>
                 {fields.map((field, i) => {
                   if ("inputs" in input) {
+                    const dependesOn = input.dependsOn
+                      ? Array.isArray(input.dependsOn)
+                        ? input.dependsOn
+                        : [input.dependsOn]
+                      : [];
+                    const resolvedDeps = dependesOn.filter((dep) =>
+                      ["disabled"].includes(dep.type)
+                    );
                     return (
                       <InputMapper
+                        deps={
+                          resolvedDeps.length > 0 ? resolvedDeps : undefined
+                        }
                         inputs={input.inputs}
                         key={field.id}
                         name={`${input.name}.${i}`}

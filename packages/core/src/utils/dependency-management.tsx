@@ -46,7 +46,7 @@ const conditionArrayCalculator = (
 
 const pushDependency = <TFields extends FieldValues>(
   target: DependencyStructure<TFields>,
-  dependsOn: DependsOnSingle<TFields, false, true>,
+  dependsOn: DependsOnSingle<TFields, false>,
   value: PathValue<TFields, Path<TFields>> | undefined
 ) => {
   switch (dependsOn.type) {
