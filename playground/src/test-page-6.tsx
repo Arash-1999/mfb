@@ -3,6 +3,7 @@ import { FB } from "./form-builder";
 interface TestPageFields {
   is_multiple: boolean;
   value: string | string[];
+  select: string;
 }
 
 const Page = () => {
@@ -25,6 +26,22 @@ const Page = () => {
                 label: "Is Multiple",
                 placeholder: "Is Multiple",
               },
+            },
+          },
+          {
+            type: "select",
+            name: "select",
+            dependsOn: {
+              type: "bind-value",
+              id: "country_id",
+              path: "is_multiple",
+            },
+            props: {
+              options: [
+                { label: "Item 1", value: "item-1" },
+                { label: "Item 2", value: "item-2" },
+                { label: "Item 3", value: "item-3" },
+              ],
             },
           },
           api.define<{ is_multiple: string }>((props) => ({
