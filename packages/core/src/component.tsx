@@ -317,7 +317,7 @@ class FormBuilder<
   private inputMapFn = <TFields extends FieldValues>(
     input: GetInputs<TConfig, TFields>,
     index: number,
-    { formMethods, name }: InputMapFnOptions<TFields>
+    { deps, formMethods, name }: InputMapFnOptions<TFields>
   ) => {
     const { DependencyManager } = this;
     const {
@@ -326,18 +326,19 @@ class FormBuilder<
 
     const key = `input-${index}`;
 
-    if (typeof input === "function") {
-      const initialDependency = input().dependsOn;
-      return (
-        <DependencyManager
-          dependsOn={initialDependency}
-          input={input}
-          key={key}
-          name={name}
-        />
-      );
-    } else if (input.dependsOn) {
-      const dependency = input.dependsOn;
+    const dependency = useMemo(() => {
+      let { dependsOn } = typeof input === "function" ? input() : input;
+      dependsOn = dependsOn
+        ? Array.isArray(dependsOn)
+          ? dependsOn
+          : [dependsOn]
+        : [];
+      const resolvedDeps = deps ? (Array.isArray(deps) ? deps : [deps]) : [];
+
+      return [...resolvedDeps, ...dependsOn];
+    }, [deps, input]);
+
+    if (typeof input === "function" || dependency.length > 0) {
       return (
         <DependencyManager
           dependsOn={dependency}
@@ -516,7 +517,7 @@ class FormBuilder<
                         : [input.dependsOn]
                       : [];
                     const resolvedDeps = dependesOn.filter((dep) =>
-                      ["disabled"].includes(dep.type)
+                      ["disable"].includes(dep.type)
                     );
                     return (
                       <InputMapper

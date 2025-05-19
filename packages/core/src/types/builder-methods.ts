@@ -9,7 +9,7 @@ import type {
 
 import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
-import type { DependsOn, DependsOnSingle } from "./dependency-management";
+import type { DependsOn } from "./dependency-management";
 import type { GetInputs, GetInputsImpl } from "./input";
 import type { AdvancedList, GetLayoutProps, InputArray } from "./utils";
 
@@ -90,7 +90,7 @@ interface FormBuilderProps<TConfig extends FormBuilderConfig> {
 }
 
 interface InputMapFnOptions<TFields extends FieldValues> {
-  deps?: Array<DependsOnSingle<TFields>>;
+  deps?: DependsOn<TFields>;
   formMethods: UseFormReturn<TFields>;
   name?: string;
 }
@@ -99,7 +99,7 @@ interface InputMapperProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > {
-  deps?: Array<DependsOnSingle<TFields>>;
+  deps?: DependsOn<TFields>;
   inputs: InputArray<TConfig, TFields>;
   name?: string;
 }
