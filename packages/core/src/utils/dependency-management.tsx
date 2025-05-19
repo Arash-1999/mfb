@@ -7,10 +7,24 @@ import type {
 import type { PropsWithChildren } from "react";
 import type { FieldValues, Path, PathValue } from "react-hook-form";
 
+const handleRenderDep = <TFields extends FieldValues, TItem>({
+  children,
+  dependency,
+}: {
+  children: TItem;
+  dependency: DependencyStructure<TFields>["visibility"];
+}): null | TItem => {
+  const condition =
+    dependency.length === 0 || conditionArrayCalculator(dependency);
+  return condition ? children : null;
+};
+
+// TODO: check usage and remove
 type RenderHoCProps<TFields extends FieldValues> = PropsWithChildren<{
   dependency: DependencyStructure<TFields>["visibility"];
 }>;
 
+// TODO: check usage and remove
 const RenderHoC = <TFields extends FieldValues>({
   children,
   dependency,
@@ -93,5 +107,6 @@ export {
   conditionArrayCalculator,
   conditionCalculator,
   createDependencyStructure,
+  handleRenderDep,
   RenderHoC,
 };

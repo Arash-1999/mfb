@@ -70,12 +70,15 @@ interface BuilderProps<
   cards: Array<GetCards<TConfig, TFields>>;
 }
 
+// TODO: check usage and remove
 interface DependencyManagerProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
+  TItem extends object,
 > {
+  component: ((props?: { deps: never }) => TItem) | TItem;
   dependsOn: DependsOn<TFields>;
-  input: GetInputs<TConfig, TFields>;
+  input?: GetInputs<TConfig, TFields>;
   name?: string;
 }
 

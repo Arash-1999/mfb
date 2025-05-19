@@ -3,7 +3,6 @@ import type {
   AdvancedMapperProps,
   BasicBuilderProps,
   BuilderProps,
-  DependencyManagerProps,
   FieldArrayEvent,
   FieldArrayProps,
   FormBuilderConfig,
@@ -19,14 +18,13 @@ import type {
 import type { Context } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
-import { useMfbFieldArray, useMfbGlobalEvent } from "@/hooks";
 import {
-  conditionArrayCalculator,
-  createDependencyStructure,
-  listInputGuard,
-  mergeName,
-  RenderHoC,
-} from "@/utils";
+  useDependency,
+  useDependsOnField,
+  useMfbFieldArray,
+  useMfbGlobalEvent,
+} from "@/hooks";
+import { conditionArrayCalculator, listInputGuard, mergeName } from "@/utils";
 import { eventNames } from "@/utils/events";
 import {
   createContext,
@@ -35,12 +33,7 @@ import {
   useContext,
   useMemo,
 } from "react";
-import {
-  FormProvider,
-  useForm,
-  useFormContext,
-  useWatch,
-} from "react-hook-form";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
@@ -183,104 +176,33 @@ class FormBuilder<
     });
   };
 
+  // TODO:
+  // private cardMapFn = <TFields extends FieldValues>(
+  //   card: GetCards<TConfig, TFields>,
+  //   index: number,
+  //   { deps, formMethods, name }: InputMapFnOptions<TFields>
+  // ) => {
+  //   const key = `input-${index}`;
+
+  //   const dependency = useDependsOnField<
+  //     TFields,
+  //     GetCardsImpl<TConfig, TFields>
+  //   >({ component: card, deps });
+
+  //   const [component, dependencies] = useDependency<
+  //     TFields,
+  //     GetCardsImpl<TConfig, TFields>
+  //   >({
+  //     component: card,
+  //     dependsOn: dependency,
+  //   });
+  // };
+
   private defineItem =
     <TItem,>() =>
     <TDeps extends FieldValues>(func: (props?: { deps: TDeps }) => TItem) => {
       return func;
     };
-
-  private DependencyManager = <TFields extends FieldValues>({
-    dependsOn,
-    input,
-    name,
-  }: DependencyManagerProps<TConfig, TFields>) => {
-    const {
-      layout: { "grid-item": GridItem },
-    } = this.config;
-    const formMethods = useFormContext<TFields>();
-
-    const value = useWatch<TFields>({
-      control: formMethods.control,
-      name: Array.isArray(dependsOn)
-        ? dependsOn.map((dep) => dep.path)
-        : [dependsOn.path],
-    });
-
-    const dependencies = useMemo(() => {
-      return createDependencyStructure<TFields>(dependsOn, value);
-    }, [value, dependsOn]);
-
-    const resolvedInput = useMemo(() => {
-      if (typeof input === "function") {
-        // TODO: move this function to dependency manager file as a helper function
-        const resolvedDeps = dependencies["def-props"].reduce<
-          Record<string, unknown>
-        >(
-          (acc, cur) => ({
-            ...acc,
-            [cur.id]: cur.current,
-          }),
-          {}
-        );
-        return input({ deps: resolvedDeps as never });
-      }
-      return input;
-    }, [input, dependencies]);
-
-    let nodes = null;
-
-    if (listInputGuard<TConfig, TFields>(resolvedInput)) {
-      nodes = this.renderInput(
-        Object.assign({}, resolvedInput, {
-          name: mergeName(name || "", resolvedInput.name),
-        }),
-        { formMethods }
-      );
-    } else {
-      // convert dependsOn to object based on given ids and paths
-      // TODO: TEST comment
-      // FIX: it doesn't work properly when there are both def-props and bind-value dependencies (it should use convert helper function) (it should handle disabled and other similar dependency types)
-      // const depsField = Array.isArray(dependsOn)
-      //   ? dependsOn.reduce<Record<string, unknown>>(
-      //       (acc, cur, i) => ({
-      //         ...acc,
-      //         [cur.id]: value[i],
-      //       }),
-      //       {}
-      //     )
-      //   : {
-      //       [dependsOn.id]: value[0],
-      //     };
-      // TODO: use type of deps field in user input components and make path and id type safe.
-      const depsField = dependencies["bind-value"].reduce<
-        Record<string, unknown>
-      >(
-        (acc, cur) => ({
-          ...acc,
-          [cur.id]: cur.current,
-        }),
-        {}
-      );
-      nodes = this.renderInput(
-        Object.assign({}, resolvedInput, {
-          name: mergeName(name || "", resolvedInput.name),
-          props: Object.assign({}, resolvedInput.props, {
-            deps: depsField,
-            disabled:
-              dependencies["disable"].length > 0 &&
-              conditionArrayCalculator(dependencies["disable"]),
-          }),
-        }),
-        { formMethods }
-      );
-    }
-
-    return (
-      <RenderHoC dependency={dependencies["visibility"]}>
-        <GridItem {...resolvedInput.gridProps}>{nodes}</GridItem>
-      </RenderHoC>
-    );
-  };
 
   private useMfbContext = () => {
     const { Context } = this;
@@ -319,44 +241,64 @@ class FormBuilder<
     index: number,
     { deps, formMethods, name }: InputMapFnOptions<TFields>
   ) => {
-    const { DependencyManager } = this;
     const {
       layout: { "grid-item": GridItem },
     } = this.config;
 
     const key = `input-${index}`;
 
-    const dependency = useMemo(() => {
-      let { dependsOn } = typeof input === "function" ? input() : input;
-      dependsOn = dependsOn
-        ? Array.isArray(dependsOn)
-          ? dependsOn
-          : [dependsOn]
-        : [];
-      const resolvedDeps = deps ? (Array.isArray(deps) ? deps : [deps]) : [];
+    const dependency = useDependsOnField<
+      TFields,
+      GetInputsImpl<TConfig, TFields>
+    >({ component: input, deps });
 
-      return [...resolvedDeps, ...dependsOn];
-    }, [deps, input]);
+    const [component, dependencies] = useDependency<
+      TFields,
+      GetInputsImpl<TConfig, TFields>
+    >({
+      component: input,
+      dependsOn: dependency,
+    });
 
-    if (typeof input === "function" || dependency.length > 0) {
-      return (
-        <DependencyManager
-          dependsOn={dependency}
-          input={input}
-          key={key}
-          name={name}
-        />
+    if (component === null) return null;
+
+    let node = null;
+
+    if (listInputGuard<TConfig, TFields>(component)) {
+      node = this.renderInput(
+        Object.assign({}, component, {
+          name: mergeName(name || "", component.name),
+        }),
+        { formMethods }
+      );
+    } else {
+      // TODO: use type of deps field in user input components and make path and id type safe.
+      const depsField = dependencies["bind-value"].reduce<
+        Record<string, unknown>
+      >(
+        (acc, cur) => ({
+          ...acc,
+          [cur.id]: cur.current,
+        }),
+        {}
+      );
+      node = this.renderInput(
+        Object.assign({}, component, {
+          name: mergeName(name || "", component.name),
+          props: Object.assign({}, component.props, {
+            deps: depsField,
+            disabled:
+              dependencies["disable"].length > 0 &&
+              conditionArrayCalculator(dependencies["disable"]),
+          }),
+        }),
+        { formMethods }
       );
     }
 
     return (
-      <GridItem key={key} {...(input.gridProps || {})}>
-        {this.renderInput(
-          Object.assign({}, input, {
-            name: mergeName(name || "", input.name),
-          }),
-          { formMethods }
-        )}
+      <GridItem key={key} {...(component.gridProps || {})}>
+        {node}
       </GridItem>
     );
   };
