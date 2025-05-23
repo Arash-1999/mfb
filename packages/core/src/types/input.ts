@@ -6,6 +6,7 @@ import type { Dependency } from "./dependency-management";
 import type {
   BaseInput,
   BaseInputParameters,
+  DefineFnProps,
   GetLayoutProps,
   HasDependencyField,
 } from "./utils";
@@ -20,7 +21,7 @@ type GetInputs<
   TFields extends FieldValues,
   TInternal extends boolean = false,
 > =
-  | ((props?: InputFnProps) => GetInputsImpl<TConfig, TFields, TInternal, true>)
+  | ((props?: DefineFnProps) => GetInputsImpl<TConfig, TFields, TInternal, true>)
   | GetInputsImpl<TConfig, TFields, TInternal>;
 
 type GetInputsImpl<
@@ -48,10 +49,6 @@ type GetInputsImpl<
         type: TInput;
       };
     }[keyof TConfig["input"]["components"]];
-
-interface InputFnProps {
-  deps: never;
-}
 
 type InputObject = Record<PropertyKey, BaseInput>;
 

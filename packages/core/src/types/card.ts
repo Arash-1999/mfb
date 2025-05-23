@@ -3,7 +3,7 @@ import type { FieldValues } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
 import type { GetInputs } from "./input";
-import type { AdvancedList, GetLayoutProps } from "./utils";
+import type { AdvancedList, DefineFnProps, GetLayoutProps } from "./utils";
 
 type GetCardBase<
   TConfig extends FormBuilderConfig,
@@ -12,29 +12,34 @@ type GetCardBase<
   TNormalGroup extends boolean = false,
 > = TAdvanced extends false
   ? {
-      inputs: TNormalGroup extends false
-        ? Array<{
-            gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-            list: Array<GetInputs<TConfig, TFields>>;
-            title: Header | string;
-          }>
-        : Array<GetInputs<TConfig, TFields>>;
-    }
+    inputs: TNormalGroup extends false
+    ? Array<{
+      gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+      list: Array<GetInputs<TConfig, TFields>>;
+      title: Header | string;
+    }>
+    : Array<GetInputs<TConfig, TFields>>;
+  }
   : {
-      list: TNormalGroup extends false
-        ? Array<{
-            gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-            list: AdvancedList<TConfig, TFields>;
-            name?: string;
-            title: Header | string;
-          }>
-        : AdvancedList<TConfig, TFields>;
-      // : Array<
-      //     GetCards<TConfig, TFields, TAdvanced> | GetInputs<TConfig, TFields>
-      //   >;
-    };
+    list: TNormalGroup extends false
+    ? Array<{
+      gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+      list: AdvancedList<TConfig, TFields>;
+      name?: string;
+      title: Header | string;
+    }>
+    : AdvancedList<TConfig, TFields>;
+  };
 
 type GetCards<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TAdvanced extends boolean = false,
+> =
+  | ((props?: DefineFnProps) => GetCardsImpl<TConfig, TFields, TAdvanced>)
+  | GetCardsImpl<TConfig, TFields, TAdvanced>;
+
+type GetCardsImpl<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TAdvanced extends boolean = false,
@@ -49,14 +54,14 @@ type GetGroupCard<
 > = TConfig["card"]["group"] extends undefined
   ? never
   : {
-      [TCard in keyof TConfig["card"]["group"]]: GroupCardBase<TCard> &
-        (
-          | (GetCardBase<TConfig, TFields, TAdvanced, true> &
-              GroupCardList<TConfig>)
-          | (GetCardBase<TConfig, TFields, TAdvanced> &
-              GroupCardNormal<TConfig>)
-        );
-    }[keyof TConfig["card"]["group"]];
+    [TCard in keyof TConfig["card"]["group"]]: GroupCardBase<TCard> &
+    (
+      | (GetCardBase<TConfig, TFields, TAdvanced, true> &
+        GroupCardList<TConfig>)
+      | (GetCardBase<TConfig, TFields, TAdvanced> &
+        GroupCardNormal<TConfig>)
+    );
+  }[keyof TConfig["card"]["group"]];
 
 type GetSimpleCard<
   TConfig extends FormBuilderConfig,
@@ -90,7 +95,7 @@ type GroupCardComponentProps = {
 
 type GroupCardList<
   TConfig extends FormBuilderConfig,
-  // TFields extends FieldValues,
+// TFields extends FieldValues,
 > = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
@@ -101,10 +106,8 @@ type GroupCardList<
 
 type GroupCardNormal<
   TConfig extends FormBuilderConfig,
-  // TFields extends FieldValues,
 > = {
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
-  // inputs: Array<{}>;
   variant?: "normal";
 };
 
@@ -120,6 +123,7 @@ type SimpleCardProps = PropsWithChildren<{
 
 export type {
   GetCards,
+  GetCardsImpl,
   GroupCardComponent,
   GroupCardComponentProps,
   Header,

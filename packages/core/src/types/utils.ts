@@ -4,12 +4,11 @@ import type { FieldValues, UseFormReturn } from "react-hook-form";
 import type { GetCards } from "./card";
 import type { ActionInput } from "./components";
 import type { FormBuilderConfig } from "./config";
-import type { GetInputs } from "./input";
 import type {
   Dependency,
   DependencyStructure,
-  DependsOn,
 } from "./dependency-management";
+import type { GetInputs } from "./input";
 
 type AdvancedList<
   TConfig extends FormBuilderConfig,
@@ -33,6 +32,10 @@ type BaseInputParameters = {
 
 interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
   name?: string;
+}
+
+interface DefineFnProps {
+  deps: never;
 }
 
 type GetLayoutProps<
@@ -72,6 +75,7 @@ export type {
   BaseInput,
   BaseInputParameters,
   DefaultItem,
+  DefineFnProps,
   GetLayoutProps,
   HasDependencyField,
   InputArray,
