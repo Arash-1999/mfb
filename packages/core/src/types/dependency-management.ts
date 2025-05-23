@@ -20,6 +20,13 @@ type Dependency<
   ? Required<DependencyObject<TFields, TOnlyBoolean>>
   : Partial<DependencyObject<TFields, TOnlyBoolean>>;
 
+interface DependencyContextDisable extends Condition {
+  current: unknown;
+}
+interface DependencyContextValue {
+  disable: Array<DependencyContextDisable>;
+}
+
 interface DependencyObject<
   TFields extends FieldValues,
   TOnlyBoolean extends boolean = false,
@@ -27,13 +34,18 @@ interface DependencyObject<
   dependsOn: DependsOn<TFields, TOnlyBoolean>;
 }
 
-type DependencyStructure<TFields extends FieldValues> = {
-  [TKey in DependsOnUnion<false> as TKey["type"]]: Array<
-    DependsOnBase<TFields> &
-      TKey & {
-        current: unknown;
-      }
-  >;
+type DependencyStructure<TFields extends FieldValues> = Omit<
+  {
+    [TKey in DependsOnUnion<false> as TKey["type"]]: Array<
+      DependsOnBase<TFields> &
+        TKey & {
+          current: unknown;
+        }
+    >;
+  },
+  "disable"
+> & {
+  disable: Array<DependencyContextDisable>;
 };
 
 type DependsOn<
@@ -71,6 +83,7 @@ export type {
   BindValueDependency,
   Condition,
   Dependency,
+  DependencyContextValue,
   DependencyStructure,
   DependsOn,
   DependsOnBase,

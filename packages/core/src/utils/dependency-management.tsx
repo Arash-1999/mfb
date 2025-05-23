@@ -7,6 +7,22 @@ import type {
 import type { PropsWithChildren } from "react";
 import type { FieldValues, Path, PathValue } from "react-hook-form";
 
+interface DefaultDep {
+  current: unknown;
+  id: string;
+}
+const convertDepsToObject = <TDep extends DefaultDep = DefaultDep>(
+  dependencies: Array<TDep>,
+): Record<string, unknown> => {
+  return dependencies.reduce<Record<string, unknown>>(
+    (acc, cur) => ({
+      ...acc,
+      [cur.id]: cur.current,
+    }),
+    {},
+  );
+};
+
 const handleRenderDep = <TFields extends FieldValues, TItem>({
   children,
   dependency,
@@ -37,7 +53,7 @@ const RenderHoC = <TFields extends FieldValues>({
 
 const conditionCalculator = (
   { condition, value }: Condition,
-  currentValue: unknown
+  currentValue: unknown,
 ): boolean => {
   let result: boolean = false;
 
@@ -53,7 +69,7 @@ const conditionCalculator = (
 };
 
 const conditionArrayCalculator = (
-  list: Array<Condition & { current: unknown }>
+  list: Array<Condition & { current: unknown }>,
 ) => {
   return list.every((dep) => conditionCalculator(dep, dep.current));
 };
@@ -61,7 +77,7 @@ const conditionArrayCalculator = (
 const pushDependency = <TFields extends FieldValues>(
   target: DependencyStructure<TFields>,
   dependsOn: DependsOnSingle<TFields, false>,
-  value: PathValue<TFields, Path<TFields>> | undefined
+  value: PathValue<TFields, Path<TFields>> | undefined,
 ) => {
   switch (dependsOn.type) {
     case "bind-value": {
@@ -83,7 +99,7 @@ const pushDependency = <TFields extends FieldValues>(
 };
 const createDependencyStructure = <TFields extends FieldValues>(
   dependsOn: DependsOn<TFields>,
-  value: readonly PathValue<TFields, Path<TFields>>[]
+  value: readonly PathValue<TFields, Path<TFields>>[],
 ) => {
   const base: DependencyStructure<TFields> = {
     "bind-value": [],
@@ -106,6 +122,7 @@ const createDependencyStructure = <TFields extends FieldValues>(
 export {
   conditionArrayCalculator,
   conditionCalculator,
+  convertDepsToObject,
   createDependencyStructure,
   handleRenderDep,
   RenderHoC,

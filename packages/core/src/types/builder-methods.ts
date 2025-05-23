@@ -11,7 +11,13 @@ import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
 import type { DependsOn } from "./dependency-management";
 import type { GetInputs, GetInputsImpl } from "./input";
-import type { AdvancedList, GetLayoutProps, InputArray } from "./utils";
+import type {
+  AdvancedList,
+  DefaultItem,
+  GetLayoutProps,
+  InputArray,
+  RenderFn,
+} from "./utils";
 
 interface AdvancedBuilderProps<
   TConfig extends FormBuilderConfig,
@@ -41,7 +47,7 @@ interface BasicBuilderProps<
         define: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetInputsImpl<TConfig, TFields, false, true>
+          }) => GetInputsImpl<TConfig, TFields, false, true>,
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true>;
@@ -70,16 +76,17 @@ interface BuilderProps<
   cards: Array<GetCards<TConfig, TFields>>;
 }
 
-// TODO: check usage and remove
 interface DependencyManagerProps<
-  TConfig extends FormBuilderConfig,
+  // TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-  TItem extends object,
+  TItem extends DefaultItem<TFields>,
 > {
   component: ((props?: { deps: never }) => TItem) | TItem;
-  dependsOn: DependsOn<TFields>;
-  input?: GetInputs<TConfig, TFields>;
+  // dependsOn: DependsOn<TFields>;
+  index: number;
   name?: string;
+  render: RenderFn<TFields, TItem>;
+  withContext: boolean;
 }
 
 interface FieldArrayProps<TFields extends FieldValues> {
