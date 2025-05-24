@@ -42,17 +42,17 @@ interface BasicBuilderProps<
 > {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   id: TFormId;
-  inputs:
+  inputs: // TODO: use single generic type instead function mode
   | ((api: {
-    define: <TDeps extends FieldValues>(
-      func: (props?: {
-        deps: TDeps;
-      }) => GetInputsImpl<TConfig, TFields, false, true>,
-    ) => (props?: {
-      deps: TDeps;
-    }) => GetInputsImpl<TConfig, TFields, false, true>;
-  }) => InputArray<TConfig, TFields>)
-  | InputArray<TConfig, TFields>;
+        define: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetInputsImpl<TConfig, TFields, false, true>
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetInputsImpl<TConfig, TFields, false, true>;
+      }) => InputArray<TConfig, TFields>)
+    | InputArray<TConfig, TFields>;
   onSubmit: SubmitHandler<TFields>;
   options?: UseFormProps<TFields>;
 }
@@ -73,7 +73,18 @@ interface BuilderProps<
   TFields extends FieldValues,
   TFormId extends string = string,
 > extends BuilderBaseProps<TConfig, TFields, TFormId> {
-  cards: Array<GetCards<TConfig, TFields>>;
+  // TODO: use single generic type instead function mode
+  cards:
+    | ((api: {
+        define: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetCardsImpl<TConfig, TFields, false, true>
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetCardsImpl<TConfig, TFields, false, true>;
+      }) => Array<GetCards<TConfig, TFields>>)
+    | Array<GetCards<TConfig, TFields>>;
 }
 
 interface DependencyManagerProps<

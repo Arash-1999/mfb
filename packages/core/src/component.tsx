@@ -12,13 +12,9 @@ import type {
   FormBuilderContext,
   FormBuilderProps,
   GetCardsImpl,
-  GetInputs,
   GetInputsImpl,
-  InputMapFnOptions,
   InputMapperProps,
-  RenderCardProps,
   RenderFnOptions,
-  RenderInputOptions,
 } from "@/types";
 import type { Context } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
@@ -49,7 +45,8 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 class FormBuilder<
   TConfig extends FormBuilderConfig,
   TFormId extends string = string,
-> implements FormBuilderProps<TConfig> {
+> implements FormBuilderProps<TConfig>
+{
   config: TConfig;
   Context: Context<FormBuilderContext<TFormId> | null>;
   DependencyContext: Context<DependencyContextValue | null>;
@@ -143,6 +140,16 @@ class FormBuilder<
     } = this.config;
     const { Context, DependencyManager, renderCard_v2: renderCard } = this;
 
+    // TODO: move useMemo into a custom hook with generic type for TItem (and list/inputs)
+    const resolvedCards = useMemo(() => {
+      if (typeof cards === "function") {
+        return cards({
+          define:
+            this.defineItem<GetCardsImpl<TConfig, TFields, false, true>>(),
+        });
+      } else return cards;
+    }, [cards]);
+
     return (
       <Context.Provider
         value={{
@@ -152,12 +159,16 @@ class FormBuilder<
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...(gridContainerProps || {})}>
-              {cards.map((card, index) => {
+              {resolvedCards.map((card, index) => {
                 return (
-                  <DependencyManager<TFields, GetCardsImpl<TConfig, TFields, false>>
+                  <DependencyManager<
+                    TFields,
+                    | GetCardsImpl<TConfig, TFields, false, true>
+                    | GetCardsImpl<TConfig, TFields, false>
+                  >
                     component={card}
                     index={index}
-                    key={`input-${index}`}
+                    key={`card-${index}`}
                     render={renderCard}
                     withContext
                   />
@@ -176,54 +187,51 @@ class FormBuilder<
     list,
     name,
   }: AdvancedMapperProps<TConfig, TFields>) => {
-    const formMethods = useFormContext<TFields>();
-    const { inputMapFn } = this;
-    // const { inputMapFn, renderCard } = this;
+    const {
+      DependencyManager,
+      renderCard_v2: renderCard,
+      renderInput_v2: renderInput,
+    } = this;
 
     return list.map((item, index) => {
       if (item.mode === "card") {
-        // const resolvedName = name ? mergeName(name, item.name || "") : null;
-
-        return null;
-        // return renderCard({
-        //   advanced: true,
-        //   card: Object.assign({}, item, { name: resolvedName }),
-        //   index,
-        // });
+        return (
+          <DependencyManager<
+            TFields,
+            | GetCardsImpl<TConfig, TFields, true, true>
+            | GetCardsImpl<TConfig, TFields, true>
+          >
+            component={item}
+            index={index}
+            key={`card-${index}`}
+            name={name}
+            render={renderCard}
+            withContext
+          />
+        );
       } else if (item.mode === "input") {
-        return inputMapFn(item, index, { formMethods, name });
+        const withContext =
+          (typeof item === "function" ? item().type : item.type) === "list";
+        return (
+          <DependencyManager<TFields, GetInputsImpl<TConfig, TFields>>
+            component={item}
+            index={index}
+            key={`input-${index}`}
+            name={name}
+            render={renderInput}
+            withContext={withContext}
+          />
+        );
       }
       return null;
     });
   };
 
-  // TODO:
-  // private cardMapFn = <TFields extends FieldValues>(
-  //   card: GetCards<TConfig, TFields>,
-  //   index: number,
-  //   { deps, formMethods, name }: InputMapFnOptions<TFields>
-  // ) => {
-  //   const key = `input-${index}`;
-
-  //   const dependency = useDependsOnField<
-  //     TFields,
-  //     GetCardsImpl<TConfig, TFields>
-  //   >({ component: card, deps });
-
-  //   const [component, dependencies] = useDependency<
-  //     TFields,
-  //     GetCardsImpl<TConfig, TFields>
-  //   >({
-  //     component: card,
-  //     dependsOn: dependency,
-  //   });
-  // };
-
   private defineItem =
     <TItem,>() =>
-      <TDeps extends FieldValues>(func: (props?: { deps: TDeps }) => TItem) => {
-        return func;
-      };
+    <TDeps extends FieldValues>(func: (props?: { deps: TDeps }) => TItem) => {
+      return func;
+    };
 
   private DependencyManager = <
     TFields extends FieldValues,
@@ -291,7 +299,7 @@ class FormBuilder<
           action(detail.action);
         }
       },
-      [action, id, name],
+      [action, id, name]
     );
 
     useMfbGlobalEvent<TFields, TFormId>({
@@ -300,74 +308,6 @@ class FormBuilder<
     });
 
     return render(fields);
-  };
-
-  private inputMapFn = <TFields extends FieldValues>(
-    input: GetInputs<TConfig, TFields>,
-    index: number,
-    { deps, formMethods, name }: InputMapFnOptions<TFields>,
-  ) => {
-    const {
-      layout: { "grid-item": GridItem },
-    } = this.config;
-
-    const key = `input-${index}`;
-
-    const dependency = useDependsOnField<
-      TFields,
-      GetInputsImpl<TConfig, TFields>
-    >({ component: input, deps });
-
-    const [component, dependencies] = useDependency<
-      TFields,
-      GetInputsImpl<TConfig, TFields>
-    >({
-      component: input,
-      dependencyContext: { disable: [] },
-      dependsOn: dependency,
-    });
-
-    if (component === null) return null;
-
-    let node = null;
-
-    if (listInputGuard<TConfig, TFields>(component)) {
-      node = this.renderInput(
-        Object.assign({}, component, {
-          name: mergeName(name || "", component.name),
-        }),
-        { formMethods },
-      );
-    } else {
-      // TODO: use type of deps field in user input components and make path and id type safe.
-      const depsField = dependencies["bind-value"].reduce<
-        Record<string, unknown>
-      >(
-        (acc, cur) => ({
-          ...acc,
-          [cur.id]: cur.current,
-        }),
-        {},
-      );
-      node = this.renderInput(
-        Object.assign({}, component, {
-          name: mergeName(name || "", component.name),
-          props: Object.assign({}, component.props, {
-            deps: depsField,
-            disabled:
-              dependencies["disable"].length > 0 &&
-              conditionArrayCalculator(dependencies["disable"]),
-          }),
-        }),
-        { formMethods },
-      );
-    }
-
-    return (
-      <GridItem key={key} {...(component.gridProps || {})}>
-        {node}
-      </GridItem>
-    );
   };
 
   private InputMapper = <TFields extends FieldValues>({
@@ -390,137 +330,18 @@ class FormBuilder<
         />
       );
     });
-    // return inputs.map((input, i) =>
-    //   this.inputMapFn(input, i, { deps, formMethods, name }),
-    // );
   };
-
-  private renderCard = <
-    TFields extends FieldValues,
-  // TAdvanced extends boolean = true,
-  >({
-    advanced,
-    card,
-    index,
-  }: RenderCardProps<TConfig, TFields>) => {
-    // TODO: pass key to each return jsx element (like normal builder)
-    const { "grid-container": GridContainer, "grid-item": GridItem } =
-      this.config.layout;
-    const { AdvancedMapper, InputMapper } = this;
-
-    if (card.isGroup) {
-      const { FieldArray } = this;
-      const {
-        card: { group },
-      } = this.config;
-
-      if (!group) return null;
-      const RenderGroupCard = group[card.type];
-
-      /* Card Group List */
-      if (card.variant === "list") {
-        return (
-          <FieldArray<TFields>
-            key={`card-${index}`}
-            name={card.name}
-            render={(fields) =>
-              createElement(RenderGroupCard, {
-                addGrid: (node, index) => (
-                  <GridItem key={`grid-item-${index}`} {...card.gridProps}>
-                    {node}
-                  </GridItem>
-                ),
-                nodes: fields.map((field, i) => ({
-                  children: (
-                    <GridContainer {...card.gridContainerProps}>
-                      {advanced ? (
-                        <AdvancedMapper
-                          key={field.id}
-                          list={card.list}
-                          name={`${card.name}.${i}`}
-                        />
-                      ) : (
-                        <InputMapper
-                          inputs={card.inputs}
-                          key={field.id}
-                          name={`${card.name}.${i}`}
-                        />
-                      )}
-                    </GridContainer>
-                  ),
-                  // TODO: add titleFn to group card(list variant) for generating title
-                  title: `List Item ${i + 1}`,
-                })),
-              })
-            }
-          />
-        );
-      }
-
-      /* Card Group Normal*/
-      return createElement(RenderGroupCard, {
-        addGrid: (node, index) => (
-          <GridItem key={`grid-item-${index}`} {...card.gridProps}>
-            {node}
-          </GridItem>
-        ),
-        key: `card-${index}`,
-        nodes: advanced
-          ? card.list.map(({ gridContainerProps, list, name, title }) => ({
-            children: (
-              <GridContainer {...gridContainerProps}>
-                <AdvancedMapper list={list} name={name} />
-              </GridContainer>
-            ),
-            title,
-          }))
-          : card.inputs.map(({ gridContainerProps, list, title }) => ({
-            children: (
-              <GridContainer {...gridContainerProps}>
-                <InputMapper inputs={list} />
-              </GridContainer>
-            ),
-            title,
-          })),
-      });
-    }
-
-    const {
-      card: { simple },
-    } = this.config;
-
-    const RenderSimpleCard = simple[card.type];
-
-    /* Card Simple */
-    if (typeof RenderSimpleCard === "function") {
-      return (
-        <GridItem key={index} {...(card.gridProps || {})}>
-          {createElement(
-            RenderSimpleCard,
-            {
-              header: card.header,
-            },
-            <GridContainer {...(card.gridContainerProps || {})}>
-              {advanced ? (
-                <AdvancedMapper list={card.list} name={card.name} />
-              ) : (
-                <InputMapper inputs={card.inputs} name={card.name} />
-              )}
-            </GridContainer>,
-          )}
-        </GridItem>
-      );
-    }
-    return null;
-  }
 
   private renderCard_v2 = <
     TFields extends FieldValues,
     TAdvanced extends boolean = true,
   >(
-    card: GetCardsImpl<TConfig, TFields, TAdvanced>,
-    { index }: RenderFnOptions<TFields>,
+    card:
+      | GetCardsImpl<TConfig, TFields, TAdvanced, true>
+      | GetCardsImpl<TConfig, TFields, TAdvanced>,
+    { index, name }: RenderFnOptions<TFields>
   ) => {
+    const resolvedName = mergeName(name || "", card.name || "");
     // TODO: pass key to each return jsx element (like normal builder)
     const { "grid-container": GridContainer, "grid-item": GridItem } =
       this.config.layout;
@@ -540,7 +361,7 @@ class FormBuilder<
         return (
           <FieldArray<TFields>
             key={`card-${index}`}
-            name={card.name}
+            name={resolvedName}
             render={(fields) =>
               createElement(RenderGroupCard, {
                 addGrid: (node, index) => (
@@ -551,17 +372,17 @@ class FormBuilder<
                 nodes: fields.map((field, i) => ({
                   children: (
                     <GridContainer {...card.gridContainerProps}>
-                      {'list' in card ? (
+                      {"list" in card ? (
                         <AdvancedMapper
                           key={field.id}
                           list={card.list}
-                          name={`${card.name}.${i}`}
+                          name={`${resolvedName}.${i}`}
                         />
                       ) : (
                         <InputMapper
                           inputs={card.inputs}
                           key={field.id}
-                          name={`${card.name}.${i}`}
+                          name={`${resolvedName}.${i}`}
                         />
                       )}
                     </GridContainer>
@@ -583,23 +404,30 @@ class FormBuilder<
           </GridItem>
         ),
         key: `card-${index}`,
-        nodes: 'list' in card
-          ? card.list.map(({ gridContainerProps, list, name, title }) => ({
-            children: (
-              <GridContainer {...gridContainerProps}>
-                <AdvancedMapper list={list} name={name} />
-              </GridContainer>
-            ),
-            title,
-          }))
-          : card.inputs.map(({ gridContainerProps, list, title }) => ({
-            children: (
-              <GridContainer {...gridContainerProps}>
-                <InputMapper inputs={list} />
-              </GridContainer>
-            ),
-            title,
-          })),
+        nodes:
+          "list" in card
+            ? card.list.map(({ gridContainerProps, list, name, title }) => ({
+                children: (
+                  <GridContainer {...gridContainerProps}>
+                    <AdvancedMapper
+                      list={list}
+                      name={mergeName(resolvedName, name || "")}
+                    />
+                  </GridContainer>
+                ),
+                title,
+              }))
+            : card.inputs.map(({ gridContainerProps, list, title }) => ({
+                children: (
+                  <GridContainer {...gridContainerProps}>
+                    <InputMapper
+                      inputs={list}
+                      name={mergeName(resolvedName, name || "")}
+                    />
+                  </GridContainer>
+                ),
+                title,
+              })),
       });
     }
 
@@ -619,98 +447,22 @@ class FormBuilder<
               header: card.header,
             },
             <GridContainer {...(card.gridContainerProps || {})}>
-              {'list' in card ? (
-                <AdvancedMapper list={card.list} name={card.name} />
+              {"list" in card ? (
+                <AdvancedMapper list={card.list} name={resolvedName} />
               ) : (
-                <InputMapper inputs={card.inputs} name={card.name} />
+                <InputMapper inputs={card.inputs} name={resolvedName} />
               )}
-            </GridContainer>,
+            </GridContainer>
           )}
         </GridItem>
       );
     }
     return null;
-  };;
+  };
 
-  private renderInput<TFields extends FieldValues>(
-    input: GetInputsImpl<TConfig, TFields, true>,
-    options: RenderInputOptions<TFields>,
-  ) {
-    if (listInputGuard<TConfig, TFields>(input)) {
-      const { AdvancedMapper, FieldArray, InputMapper } = this;
-      const {
-        layout: { "grid-container": GridContainer, "grid-item": GridItem },
-      } = this.config;
-
-      return (
-        <FieldArray<TFields>
-          name={input.name}
-          render={(fields) => (
-            <GridItem {...input.gridProps}>
-              <GridContainer {...input.gridContainerProps}>
-                {fields.map((field, i) => {
-                  if ("inputs" in input) {
-                    const dependesOn = input.dependsOn
-                      ? Array.isArray(input.dependsOn)
-                        ? input.dependsOn
-                        : [input.dependsOn]
-                      : [];
-                    const resolvedDeps = dependesOn.filter((dep) =>
-                      ["disable"].includes(dep.type),
-                    );
-                    return (
-                      <InputMapper
-                        deps={
-                          resolvedDeps.length > 0 ? resolvedDeps : undefined
-                        }
-                        inputs={input.inputs}
-                        key={field.id}
-                        name={`${input.name}.${i}`}
-                      />
-                    );
-                  } else if ("list" in input) {
-                    return (
-                      <AdvancedMapper
-                        key={field.id}
-                        list={input.list}
-                        name={`${input.name}.${i}`}
-                      />
-                    );
-                  }
-                  return null;
-                })}
-              </GridContainer>
-            </GridItem>
-          )}
-        />
-      );
-    }
-    const {
-      input: { components },
-      layout: { field: Field },
-    } = this.config;
-    const InputFn = components[input.type];
-
-    if (typeof InputFn === "function" && typeof input.props === "object") {
-      const renderedInput = (
-        <InputFn
-          formMethods={options.formMethods}
-          name={input.name}
-          {...input.props}
-        />
-      );
-      return input.field ? (
-        <Field {...input.field}>{renderedInput}</Field>
-      ) : (
-        renderedInput
-      );
-    }
-
-    return null;
-  }
   private renderInput_v2 = <TFields extends FieldValues>(
     input: GetInputsImpl<TConfig, TFields, true>,
-    { dependsOn, formMethods, name }: RenderFnOptions<TFields>,
+    { dependsOn, formMethods, name }: RenderFnOptions<TFields>
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {
@@ -727,19 +479,8 @@ class FormBuilder<
               <GridContainer {...input.gridContainerProps}>
                 {fields.map((field, i) => {
                   if ("inputs" in input) {
-                    const dependesOn = input.dependsOn
-                      ? Array.isArray(input.dependsOn)
-                        ? input.dependsOn
-                        : [input.dependsOn]
-                      : [];
-                    const resolvedDeps = dependesOn.filter((dep) =>
-                      ["disable"].includes(dep.type),
-                    );
                     return (
                       <InputMapper
-                        deps={
-                          resolvedDeps.length > 0 ? resolvedDeps : undefined
-                        }
                         inputs={input.inputs}
                         key={field.id}
                         name={`${resolvedName}.${i}`}
