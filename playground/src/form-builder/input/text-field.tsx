@@ -24,19 +24,18 @@ const TextFieldInput = <TFields extends FieldValues>({
       control={control}
       name={name}
       render={({ field: { ref, value, ...field } }) => {
-        if(name.includes('fucking'))
-          console.log(name, value);
         return (
-        <TextField
-          fullWidth
-          inputRef={ref}
-          value={value || ""}
-          autoComplete="off"
-          disabled={disabled}
-          {...textFieldProps}
-          {...field}
-        />
-      )}}
+          <TextField
+            fullWidth
+            inputRef={ref}
+            value={value || ""}
+            autoComplete="off"
+            disabled={disabled}
+            {...textFieldProps}
+            {...field}
+          />
+        );
+      }}
     />
   );
 };
