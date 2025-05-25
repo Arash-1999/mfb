@@ -138,7 +138,7 @@ class FormBuilder<
     const {
       layout: { "grid-container": GridContainer },
     } = this.config;
-    const { Context, DependencyManager, renderCard_v2: renderCard } = this;
+    const { Context, DependencyManager, renderCard } = this;
 
     // TODO: move useMemo into a custom hook with generic type for TItem (and list/inputs)
     const resolvedCards = useMemo(() => {
@@ -187,11 +187,7 @@ class FormBuilder<
     list,
     name,
   }: AdvancedMapperProps<TConfig, TFields>) => {
-    const {
-      DependencyManager,
-      renderCard_v2: renderCard,
-      renderInput_v2: renderInput,
-    } = this;
+    const { DependencyManager, renderCard, renderInput } = this;
 
     return list.map((item, index) => {
       if (item.mode === "card") {
@@ -284,6 +280,7 @@ class FormBuilder<
 
   // TODO: add `disable` props and if it is true disable action handler
   private FieldArray = <TFields extends FieldValues>({
+    disabled,
     name,
     render,
   }: FieldArrayProps<TFields>) => {
@@ -303,6 +300,7 @@ class FormBuilder<
     );
 
     useMfbGlobalEvent<TFields, TFormId>({
+      disabled,
       eventName: eventNames["field-array"],
       handler,
     });
@@ -314,7 +312,7 @@ class FormBuilder<
     inputs,
     name, // should passed in list input. optional in card or flat mode inputs.
   }: InputMapperProps<TConfig, TFields>) => {
-    const { DependencyManager, renderInput_v2: renderInput } = this;
+    const { DependencyManager, renderInput } = this;
 
     return inputs.map((input, i) => {
       const withContext =
@@ -332,14 +330,14 @@ class FormBuilder<
     });
   };
 
-  private renderCard_v2 = <
+  private renderCard = <
     TFields extends FieldValues,
     TAdvanced extends boolean = true,
   >(
     card:
       | GetCardsImpl<TConfig, TFields, TAdvanced, true>
       | GetCardsImpl<TConfig, TFields, TAdvanced>,
-    { index, name }: RenderFnOptions<TFields>
+    { dependsOn, index, name }: RenderFnOptions<TFields>
   ) => {
     const resolvedName = mergeName(name || "", card.name || "");
     // TODO: pass key to each return jsx element (like normal builder)
@@ -360,6 +358,10 @@ class FormBuilder<
       if (card.variant === "list") {
         return (
           <FieldArray<TFields>
+            disabled={
+              dependsOn["disable"].length > 0 &&
+              conditionArrayCalculator(dependsOn["disable"])
+            }
             key={`card-${index}`}
             name={resolvedName}
             render={(fields) =>
@@ -460,7 +462,7 @@ class FormBuilder<
     return null;
   };
 
-  private renderInput_v2 = <TFields extends FieldValues>(
+  private renderInput = <TFields extends FieldValues>(
     input: GetInputsImpl<TConfig, TFields, true>,
     { dependsOn, formMethods, name }: RenderFnOptions<TFields>
   ) => {
@@ -473,6 +475,10 @@ class FormBuilder<
 
       return (
         <FieldArray<TFields>
+          disabled={
+            dependsOn["disable"].length > 0 &&
+            conditionArrayCalculator(dependsOn["disable"])
+          }
           name={resolvedName}
           render={(fields) => (
             <GridItem {...input.gridProps}>

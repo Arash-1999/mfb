@@ -101,6 +101,7 @@ interface DependencyManagerProps<
 }
 
 interface FieldArrayProps<TFields extends FieldValues> {
+  disabled: boolean | undefined;
   // TODO: use ArrayPath generic type instead of string
   name: string;
   render: (fields: UseFieldArrayReturn<TFields>["fields"]) => ReactNode;

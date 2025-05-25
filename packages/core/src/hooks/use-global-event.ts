@@ -8,19 +8,22 @@ const useMfbGlobalEvent = <
   TFields extends FieldValues,
   TFormId extends string = string,
 >({
+  disabled,
   eventName,
   handler,
 }: {
+  disabled?: boolean;
   eventName: EventName;
   handler: (event: CustomEventInit<FieldArrayEvent<TFields, TFormId>>) => void;
 }) => {
   useEffect(() => {
+    if (disabled) return;
     window.addEventListener(eventName, handler);
 
     return () => {
       window.removeEventListener(eventName, handler);
     };
-  }, [eventName, handler]);
+  }, [disabled, eventName, handler]);
 };
 
 export { useMfbGlobalEvent };
