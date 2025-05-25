@@ -148,11 +148,11 @@ const TestPage2 = () => {
           },
           {
             dependsOn: {
-              type: "visibility",
+              type: "disable",
               id: "list-dep",
               path: "card-1.list-dep",
               condition: "eq",
-              value: "hidden",
+              value: "show",
             },
             gridProps: { size: 12 },
             header: "First Card (asghar)",
