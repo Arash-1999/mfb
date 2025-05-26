@@ -24,7 +24,24 @@ interface AdvancedBuilderProps<
   TFields extends FieldValues,
   TFormId extends string = string,
 > extends BuilderBaseProps<TConfig, TFields, TFormId> {
-  list: AdvancedList<TConfig, TFields>;
+  list:
+    | ((api: {
+        defineCard: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" }
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" };
+        defineInput: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" }
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" };
+      }) => AdvancedList<TConfig, TFields>)
+    | AdvancedList<TConfig, TFields>;
 }
 
 interface AdvancedMapperProps<
@@ -76,13 +93,20 @@ interface BuilderProps<
   // TODO: use single generic type instead function mode
   cards:
     | ((api: {
-        define: <TDeps extends FieldValues>(
+        defineCard: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
           }) => GetCardsImpl<TConfig, TFields, false, true>
         ) => (props?: {
           deps: TDeps;
         }) => GetCardsImpl<TConfig, TFields, false, true>;
+        defineInput: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetInputsImpl<TConfig, TFields, false, true>
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetInputsImpl<TConfig, TFields, false, true>;
       }) => Array<GetCards<TConfig, TFields>>)
     | Array<GetCards<TConfig, TFields>>;
 }

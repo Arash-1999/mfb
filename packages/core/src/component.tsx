@@ -68,6 +68,19 @@ class FormBuilder<
     const { "grid-container": GridContainer } = this.config.layout;
     const formMethods = useForm<TFields>(options);
 
+    const resolvedList = useMemo(() => {
+      if (typeof list === "function") {
+        return list({
+          defineCard: this.defineItem<
+            GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" }
+          >(),
+          defineInput: this.defineItem<
+            GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" }
+          >(),
+        });
+      } else return list;
+    }, [list]);
+
     return (
       <Context.Provider
         value={{
@@ -77,7 +90,7 @@ class FormBuilder<
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <GridContainer {...gridContainerProps}>
-              <AdvancedMapper list={list} />
+              <AdvancedMapper list={resolvedList} />
             </GridContainer>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
@@ -144,8 +157,10 @@ class FormBuilder<
     const resolvedCards = useMemo(() => {
       if (typeof cards === "function") {
         return cards({
-          define:
+          defineCard:
             this.defineItem<GetCardsImpl<TConfig, TFields, false, true>>(),
+          defineInput:
+            this.defineItem<GetInputsImpl<TConfig, TFields, false, true>>(),
         });
       } else return cards;
     }, [cards]);
@@ -278,7 +293,6 @@ class FormBuilder<
     return useContext(Context);
   };
 
-  // TODO: add `disable` props and if it is true disable action handler
   private FieldArray = <TFields extends FieldValues>({
     disabled,
     name,
@@ -340,7 +354,6 @@ class FormBuilder<
     { dependsOn, index, name }: RenderFnOptions<TFields>
   ) => {
     const resolvedName = mergeName(name || "", card.name || "");
-    // TODO: pass key to each return jsx element (like normal builder)
     const { "grid-container": GridContainer, "grid-item": GridItem } =
       this.config.layout;
     const { AdvancedMapper, InputMapper } = this;
