@@ -310,7 +310,7 @@ class FormBuilder<
           action(detail.action);
         }
       },
-      [action, id, name]
+      [action, id, name],
     );
 
     useMfbGlobalEvent<TFields, TFormId>({
@@ -351,7 +351,7 @@ class FormBuilder<
     card:
       | GetCardsImpl<TConfig, TFields, TAdvanced, true>
       | GetCardsImpl<TConfig, TFields, TAdvanced>,
-    { dependsOn, index, name }: RenderFnOptions<TFields>
+    { dependsOn, index, name }: RenderFnOptions<TFields>,
   ) => {
     const resolvedName = mergeName(name || "", card.name || "");
     const { "grid-container": GridContainer, "grid-item": GridItem } =
@@ -405,6 +405,7 @@ class FormBuilder<
                   // TODO: add titleFn to group card(list variant) for generating title
                   title: `List Item ${i + 1}`,
                 })),
+                ...card.props,
               })
             }
           />
@@ -443,6 +444,7 @@ class FormBuilder<
                 ),
                 title,
               })),
+        ...card.props,
       });
     }
 
@@ -467,7 +469,7 @@ class FormBuilder<
               ) : (
                 <InputMapper inputs={card.inputs} name={resolvedName} />
               )}
-            </GridContainer>
+            </GridContainer>,
           )}
         </GridItem>
       );
@@ -477,7 +479,7 @@ class FormBuilder<
 
   private renderInput = <TFields extends FieldValues>(
     input: GetInputsImpl<TConfig, TFields, true>,
-    { dependsOn, formMethods, name }: RenderFnOptions<TFields>
+    { dependsOn, formMethods, name }: RenderFnOptions<TFields>,
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {

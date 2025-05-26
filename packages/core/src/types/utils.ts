@@ -4,10 +4,7 @@ import type { FieldValues, UseFormReturn } from "react-hook-form";
 import type { GetCards } from "./card";
 import type { ActionInput } from "./components";
 import type { FormBuilderConfig } from "./config";
-import type {
-  Dependency,
-  DependencyStructure,
-} from "./dependency-management";
+import type { Dependency, DependencyStructure } from "./dependency-management";
 import type { GetInputs } from "./input";
 
 type AdvancedList<
@@ -21,14 +18,15 @@ type AdvancedList<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BaseComponent = (props: any) => JSX.Element;
 
-type BaseInput = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  props: any & BaseInputParameters,
-) => JSX.Element;
-
-type BaseInputParameters = {
+interface BaseComponentProps {
   disabled?: boolean;
-};
+}
+
+type BaseInput = (
+  // TODO: use unknown instead of any for 'name' and 'formMethods' type-safety
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  props: any & BaseComponentProps,
+) => JSX.Element;
 
 interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
   name?: string;
@@ -72,8 +70,8 @@ interface RenderFnOptions<TFields extends FieldValues> {
 export type {
   AdvancedList,
   BaseComponent,
+  BaseComponentProps,
   BaseInput,
-  BaseInputParameters,
   DefaultItem,
   DefineFnProps,
   GetLayoutProps,
