@@ -4,8 +4,9 @@ import type { ListInput } from "./components";
 import type { FormBuilderConfig } from "./config";
 import type { Dependency } from "./dependency-management";
 import type {
+  BaseComponentProps,
   BaseInput,
-  BaseInputParameters,
+  DefineFnProps,
   GetLayoutProps,
   HasDependencyField,
 } from "./utils";
@@ -20,10 +21,22 @@ type GetInputs<
   TFields extends FieldValues,
   TInternal extends boolean = false,
 > =
-  | (Dependency<TFields> & ListInput<TConfig, TFields>)
+  | ((
+      props?: DefineFnProps,
+    ) => GetInputsImpl<TConfig, TFields, TInternal, true>)
+  | GetInputsImpl<TConfig, TFields, TInternal>;
+
+type GetInputsImpl<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TInternal extends boolean = false,
+  TFunc extends boolean = false,
+> =
+  | (Dependency<TFields, TFunc> & ListInput<TConfig, TFields>)
   | {
       [TInput in keyof TConfig["input"]["components"]]: Dependency<
         TFields,
+        TFunc,
         HasDependencyField<TConfig["input"]["components"][TInput]>
       > & {
         field?: GetLayoutProps<TConfig, "field">;
@@ -41,10 +54,10 @@ type GetInputs<
 
 type InputObject = Record<PropertyKey, BaseInput>;
 
-type InputProps<TFields extends FieldValues, TProps> = BaseInputParameters &
+type InputProps<TFields extends FieldValues, TProps> = BaseComponentProps &
   TProps & {
     formMethods: UseFormReturn<TFields>;
     name: Path<TFields>;
   };
 
-export type { BaseInputParameters, GetInputs, InputObject, InputProps };
+export type { GetInputs, GetInputsImpl, InputObject, InputProps };

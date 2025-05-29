@@ -9,20 +9,43 @@ type Condition = {
   value: number | string;
 };
 
+type DefPropsDependency = {
+  type: "def-props";
+};
 type Dependency<
   TFields extends FieldValues,
+  TFunc extends boolean = false,
   TOnlyBoolean extends boolean = false,
-> = {
-  dependsOn?: DependsOn<TFields, TOnlyBoolean>;
-};
+> = TFunc extends true
+  ? Required<DependencyObject<TFields, TOnlyBoolean>>
+  : Partial<DependencyObject<TFields, TOnlyBoolean>>;
 
-type DependencyStructure<TFields extends FieldValues> = {
-  [TKey in DependsOnUnion as TKey["type"]]: Array<
-    DependsOnBase<TFields> &
-      TKey & {
-        current: unknown;
-      }
-  >;
+interface DependencyContextDisable extends Condition {
+  current: unknown;
+}
+interface DependencyContextValue {
+  disable: Array<DependencyContextDisable>;
+}
+
+interface DependencyObject<
+  TFields extends FieldValues,
+  TOnlyBoolean extends boolean = false,
+> {
+  dependsOn: DependsOn<TFields, TOnlyBoolean>;
+}
+
+type DependencyStructure<TFields extends FieldValues> = Omit<
+  {
+    [TKey in DependsOnUnion<false> as TKey["type"]]: Array<
+      DependsOnBase<TFields> &
+        TKey & {
+          current: unknown;
+        }
+    >;
+  },
+  "disable"
+> & {
+  disable: Array<DependencyContextDisable>;
 };
 
 type DependsOn<
@@ -43,6 +66,7 @@ type DependsOnSingle<
 > = DependsOnBase<TFields> & DependsOnUnion<TOnlyBoolean>;
 
 type DependsOnUnion<TOnlyBoolean extends boolean = false> =
+  | DefPropsDependency
   | DisableDependency
   | (TOnlyBoolean extends false ? BindValueDependency : never)
   | VisibilityDependency;
@@ -59,6 +83,7 @@ export type {
   BindValueDependency,
   Condition,
   Dependency,
+  DependencyContextValue,
   DependencyStructure,
   DependsOn,
   DependsOnBase,

@@ -1,9 +1,10 @@
 import type { JSX } from "react";
-import type { FieldValues } from "react-hook-form";
+import type { FieldValues, UseFormReturn } from "react-hook-form";
 
 import type { GetCards } from "./card";
 import type { ActionInput } from "./components";
 import type { FormBuilderConfig } from "./config";
+import type { Dependency, DependencyStructure } from "./dependency-management";
 import type { GetInputs } from "./input";
 
 type AdvancedList<
@@ -17,14 +18,23 @@ type AdvancedList<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BaseComponent = (props: any) => JSX.Element;
 
+interface BaseComponentProps {
+  disabled?: boolean;
+}
+
 type BaseInput = (
+  // TODO: use unknown instead of any for 'name' and 'formMethods' type-safety
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  props: any & BaseInputParameters
+  props: any & BaseComponentProps,
 ) => JSX.Element;
 
-type BaseInputParameters = {
-  disabled?: boolean;
-};
+interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
+  name?: string;
+}
+
+interface DefineFnProps {
+  deps: never;
+}
 
 type GetLayoutProps<
   TConfig extends FormBuilderConfig,
@@ -46,14 +56,29 @@ type ListInputArray<
   TFields extends FieldValues,
 > = Array<ActionInput | GetInputs<TConfig, TFields>>;
 
+type RenderFn<
+  TFields extends FieldValues,
+  TItem extends DefaultItem<TFields>,
+> = (item: TItem, options: RenderFnOptions<TFields>) => JSX.Element | null;
+interface RenderFnOptions<TFields extends FieldValues> {
+  dependsOn: DependencyStructure<TFields>;
+  formMethods: UseFormReturn<TFields>;
+  index: number;
+  name?: string;
+}
+
 export type {
   AdvancedList,
   BaseComponent,
+  BaseComponentProps,
   BaseInput,
-  BaseInputParameters,
+  DefaultItem,
+  DefineFnProps,
   GetLayoutProps,
   HasDependencyField,
   InputArray,
   LayoutKey,
   ListInputArray,
+  RenderFn,
+  RenderFnOptions,
 };

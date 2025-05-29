@@ -7,10 +7,40 @@ import type {
 import type { PropsWithChildren } from "react";
 import type { FieldValues, Path, PathValue } from "react-hook-form";
 
+interface DefaultDep {
+  current: unknown;
+  id: string;
+}
+const convertDepsToObject = <TDep extends DefaultDep = DefaultDep>(
+  dependencies: Array<TDep>,
+): Record<string, unknown> => {
+  return dependencies.reduce<Record<string, unknown>>(
+    (acc, cur) => ({
+      ...acc,
+      [cur.id]: cur.current,
+    }),
+    {},
+  );
+};
+
+const handleRenderDep = <TFields extends FieldValues, TItem>({
+  children,
+  dependency,
+}: {
+  children: TItem;
+  dependency: DependencyStructure<TFields>["visibility"];
+}): null | TItem => {
+  const condition =
+    dependency.length === 0 || conditionArrayCalculator(dependency);
+  return condition ? children : null;
+};
+
+// TODO: check usage and remove
 type RenderHoCProps<TFields extends FieldValues> = PropsWithChildren<{
   dependency: DependencyStructure<TFields>["visibility"];
 }>;
 
+// TODO: check usage and remove
 const RenderHoC = <TFields extends FieldValues>({
   children,
   dependency,
@@ -46,11 +76,15 @@ const conditionArrayCalculator = (
 
 const pushDependency = <TFields extends FieldValues>(
   target: DependencyStructure<TFields>,
-  dependsOn: DependsOnSingle<TFields>,
+  dependsOn: DependsOnSingle<TFields, false>,
   value: PathValue<TFields, Path<TFields>> | undefined,
 ) => {
   switch (dependsOn.type) {
     case "bind-value": {
+      target[dependsOn.type].push({ ...dependsOn, current: value });
+      break;
+    }
+    case "def-props": {
       target[dependsOn.type].push({ ...dependsOn, current: value });
       break;
     }
@@ -69,6 +103,7 @@ const createDependencyStructure = <TFields extends FieldValues>(
 ) => {
   const base: DependencyStructure<TFields> = {
     "bind-value": [],
+    "def-props": [],
     disable: [],
     visibility: [],
   };
@@ -87,6 +122,8 @@ const createDependencyStructure = <TFields extends FieldValues>(
 export {
   conditionArrayCalculator,
   conditionCalculator,
+  convertDepsToObject,
   createDependencyStructure,
+  handleRenderDep,
   RenderHoC,
 };

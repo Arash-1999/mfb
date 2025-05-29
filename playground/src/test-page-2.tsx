@@ -7,6 +7,7 @@ const TEST_PAGE_2_FORM_ID = "TEST_PAGE_2_FORM_ID";
 
 type TestPageForm = {
   "card-1": {
+    "list-dep": string;
     akbar: Array<Record<`input-${1 | 2 | 3}`, string>>;
   };
   "card-2": {
@@ -38,7 +39,7 @@ const TestPage2 = () => {
                 },
                 { shouldFocus: false },
               ],
-            },
+            }
           );
         }}
       >
@@ -56,14 +57,14 @@ const TestPage2 = () => {
             {
               type: "remove",
               params: [-1],
-            },
+            }
           );
         }}
       >
         REMOVE FROM AKBAR
       </Button>
       <FB.Builder<TestPageForm>
-        gridProps={{
+        gridContainerProps={{
           spacing: 2,
         }}
         id={TEST_PAGE_2_FORM_ID}
@@ -75,6 +76,17 @@ const TestPage2 = () => {
             type: "paper",
             inputs: [
               {
+                type: "text",
+                name: "list-dep",
+                props: {
+                  textFieldProps: {
+                    label: "List Deps",
+                    placeholder: "List Deps",
+                    size: "small",
+                  },
+                },
+              },
+              {
                 gridProps: {
                   size: 12,
                 },
@@ -83,6 +95,13 @@ const TestPage2 = () => {
                 },
                 type: "list",
                 name: "akbar",
+                dependsOn: {
+                  type: "disable",
+                  condition: "eq",
+                  path: "card-1.list-dep",
+                  value: "show",
+                  id: "list-dep",
+                },
                 inputs: [
                   {
                     type: "text",
@@ -128,6 +147,13 @@ const TestPage2 = () => {
             ],
           },
           {
+            dependsOn: {
+              type: "disable",
+              id: "list-dep",
+              path: "card-1.list-dep",
+              condition: "eq",
+              value: "show",
+            },
             gridProps: { size: 12 },
             header: "First Card (asghar)",
             name: "card-2",
@@ -187,6 +213,9 @@ const TestPage2 = () => {
             ],
           },
         ]}
+        onSubmit={(data) => {
+          console.log(data);
+        }}
       />
     </>
   );

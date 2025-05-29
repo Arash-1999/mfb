@@ -74,6 +74,13 @@ const Page = () => {
                     },
                   },
                   {
+                    dependsOn: {
+                      type: "disable",
+                      path: "filters.title",
+                      id: "fitlers-title",
+                      condition: "eq",
+                      value: "fuck",
+                    },
                     mode: "card",
                     type: "accordion",
                     header: "Accordion 1",

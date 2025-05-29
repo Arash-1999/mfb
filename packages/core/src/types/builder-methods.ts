@@ -7,18 +7,41 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 
-import type { GetCards } from "./card";
+import type { GetCards, GetCardsImpl } from "./card";
 import type { FormBuilderConfig } from "./config";
 import type { DependsOn } from "./dependency-management";
-import type { GetInputs } from "./input";
-import type { AdvancedList, GetLayoutProps, InputArray } from "./utils";
+import type { GetInputsImpl } from "./input";
+import type {
+  AdvancedList,
+  DefaultItem,
+  GetLayoutProps,
+  InputArray,
+  RenderFn,
+} from "./utils";
 
 interface AdvancedBuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormId extends string = string,
 > extends BuilderBaseProps<TConfig, TFields, TFormId> {
-  list: AdvancedList<TConfig, TFields>;
+  list:
+    | ((api: {
+        defineCard: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" }
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" };
+        defineInput: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" }
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" };
+      }) => AdvancedList<TConfig, TFields>)
+    | AdvancedList<TConfig, TFields>;
 }
 
 interface AdvancedMapperProps<
@@ -36,7 +59,17 @@ interface BasicBuilderProps<
 > {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   id: TFormId;
-  inputs: InputArray<TConfig, TFields>;
+  inputs: // TODO: use single generic type instead function mode
+  | ((api: {
+        define: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetInputsImpl<TConfig, TFields, false, true>
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetInputsImpl<TConfig, TFields, false, true>;
+      }) => InputArray<TConfig, TFields>)
+    | InputArray<TConfig, TFields>;
   onSubmit: SubmitHandler<TFields>;
   options?: UseFormProps<TFields>;
 }
@@ -57,18 +90,42 @@ interface BuilderProps<
   TFields extends FieldValues,
   TFormId extends string = string,
 > extends BuilderBaseProps<TConfig, TFields, TFormId> {
-  cards: Array<GetCards<TConfig, TFields>>;
+  // TODO: use single generic type instead function mode
+  cards:
+    | ((api: {
+        defineCard: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetCardsImpl<TConfig, TFields, false, true>
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetCardsImpl<TConfig, TFields, false, true>;
+        defineInput: <TDeps extends FieldValues>(
+          func: (props?: {
+            deps: TDeps;
+          }) => GetInputsImpl<TConfig, TFields, false, true>
+        ) => (props?: {
+          deps: TDeps;
+        }) => GetInputsImpl<TConfig, TFields, false, true>;
+      }) => Array<GetCards<TConfig, TFields>>)
+    | Array<GetCards<TConfig, TFields>>;
 }
 
 interface DependencyManagerProps<
-  TConfig extends FormBuilderConfig,
+  // TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
+  TItem extends DefaultItem<TFields>,
 > {
-  dependsOn: DependsOn<TFields>;
-  input: GetInputs<TConfig, TFields>;
+  component: ((props?: { deps: never }) => TItem) | TItem;
+  // dependsOn: DependsOn<TFields>;
+  index: number;
+  name?: string;
+  render: RenderFn<TFields, TItem>;
+  withContext: boolean;
 }
 
 interface FieldArrayProps<TFields extends FieldValues> {
+  disabled: boolean | undefined;
   // TODO: use ArrayPath generic type instead of string
   name: string;
   render: (fields: UseFieldArrayReturn<TFields>["fields"]) => ReactNode;
@@ -79,6 +136,7 @@ interface FormBuilderProps<TConfig extends FormBuilderConfig> {
 }
 
 interface InputMapFnOptions<TFields extends FieldValues> {
+  deps?: DependsOn<TFields>;
   formMethods: UseFormReturn<TFields>;
   name?: string;
 }
@@ -87,6 +145,7 @@ interface InputMapperProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > {
+  deps?: DependsOn<TFields>;
   inputs: InputArray<TConfig, TFields>;
   name?: string;
 }
@@ -104,7 +163,7 @@ interface RenderPropsAdvanced<
   TFields extends FieldValues,
 > extends RenderPropsBase {
   advanced: false;
-  card: GetCards<TConfig, TFields, false>;
+  card: GetCardsImpl<TConfig, TFields, false>;
 }
 interface RenderPropsBase {
   index: number;
@@ -115,7 +174,7 @@ interface RenderPropsNormal<
   TFields extends FieldValues,
 > extends RenderPropsBase {
   advanced: true;
-  card: GetCards<TConfig, TFields, true> & { mode: "card" };
+  card: GetCardsImpl<TConfig, TFields, true> & { mode: "card" };
 }
 
 export type {
