@@ -1,18 +1,20 @@
-import type { GridProps } from "@mui/material";
+import type { Grid2Props } from "@mui/material";
 import type { PropsWithChildren } from "react";
 
-import { Grid } from "@mui/material";
+import { Grid2 } from "@mui/material";
 
-type MuiGridProps = Omit<GridProps, "container">;
+type MuiGridProps = Omit<Grid2Props, "container">;
 const GridContainer = ({
   children,
   ...gridProps
 }: PropsWithChildren<MuiGridProps>) => {
   return (
-    <Grid container {...gridProps}>
+    <Grid2 container {...gridProps}>
       {children}
-    </Grid>
+    </Grid2>
   );
 };
 
+type GridContainerProps = PropsWithChildren<MuiGridProps>;
 export { GridContainer };
+export type { GridContainerProps };

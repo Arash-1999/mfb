@@ -8,4 +8,6 @@ const FormField = ({
   return <FormControl>{children}</FormControl>;
 };
 
+type FormFieldProps = PropsWithChildren<{ controlProps: FormControlProps }>;
 export { FormField };
+export type { FormFieldProps };
