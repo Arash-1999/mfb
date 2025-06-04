@@ -1,9 +1,10 @@
 import type { FieldValues } from "react-hook-form";
 
 import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
+import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
-import type { MfbRadioProps } from "./type";
+import type { MfbRadioGroupProps } from "./type";
 
 const MfbRadioGroup = <TFields extends FieldValues = FieldValues>({
   disabled,
@@ -12,12 +13,13 @@ const MfbRadioGroup = <TFields extends FieldValues = FieldValues>({
   options,
   radioGroupProps,
   radioProps,
-}: MfbRadioProps<TFields>) => {
+}: MfbRadioGroupProps<TFields>) => {
   const { control } = useFormContext();
 
   return (
     <Controller
       control={control}
+      defaultValue={radioGroupProps?.defaultValue}
       name={name}
       render={({ field: { ref, value, ...field } }) => (
         <RadioGroup

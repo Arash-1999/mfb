@@ -1,26 +1,8 @@
-import type { JSX } from "react";
-
-import { MfbCheckbox } from "./checkbox";
-import { MfbTextField } from "./text-field";
-import { MfbRadioGroup } from "./radio";
-
-import type { MfbCheckboxProps } from "./checkbox";
-import type { MfbTextFieldProps } from "./text-field";
-import type { MfbRadioGroupProps } from "./radio/type";
-
-interface InputsReturn {
-  checkbox: (props: MfbCheckboxProps) => JSX.Element;
-  radio: (props: MfbRadioGroupProps) => JSX.Element;
-  text: (props: MfbTextFieldProps) => JSX.Element;
-}
-
-const getInputsConfig = (): InputsReturn => {
-  return {
-    checkbox: MfbCheckbox,
-    radio: MfbRadioGroup,
-    text: MfbTextField,
-  };
-};
-
-export { getInputsConfig };
-export type { InputsReturn };
+export type { MfbCheckboxProps } from "./checkbox";
+export { MfbCheckbox } from "./checkbox";
+export type { MfbRadioGroupProps } from "./radio";
+export { MfbRadioGroup } from "./radio";
+export type { MfbSwitchProps } from "./switch";
+export { MfbSwitch } from "./switch";
+export type { MfbTextFieldProps } from "./text-field";
+export { MfbTextField } from "./text-field";

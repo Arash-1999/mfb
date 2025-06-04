@@ -3,18 +3,21 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "dependencies": {
-    "@mfb/core": "workspace:*"
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "build:watch": "tsc -b && vite build --watch",
+    "lint": "eslint ."
   },
   "peerDependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@mfb/core": "workspace:*",
     "@mui/material": "^6.4.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -27,6 +30,7 @@
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "typescript": "~5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vite-plugin-dts": "^4.5.0"
   }
 }

@@ -15,7 +15,7 @@ type MfbRadioGroupProps<TFields extends FieldValues = FieldValues> = InputProps<
       RadioGroupProps,
       "disabled" | "label" | "onBlur" | "onChange" | "value"
     >;
-    radioProps?: RadioProps;
+    radioProps?: Omit<RadioProps, "value">;
   }
 >;
 
