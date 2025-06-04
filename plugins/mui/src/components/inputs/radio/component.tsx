@@ -1,7 +1,6 @@
 import type { FieldValues } from "react-hook-form";
 
 import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
-import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import type { MfbRadioGroupProps } from "./type";
