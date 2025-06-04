@@ -26,8 +26,7 @@ const MfbRadioGroup = <TFields extends FieldValues = FieldValues>({
           ref={ref}
           value={value}
           {...field}
-          {...radioGroupProps}
-        >
+          {...radioGroupProps}>
           {options.map((option) => {
             const [key, label] =
               typeof option === "string" || typeof option === "number"

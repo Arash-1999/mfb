@@ -4,6 +4,9 @@ import type { FormBuilderConfig } from "@mfb/core";
 import {
   MfbCheckbox,
   MfbRadioGroup,
+  MfbRating,
+  MfbSelect,
+  MfbSlider,
   MfbSwitch,
   MfbTextField,
 } from "./components/inputs";
@@ -19,6 +22,9 @@ const config = {
     components: {
       checkbox: MfbCheckbox,
       radio: MfbRadioGroup,
+      rating: MfbRating,
+      select: MfbSelect,
+      slider: MfbSlider,
       switch: MfbSwitch,
       text: MfbTextField,
     },

@@ -5,7 +5,9 @@
     "build": "turbo build",
     "dev": "turbo dev --filter=./playground",
     "build:watch": "turbo build:watch",
-    "dev:mui": "turbo run dev build:watch",
+    "dev:mui": "turbo run  --filter=playground... dev",
+    "dev:pg": "turbo run --filter=./playground dev:pg",
+    "bw": "turbo run --filter=./playground... build:watch",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
