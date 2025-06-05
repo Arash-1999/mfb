@@ -2,6 +2,7 @@
   "name": "@mfb/plugin-mui",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -14,10 +15,12 @@
     "lint": "eslint .",
     "gen:input": "turbo gen mfb-input"
   },
+  "dependencies": {
+    "@mfb/core": "workspace:*"
+  },
   "peerDependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mfb/core": "workspace:*",
     "@mui/material": "^6.4.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -30,7 +33,7 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react-swc": "^3.9.0",
-    "typescript": "~5.8.3",
+    "typescript": "~5.7.2",
     "vite": "^6.3.5",
     "vite-plugin-dts": "^4.5.0"
   }

@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:mui": "turbbo dev --filter=./playground --parallel && turbo build:watch --parallel",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
