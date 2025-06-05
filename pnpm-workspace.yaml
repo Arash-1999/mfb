@@ -1,3 +1,5 @@
 packages:
+  - "apps/editor"
   - "playground"
+  - "plugins/*"
   - "packages/*"

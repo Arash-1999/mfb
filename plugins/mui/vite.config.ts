@@ -11,13 +11,15 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, join("src", "index.ts")),
       fileName: "index",
-      name: "@mfb/core",
+      name: "@mfb/plugin-mui",
     },
     minify: false,
     rollupOptions: {
       external: [...Object.keys(peerDependencies)],
       output: {
         globals: {
+          "@emotion/styled": "EmStyled",
+          "@mui/material": "Mui",
           react: "React",
           "react-dom": "ReactDOM",
           "react-hook-form": "RHF",

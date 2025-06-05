@@ -54,6 +54,7 @@ type GetInputsImpl<
 
 type InputObject = Record<PropertyKey, BaseInput>;
 
+// TODO: add required and other rules
 type InputProps<TFields extends FieldValues, TProps> = BaseComponentProps &
   TProps & {
     formMethods: UseFormReturn<TFields>;

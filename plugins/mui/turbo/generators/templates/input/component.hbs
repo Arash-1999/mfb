@@ -1,0 +1,27 @@
+import type { FieldValues } from "react-hook-form";
+
+import { Controller, useFormContext } from "react-hook-form";
+
+import type { Mfb{{pascalCase name}}Props } from "./type";
+
+const Mfb{{pascalCase name}}= <TFields extends FieldValues = FieldValues>({
+  disabled,
+  name,
+}: Mfb{{pascalCase name}}Props<TFields>) => {
+  const { control } = useFormContext();
+
+  return (
+    <Controller
+      control={control}
+      // defaultValue={}
+      name={name}
+      render={({ field: { ref, value, ...field } }) => (
+        <>
+          {/* put your component here... */}
+        </>
+      )}
+    />
+  );
+};
+
+export { Mfb{{pascalCase name}} };

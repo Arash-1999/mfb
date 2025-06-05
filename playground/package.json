@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:mui": "turbbo dev --filter=./playground --parallel && turbo build:watch --parallel",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -15,6 +14,7 @@
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.1.1",
     "@mfb/core": "workspace:*",
+    "@mfb/plugin-mui": "workspace:*",
     "@mui/icons-material": "^6.4.5",
     "@mui/material": "^6.4.5",
     "react": "^19.0.0",

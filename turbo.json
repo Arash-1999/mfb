@@ -8,7 +8,7 @@
       "outputs": ["dist/**"]
     },
     "build:watch": {
-      "dependsOn": ["^build:watch"],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**"]
     },

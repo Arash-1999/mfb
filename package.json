@@ -2,17 +2,16 @@
   "name": "mfb",
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev --filter=./playground",
-    "build:watch": "turbo build:watch",
-    "dev:mui": "turbo run dev build:watch",
+    "dev:core": "turbo build:watch --filter=@mfb/core",
+    "dev:plugin:mui": "turbo build:watch --filter=@mfb/plugin-mui",
+    "dev:pg": "turbo dev --filter=./playground",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "prettier": "^3.4.2",
     "turbo": "^2.4.0",
-    "typescript": "5.7.3"
+    "typescript": "~5.7.3"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
