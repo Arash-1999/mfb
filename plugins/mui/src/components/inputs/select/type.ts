@@ -4,16 +4,14 @@ import type {
   InputLabelProps,
   SelectProps,
 } from "@mui/material";
-import type { FieldValues, Path, PathValue } from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 
 type MfbSelectProps<TFields extends FieldValues> = InputProps<
   TFields,
   {
-    disabled?: boolean;
     formControlProps?: FormControlProps;
     inputLabelProps?: InputLabelProps;
     label?: string;
-    name: Path<TFields>;
     options: Array<
       | number
       | string
@@ -22,12 +20,7 @@ type MfbSelectProps<TFields extends FieldValues> = InputProps<
           value: number | string;
         }
     >;
-    selectProps?: Omit<
-      SelectProps,
-      "defaultValue" | "name" | "onChange" | "value"
-    > & {
-      defaultValue?: PathValue<TFields, Path<TFields>>;
-    };
+    selectProps?: Omit<SelectProps, "name" | "onBlur" | "onChange" | "value">;
   }
 >;
 export type { MfbSelectProps };

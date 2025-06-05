@@ -10,12 +10,11 @@ const MfbSlider = <TFields extends FieldValues = FieldValues>({
   name,
   sliderProps,
 }: MfbSliderProps<TFields>) => {
-  const { control } = useFormContext<TFields>();
+  const { control } = useFormContext();
 
   return (
     <Controller
       control={control}
-      defaultValue={sliderProps?.defaultValue}
       name={name}
       render={({ field: { onChange, ref, value, ...field } }) => (
         <Slider

@@ -10,12 +10,11 @@ const MfbRating = <TFields extends FieldValues = FieldValues>({
   name,
   ratingProps,
 }: MfbRatingProps<TFields>) => {
-  const { control } = useFormContext<TFields>();
+  const { control } = useFormContext();
 
   return (
     <Controller
       control={control}
-      // defaultValue={ratingProps?.defaultValue}
       name={name}
       render={({ field: { ref, value, ...field } }) => (
         <Rating

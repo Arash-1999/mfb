@@ -1,12 +1,6 @@
 import type { FieldValues } from "react-hook-form";
 
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  type SelectChangeEvent,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { Controller, useFormContext } from "react-hook-form";
 
 import type { MfbSelectProps } from "./type";
@@ -27,13 +21,12 @@ const MfbSelect = <TFields extends FieldValues = FieldValues>({
       {label && <InputLabel {...inputLabelProps}>{label}</InputLabel>}
       <Controller
         control={control}
-        defaultValue={selectProps?.defaultValue}
         name={name}
         render={({ field: { onChange, ref, value, ...field } }) => (
           <Select
             inputRef={ref}
             label={label}
-            onChange={(e: SelectChangeEvent) => onChange(e.target.value)}
+            onChange={(e) => onChange(e.target.value)}
             value={value ?? ""}
             {...field}
             {...selectProps}>
