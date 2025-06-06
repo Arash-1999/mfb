@@ -5,9 +5,16 @@ const MuiPage1 = () => {
     <>
       <MuiFB.BasicBuilder
         id="form-2"
+        gridContainerProps={{
+          spacing: 2,
+          p: 2,
+        }}
         inputs={[
           {
             name: "gender",
+            gridProps: {
+              size: 6,
+            },
             props: {
               options: [
                 { label: "Male", value: "1" },
@@ -19,6 +26,23 @@ const MuiPage1 = () => {
               },
             },
             type: "radio",
+          },
+          {
+            name: "asghar",
+            gridProps: {
+              size: 6,
+            },
+            props: {
+              options: [
+                { label: "Male", value: "1" },
+                { label: "Female", value: "0" },
+              ],
+              label: "Gender",
+              formControlProps: {
+                fullWidth: true,
+              },
+            },
+            type: "select",
           },
         ]}
         onSubmit={console.log}
