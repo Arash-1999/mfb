@@ -29,14 +29,19 @@ interface AdvancedBuilderProps<
         defineCard: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" }
+          }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" },
         ) => (props?: {
           deps: TDeps;
         }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" };
         defineInput: <TDeps extends FieldValues>(
-          func: (props?: {
-            deps: TDeps;
-          }) => GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" }
+          func: (props?: { deps: TDeps }) => GetInputsImpl<
+            TConfig,
+            TFields,
+            false,
+            true
+          > & {
+            mode: "input";
+          },
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" };
@@ -64,7 +69,7 @@ interface BasicBuilderProps<
         define: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetInputsImpl<TConfig, TFields, false, true>
+          }) => GetInputsImpl<TConfig, TFields, false, true>,
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true>;
@@ -96,14 +101,14 @@ interface BuilderProps<
         defineCard: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetCardsImpl<TConfig, TFields, false, true>
+          }) => GetCardsImpl<TConfig, TFields, false, true>,
         ) => (props?: {
           deps: TDeps;
         }) => GetCardsImpl<TConfig, TFields, false, true>;
         defineInput: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetInputsImpl<TConfig, TFields, false, true>
+          }) => GetInputsImpl<TConfig, TFields, false, true>,
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true>;
@@ -112,16 +117,15 @@ interface BuilderProps<
 }
 
 interface DependencyManagerProps<
-  // TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TItem extends DefaultItem<TFields>,
 > {
   component: ((props?: { deps: never }) => TItem) | TItem;
-  // dependsOn: DependsOn<TFields>;
   index: number;
   name?: string;
   render: RenderFn<TFields, TItem>;
   withContext: boolean;
+  withGrid?: boolean;
 }
 
 interface FieldArrayProps<TFields extends FieldValues> {

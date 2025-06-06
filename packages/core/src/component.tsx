@@ -78,7 +78,8 @@ class FormBuilder<
             GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" }
           >(),
         });
-      } else return list;
+      }
+      return list;
     }, [list]);
 
     return (
@@ -118,7 +119,8 @@ class FormBuilder<
           define:
             this.defineItem<GetInputsImpl<TConfig, TFields, false, true>>(),
         });
-      } else return inputs;
+      }
+      return inputs;
     }, [inputs]);
 
     return (
@@ -162,7 +164,8 @@ class FormBuilder<
           defineInput:
             this.defineItem<GetInputsImpl<TConfig, TFields, false, true>>(),
         });
-      } else return cards;
+      }
+      return cards;
     }, [cards]);
 
     return (
@@ -220,7 +223,8 @@ class FormBuilder<
             withContext
           />
         );
-      } else if (item.mode === "input") {
+      }
+      if (item.mode === "input") {
         const withContext =
           (typeof item === "function" ? item().type : item.type) === "list";
         return (
@@ -231,6 +235,7 @@ class FormBuilder<
             name={name}
             render={renderInput}
             withContext={withContext}
+            withGrid
           />
         );
       }
@@ -253,8 +258,12 @@ class FormBuilder<
     name,
     render,
     withContext,
+    withGrid,
   }: DependencyManagerProps<TFields, TItem>) => {
     const { DependencyContext } = this;
+    const {
+      layout: { "grid-item": GridItem },
+    } = this.config;
     const dependencyContext = useContext(DependencyContext) || { disable: [] };
     const formMethods = useFormContext<TFields>();
     const dependency = useDependsOnField<TFields, TItem>({
@@ -269,16 +278,26 @@ class FormBuilder<
 
     if (resolvedComponent === null) return null;
 
-    const children = render(resolvedComponent, {
+    const renderedComponent = render(resolvedComponent, {
       dependsOn: dependencies,
       formMethods,
       index,
       name,
     });
+
+    const children =
+      withGrid || "gridProps" in resolvedComponent ? (
+        <GridItem {...resolvedComponent.gridProps}>
+          {renderedComponent}
+        </GridItem>
+      ) : (
+        renderedComponent
+      );
+
     return withContext ? (
       <DependencyContext.Provider
         value={{
-          disable: [...dependencies["disable"], ...dependencyContext.disable],
+          disable: [...dependencies.disable, ...dependencyContext.disable],
         }}
       >
         {children}
@@ -339,6 +358,7 @@ class FormBuilder<
           name={name}
           render={renderInput}
           withContext={withContext}
+          withGrid
         />
       );
     });
@@ -372,8 +392,8 @@ class FormBuilder<
         return (
           <FieldArray<TFields>
             disabled={
-              dependsOn["disable"].length > 0 &&
-              conditionArrayCalculator(dependsOn["disable"])
+              dependsOn.disable.length > 0 &&
+              conditionArrayCalculator(dependsOn.disable)
             }
             key={`card-${index}`}
             name={resolvedName}
@@ -491,8 +511,8 @@ class FormBuilder<
       return (
         <FieldArray<TFields>
           disabled={
-            dependsOn["disable"].length > 0 &&
-            conditionArrayCalculator(dependsOn["disable"])
+            dependsOn.disable.length > 0 &&
+            conditionArrayCalculator(dependsOn.disable)
           }
           name={resolvedName}
           render={(fields) => (
@@ -507,7 +527,8 @@ class FormBuilder<
                         name={`${resolvedName}.${i}`}
                       />
                     );
-                  } else if ("list" in input) {
+                  }
+                  if ("list" in input) {
                     return (
                       <AdvancedMapper
                         key={field.id}
@@ -538,8 +559,8 @@ class FormBuilder<
           {...Object.assign({}, input.props, {
             deps: convertDepsToObject(dependsOn["bind-value"]),
             disabled:
-              dependsOn["disable"].length > 0 &&
-              conditionArrayCalculator(dependsOn["disable"]),
+              dependsOn.disable.length > 0 &&
+              conditionArrayCalculator(dependsOn.disable),
           })}
         />
       );

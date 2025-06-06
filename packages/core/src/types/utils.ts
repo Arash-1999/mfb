@@ -15,7 +15,6 @@ type AdvancedList<
   | (GetInputs<TConfig, TFields> & { mode: "input" })
 >;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BaseComponent = (props: any) => JSX.Element;
 
 interface BaseComponentProps {
@@ -24,11 +23,11 @@ interface BaseComponentProps {
 
 type BaseInput = (
   // TODO: use unknown instead of any for 'name' and 'formMethods' type-safety
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props: any & BaseComponentProps,
 ) => JSX.Element;
 
 interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
+  gridProps?: object;
   name?: string;
 }
 

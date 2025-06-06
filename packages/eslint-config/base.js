@@ -6,6 +6,9 @@ import perfectionist from "eslint-plugin-perfectionist";
 
 /* @type {import("eslint").Linter.Config} */
 export const config = tseslint.config(
+  {
+    ignores: ["dist/**", "eslint.config.{mjs,cjs}"],
+  },
   js.configs.recommended,
   tseslint.configs.recommended,
   {
@@ -27,6 +30,8 @@ export const config = tseslint.config(
   },
   perfectionist.configs["recommended-natural"],
   {
-    ignores: ["dist/**", "eslint.config.{mjs,cjs}"],
-  }
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 );
