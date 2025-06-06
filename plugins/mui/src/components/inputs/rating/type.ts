@@ -5,9 +5,16 @@ import type { FieldValues } from "react-hook-form";
 type MfbRatingProps<TFields extends FieldValues> = InputProps<
   TFields,
   {
+    defaultValue?: null | number;
     ratingProps?: Omit<
       RatingProps,
-      "disabled" | "name" | "onBlur" | "onChange" | "value"
+      | "defaultChecked"
+      | "defaultValue"
+      | "disabled"
+      | "name"
+      | "onBlur"
+      | "onChange"
+      | "value"
     >;
   }
 >;

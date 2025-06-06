@@ -6,6 +6,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import type { MfbTextFieldProps } from "./type";
 
 const MfbTextField = <TFields extends FieldValues = FieldValues>({
+  defaultValue,
   disabled,
   name,
   textFieldProps,
@@ -15,6 +16,7 @@ const MfbTextField = <TFields extends FieldValues = FieldValues>({
   return (
     <Controller
       control={control}
+      defaultValue={defaultValue as never}
       name={name}
       render={({ field: { ref, value, ...field } }) => (
         <TextField

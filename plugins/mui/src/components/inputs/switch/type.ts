@@ -5,11 +5,17 @@ import type { FieldValues } from "react-hook-form";
 type MfbSwitchProps<TFields extends FieldValues = FieldValues> = InputProps<
   TFields,
   {
+    defaultValue?: boolean;
     formControlLabelProps: Omit<FormControlLabelProps, "control" | "label">;
     label: string;
     switchProps?: Omit<
       SwitchProps,
-      "disabled" | "onBlur" | "onChange" | "value"
+      | "defaultChecked"
+      | "defaultValue"
+      | "disabled"
+      | "onBlur"
+      | "onChange"
+      | "value"
     >;
   }
 >;

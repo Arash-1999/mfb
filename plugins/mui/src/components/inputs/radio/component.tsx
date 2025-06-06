@@ -6,6 +6,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import type { MfbRadioGroupProps } from "./type";
 
 const MfbRadioGroup = <TFields extends FieldValues = FieldValues>({
+  defaultValue,
   disabled,
   formControlLabelProps,
   name,
@@ -18,7 +19,7 @@ const MfbRadioGroup = <TFields extends FieldValues = FieldValues>({
   return (
     <Controller
       control={control}
-      defaultValue={radioGroupProps?.defaultValue}
+      defaultValue={defaultValue as never}
       name={name}
       render={({ field: { ref, value, ...field } }) => (
         <RadioGroup

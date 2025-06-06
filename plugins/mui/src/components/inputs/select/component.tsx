@@ -6,6 +6,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import type { MfbSelectProps } from "./type";
 
 const MfbSelect = <TFields extends FieldValues = FieldValues>({
+  defaultValue,
   disabled,
   formControlProps,
   inputLabelProps,
@@ -21,6 +22,8 @@ const MfbSelect = <TFields extends FieldValues = FieldValues>({
       {label && <InputLabel {...inputLabelProps}>{label}</InputLabel>}
       <Controller
         control={control}
+        defaultValue={defaultValue as never}
+        disabled={disabled}
         name={name}
         render={({ field: { onChange, ref, value, ...field } }) => (
           <Select
@@ -29,7 +32,8 @@ const MfbSelect = <TFields extends FieldValues = FieldValues>({
             onChange={(e) => onChange(e.target.value)}
             value={value ?? ""}
             {...field}
-            {...selectProps}>
+            {...selectProps}
+          >
             {options.map((option) => {
               const [key, display] =
                 typeof option === "string" || typeof option === "number"

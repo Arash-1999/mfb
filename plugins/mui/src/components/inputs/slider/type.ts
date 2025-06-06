@@ -5,9 +5,16 @@ import type { FieldValues } from "react-hook-form";
 type MfbSliderProps<TFields extends FieldValues> = InputProps<
   TFields,
   {
+    defaultValue?: Array<number> | number;
     sliderProps?: Omit<
       SliderProps,
-      "disabled" | "name" | "onBlur" | "onChange" | "value"
+      | "defaultChecked"
+      | "defaultValue"
+      | "disabled"
+      | "name"
+      | "onBlur"
+      | "onChange"
+      | "value"
     >;
   }
 >;

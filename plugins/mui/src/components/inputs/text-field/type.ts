@@ -2,12 +2,19 @@ import type { InputProps } from "@mfb/core";
 import type { TextFieldProps } from "@mui/material";
 import type { FieldValues } from "react-hook-form";
 
-type MfbTextFieldProps<TFields extends FieldValues = FieldValues> = InputProps<
+type MfbTextFieldProps<TFields extends FieldValues> = InputProps<
   TFields,
   {
+    defaultValue?: string;
     textFieldProps?: Omit<
       TextFieldProps,
-      "disabled" | "onBlur" | "onChange" | "value"
+      | "defaultChecked"
+      | "defaultValue"
+      | "disabled"
+      | "name"
+      | "onBlur"
+      | "onChange"
+      | "value"
     >;
   }
 >;

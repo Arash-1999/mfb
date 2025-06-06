@@ -7,6 +7,7 @@ import type { MfbCheckboxProps } from "./type";
 
 const MfbCheckbox = <TFields extends FieldValues = FieldValues>({
   checkboxProps,
+  defaultValue,
   disabled,
   formControlLabelProps,
   label,
@@ -17,6 +18,7 @@ const MfbCheckbox = <TFields extends FieldValues = FieldValues>({
   return (
     <Controller
       control={control}
+      defaultValue={defaultValue as never}
       disabled={disabled}
       name={name}
       render={({ field: { ref, value, ...field } }) => (

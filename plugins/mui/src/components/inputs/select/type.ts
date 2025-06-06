@@ -9,6 +9,7 @@ import type { FieldValues } from "react-hook-form";
 type MfbSelectProps<TFields extends FieldValues> = InputProps<
   TFields,
   {
+    defaultValue?: number | string;
     formControlProps?: FormControlProps;
     inputLabelProps?: InputLabelProps;
     label?: string;
@@ -16,11 +17,20 @@ type MfbSelectProps<TFields extends FieldValues> = InputProps<
       | number
       | string
       | {
-          label: number | string;
-          value: number | string;
-        }
+        label: number | string;
+        value: number | string;
+      }
     >;
-    selectProps?: Omit<SelectProps, "name" | "onBlur" | "onChange" | "value">;
+    selectProps?: Omit<
+      SelectProps,
+      | "defaultChecked"
+      | "defaultValue"
+      | "disabled"
+      | "name"
+      | "onBlur"
+      | "onChange"
+      | "value"
+    >;
   }
 >;
 export type { MfbSelectProps };

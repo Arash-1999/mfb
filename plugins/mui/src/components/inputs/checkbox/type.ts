@@ -7,8 +7,15 @@ type MfbCheckboxProps<TFields extends FieldValues = FieldValues> = InputProps<
   {
     checkboxProps?: Omit<
       CheckboxProps,
-      "disabled" | "label" | "onBlur" | "onChange" | "value"
+      | "defaultChecked"
+      | "defaultValue"
+      | "disabled"
+      | "label"
+      | "onBlur"
+      | "onChange"
+      | "value"
     >;
+    defaultValue?: boolean;
     formControlLabelProps?: Omit<FormControlLabelProps, "label">;
     label: string;
   }
