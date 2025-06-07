@@ -1,0 +1,7 @@
+{
+  "extends": "@mfb/typescript-config/base.json",
+  "include": [
+    "./turbo/**/*.ts",
+    "./turbo/**/*.ts"
+  ]
+}

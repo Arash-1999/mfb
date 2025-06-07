@@ -9,6 +9,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
+    "@inquirer/core": "^10.1.13",
+    "@inquirer/type": "^3.0.7",
+    "@mfb/eslint-config": "workspace:*",
+    "@mfb/typescript-config": "workspace:*",
+    "@turbo/gen": "^2.4.0",
+    "@types/node": "^22.15.30",
     "prettier": "^3.4.2",
     "turbo": "^2.4.0",
     "typescript": "~5.7.3"

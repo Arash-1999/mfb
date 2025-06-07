@@ -12,8 +12,7 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "build:watch": "tsc -b && vite build --watch",
-    "lint": "eslint .",
-    "gen:input": "turbo gen mfb-input"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@mfb/core": "workspace:*"
@@ -29,7 +28,6 @@
   "devDependencies": {
     "@mfb/eslint-config": "workspace:*",
     "@mfb/typescript-config": "workspace:*",
-    "@turbo/gen": "^2.4.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react-swc": "^3.9.0",
