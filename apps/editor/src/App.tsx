@@ -1,12 +1,17 @@
-import { Dnd } from "@/components/dnd";
-import { Layout } from "@/components/layout";
+import { CssBaseline } from "@mui/material";
+import { MuiPage2 } from "./components/test-2";
 
-function App() {
+const App = () => {
   return (
-    <Layout title="Mfb Editor">
-      <Dnd />
-    </Layout>
+    <>
+      <CssBaseline />
+      <main>
+        <h1>MFB Editor</h1>
+
+        <MuiPage2 />
+      </main>
+    </>
   );
-}
+};
 
 export default App;

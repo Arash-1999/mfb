@@ -4,6 +4,7 @@
   "scripts": {
     "dev:core": "turbo watch build:watch --filter=@mfb/core",
     "dev:plugin:mui": "turbo watch build:watch --filter=@mfb/plugin-mui",
+    "dev:editor": "turbo dev --filter=@mfb/editor",
     "dev:pg": "turbo dev --filter=./playground",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
