@@ -21,9 +21,9 @@
     "@mfb/plugin-mui": "workspace:*",
     "@mui/icons-material": "^6.4.5",
     "@mui/material": "^6.4.5",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "react-hook-form": "^7.54.2"
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-hook-form": "catalog:"
   },
   "devDependencies": {
     "@mfb/eslint-config": "workspace:*",
