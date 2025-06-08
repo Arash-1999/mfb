@@ -17,6 +17,7 @@ import { readdirSync } from "fs";
 
 interface IConfig {
   basePath: string;
+  default?: string;
   message: string;
   theme?: PartialDeep<Theme>;
   validate?: (path: string) => boolean;
@@ -27,6 +28,9 @@ const pageSize = 7;
 const directorySelect = createPrompt<string, IConfig>((config, done) => {
   const [path, setPath] = useState<string>(config.basePath);
   const [active, setActive] = useState<number>(0);
+  const [showOptions, setShowOptions] = useState<boolean>(
+    typeof config.default === "undefined"
+  );
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string>("");
   const items = useMemo(() => getDirectories(path), [path]);
@@ -36,6 +40,14 @@ const directorySelect = createPrompt<string, IConfig>((config, done) => {
   const message = theme.style.message(config.message, status);
   useKeypress((key, rl) => {
     rl.clearLine(0);
+    if (!showOptions && config.default) {
+      if ((isEnterKey(key) || key.name === "y") && config.default) {
+        done(config.default);
+      } else if (key.name === "n") {
+        setShowOptions(true);
+      }
+      return;
+    }
     if (isEnterKey(key)) {
       let result = "";
       if (items[active] === "" || !items[active]) {
@@ -95,6 +107,10 @@ const directorySelect = createPrompt<string, IConfig>((config, done) => {
   }
   helpTipBottom += `\n${theme.style.help("(Use Enter to select directory)")}`;
 
+  if (!showOptions && config.default) {
+    const selectDefaultMessage = `default path is '${config.default}'. (Y/n)?`;
+    return `${[prefix, message].filter(Boolean).join(" ")}\n${selectDefaultMessage}`;
+  }
   const successMessage = `${[prefix, message].filter(Boolean).join(" ")}\n${page}${helpTipBottom}`;
 
   return error === ""

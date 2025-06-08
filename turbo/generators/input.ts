@@ -8,46 +8,48 @@ const NAME = "input";
 const CONFIG: PlopTypes.PlopGeneratorConfig = {
   actions: [
     {
-      path: "src/components/inputs/{{kebabCase name}}/index.ts",
+      path: "{{path}}/{{kebabCase name}}/index.ts",
       templateFile: "templates/input/index.hbs",
       type: "add",
     },
     {
-      path: "src/components/inputs/{{kebabCase name}}/component.tsx",
+      path: "{{path}}/{{kebabCase name}}/component.tsx",
       templateFile: "templates/input/component.hbs",
       type: "add",
     },
     {
-      path: "src/components/inputs/{{kebabCase name}}/type.ts",
+      path: "{{path}}/{{kebabCase name}}/type.ts",
       templateFile: "templates/input/type.hbs",
       type: "add",
     },
+    // TODO: append new created input to main config
   ],
   description: "",
   prompts: async (inquirer) => {
-    const result = { name: "", path: "" };
+    const result = { name: "", path: "", plugin: "" };
 
-    const path = await directorySelect({
-      basePath: "./src",
-      message: "Choose Your Page: ",
-      validate: (path: string) => {
-        const dir = readdirSync(path, { withFileTypes: true });
-        return dir.findIndex((dirent) => dirent.name === "index.ts") !== -1;
+    result.plugin = await directorySelect({
+      basePath: "./plugins",
+      message: "Choose Your Plugin: ",
+      validate: (plugin: string) => {
+        const dir = readdirSync(plugin, { withFileTypes: true });
+        return dir.findIndex((dirent) => dirent.name === "package.json") !== -1;
       },
     });
-    result.path = path;
-    const filename = path.split("/").at(-1);
 
-    if (filename) {
-      result.name = filename;
-    } else {
-      const name = await inquirer.prompt({
+    result.path = await directorySelect({
+      basePath: result.plugin,
+      default: `${result.plugin}/src/components/inputs`,
+      message: "select your inputs directory",
+    });
+
+    result.name = await inquirer
+      .prompt({
+        message: "What is your input name? ",
         name: "name",
         type: "input",
-      });
-
-      result.name = name.name;
-    }
+      })
+      .then((res) => res.name);
 
     return Promise.resolve(result);
   },

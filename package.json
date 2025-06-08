@@ -6,7 +6,8 @@
     "dev:plugin:mui": "turbo watch build:watch --filter=@mfb/plugin-mui",
     "dev:pg": "turbo dev --filter=./playground",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "gen:plugin:input": "turbo gen mfb-input"
   },
   "devDependencies": {
     "@inquirer/core": "^10.1.13",

@@ -260,9 +260,6 @@ importers:
       '@mfb/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
-      '@turbo/gen':
-        specifier: ^2.4.0
-        version: 2.4.0(@swc/core@1.11.29(@swc/helpers@0.5.15))(@types/node@22.15.30)(typescript@5.7.3)
       '@types/react':
         specifier: ^19.1.2
         version: 19.1.6
