@@ -1,6 +1,8 @@
 {
   "extends": "@mfb/typescript-config/base.json",
   "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
     "baseUrl": ".",
     "paths": {
       "@/*": [

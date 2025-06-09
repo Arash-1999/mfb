@@ -1,5 +1,5 @@
-import { GetInputsImpl } from "@mfb/core";
-import { MuiConfig, MuiFB } from ".";
+import type { GetInputsImpl } from "@mfb/core";
+import type { MuiConfig } from "@/builder/builder";
 
 interface TextFieldOptions {
   color: string;
@@ -17,7 +17,7 @@ interface TextFieldOptions {
   variant: "filled" | "outlined" | "standard";
 }
 
-const options: Record<
+const textFieldOptions: Record<
   keyof TextFieldOptions,
   GetInputsImpl<MuiConfig, TextFieldOptions>
 > = {
@@ -96,6 +96,13 @@ const options: Record<
     type: "text",
   },
   maxRows: {
+    dependsOn: {
+      condition: "not-eq",
+      id: "is_multiline",
+      path: "multiline",
+      type: "disable",
+      value: true,
+    },
     gridProps: { size: 6 },
     name: "maxRows",
     props: {
@@ -109,6 +116,13 @@ const options: Record<
     type: "text",
   },
   minRows: {
+    dependsOn: {
+      condition: "not-eq",
+      id: "is_multiline",
+      path: "multiline",
+      type: "disable",
+      value: true,
+    },
     gridProps: { size: 6 },
     name: "minRows",
     props: {
@@ -125,14 +139,10 @@ const options: Record<
     gridProps: { size: 6 },
     name: "multiline",
     props: {
-      textFieldProps: {
-        fullWidth: true,
-        label: "Multi-line",
-        placeholder: "Multi-line",
-        size: "small",
-      },
+      label: "Multi-line",
+      defaultValue: false,
     },
-    type: "text",
+    type: "checkbox",
   },
   placeholder: {
     gridProps: { size: 6 },
@@ -148,6 +158,13 @@ const options: Record<
     type: "text",
   },
   rows: {
+    dependsOn: {
+      condition: "not-eq",
+      id: "is_multiline",
+      path: "multiline",
+      type: "disable",
+      value: true,
+    },
     gridProps: { size: 6 },
     name: "rows",
     props: {
@@ -188,20 +205,5 @@ const options: Record<
   },
 };
 
-const Test = () => {
-  return (
-    <div>
-      <MuiFB.BasicBuilder
-        gridContainerProps={{
-          spacing: 2,
-          padding: 2,
-        }}
-        id="form-2"
-        inputs={Object.values(options)}
-        onSubmit={console.log}
-      />
-    </div>
-  );
-};
-
-export { Test as MuiPage2 };
+export { textFieldOptions };
+export type { TextFieldOptions };
