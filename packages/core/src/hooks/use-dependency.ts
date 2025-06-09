@@ -34,6 +34,7 @@ const useDependency = <
 }: UseDependencyProps<TFields, TItem>): UseDependencyReturn<TFields, TItem> => {
   const formMethods = useFormContext<TFields>();
 
+  // TODO: provide default value (it's will be undefined when defaultValue passed to Controller)
   const value = useWatch<TFields>({
     control: formMethods.control,
     name: Array.isArray(dependsOn)
@@ -44,12 +45,9 @@ const useDependency = <
   const dependencies = useMemo(() => {
     const dependencyStructure = createDependencyStructure<TFields>(
       dependsOn,
-      value,
+      value
     );
     dependencyStructure.disable.push(...dependencyContext.disable);
-    if (component.name === "card-1.akbar") {
-      console.log("watch, ", "card-1.akbar", value);
-    }
     return dependencyStructure;
   }, [value, dependsOn, dependencyContext]);
 
@@ -63,7 +61,7 @@ const useDependency = <
           ...acc,
           [cur.id]: cur.current,
         }),
-        {},
+        {}
       );
       return component({ deps: resolvedDeps as never });
     }

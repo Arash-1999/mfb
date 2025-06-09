@@ -6,7 +6,7 @@ type BindValueDependency = {
 
 type Condition = {
   condition: "eq" | "not-eq";
-  value: number | string;
+  value: boolean | number | string;
 };
 
 type DefPropsDependency = {
