@@ -15,8 +15,8 @@ interface UseDependencyProps<
   TItem extends DefaultItem<TFields>,
 > {
   component: ((props?: { deps: never }) => TItem) | TItem;
-  dependsOn: DependsOn<TFields>;
   dependencyContext: DependencyContextValue;
+  dependsOn: DependsOn<TFields>;
 }
 
 type UseDependencyReturn<
@@ -29,8 +29,8 @@ const useDependency = <
   TItem extends DefaultItem<TFields>,
 >({
   component,
-  dependsOn,
   dependencyContext,
+  dependsOn,
 }: UseDependencyProps<TFields, TItem>): UseDependencyReturn<TFields, TItem> => {
   const formMethods = useFormContext<TFields>();
 
@@ -45,7 +45,7 @@ const useDependency = <
   const dependencies = useMemo(() => {
     const dependencyStructure = createDependencyStructure<TFields>(
       dependsOn,
-      value
+      value,
     );
     dependencyStructure.disable.push(...dependencyContext.disable);
     return dependencyStructure;
@@ -61,7 +61,7 @@ const useDependency = <
           ...acc,
           [cur.id]: cur.current,
         }),
-        {}
+        {},
       );
       return component({ deps: resolvedDeps as never });
     }
