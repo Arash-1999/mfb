@@ -4,7 +4,8 @@ import { CssBaseline } from "@mui/material";
 // import TestPage3 from "./test-page-3";
 // import TestPage5 from "./test-page-5";
 // import TestPage6 from "./test-page-6";
-import { MuiPage1 } from "./pages/mui-plugin";
+import TestPage7 from "./test-page-7";
+// import { MuiPage1 } from "./pages/mui-plugin";
 
 function App() {
   return (
@@ -15,7 +16,8 @@ function App() {
       {/* <TestPage3 /> */}
       {/* <TestPage5 /> */}
       {/* <TestPage6 /> */}
-      <MuiPage1 />
+      <TestPage7 />
+      {/* <MuiPage1 /> */}
     </>
   );
 }
