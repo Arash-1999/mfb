@@ -16,9 +16,11 @@ type Dependency<
   TFields extends FieldValues,
   TFunc extends boolean = false,
   TOnlyBoolean extends boolean = false,
-> = TFunc extends true
+> = (TFunc extends true
   ? Required<DependencyObject<TFields, TOnlyBoolean>>
-  : Partial<DependencyObject<TFields, TOnlyBoolean>>;
+  : Partial<DependencyObject<TFields, TOnlyBoolean>>) & {
+  shouldReset?: boolean;
+};
 
 interface DependencyContextDisable extends Condition {
   current: unknown;

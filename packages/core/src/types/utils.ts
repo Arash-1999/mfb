@@ -21,9 +21,12 @@ interface BaseComponentProps {
   disabled?: boolean;
 }
 
+interface BaseInputProps extends BaseComponentProps {
+  defaultValue?: never;
+}
 type BaseInput = (
   // TODO: use unknown instead of any for 'name' and 'formMethods' type-safety
-  props: any & BaseComponentProps,
+  props: any & BaseInputProps
 ) => JSX.Element;
 
 interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {

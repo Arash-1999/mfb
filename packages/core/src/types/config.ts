@@ -12,11 +12,14 @@ interface FormBuilderConfig {
     defaultValues: Record<PropertyKey, unknown>;
   };
   layout: Record<LayoutKey, BaseComponent>;
+  options?: Partial<FormBuilderOptions>;
 }
 
+interface FormBuilderOptions {
+  dependencyShouldReset: boolean;
+}
 interface FormBuilderContext<TFormId extends string = string> {
   id: TFormId;
 }
 
-export type { FormBuilderConfig, FormBuilderContext };
-
+export type { FormBuilderConfig, FormBuilderContext, FormBuilderOptions };

@@ -4,10 +4,15 @@ import type {
   DependencyStructure,
   DependsOn,
 } from "@/types";
-import type { FieldValues } from "react-hook-form";
+import type { FieldValues, Path } from "react-hook-form";
 
-import { createDependencyStructure, handleRenderDep } from "@/utils";
-import { useMemo } from "react";
+import {
+  conditionArrayCalculator,
+  createDependencyStructure,
+  handleRenderDep,
+  mergeName,
+} from "@/utils";
+import { useEffect, useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 interface UseDependencyProps<
@@ -15,8 +20,13 @@ interface UseDependencyProps<
   TItem extends DefaultItem<TFields>,
 > {
   component: ((props?: { deps: never }) => TItem) | TItem;
+  name: string | undefined;
   dependencyContext: DependencyContextValue;
   dependsOn: DependsOn<TFields>;
+}
+
+interface UseDependencyOptions {
+  shouldReset?: boolean;
 }
 
 type UseDependencyReturn<
@@ -27,11 +37,15 @@ type UseDependencyReturn<
 const useDependency = <
   TFields extends FieldValues,
   TItem extends DefaultItem<TFields>,
->({
-  component,
-  dependencyContext,
-  dependsOn,
-}: UseDependencyProps<TFields, TItem>): UseDependencyReturn<TFields, TItem> => {
+>(
+  {
+    component,
+    name = "",
+    dependencyContext,
+    dependsOn,
+  }: UseDependencyProps<TFields, TItem>,
+  options?: UseDependencyOptions
+): UseDependencyReturn<TFields, TItem> => {
   const formMethods = useFormContext<TFields>();
 
   // TODO: provide default value (it's will be undefined when defaultValue passed to Controller)
@@ -45,7 +59,7 @@ const useDependency = <
   const dependencies = useMemo(() => {
     const dependencyStructure = createDependencyStructure<TFields>(
       dependsOn,
-      value,
+      value
     );
     dependencyStructure.disable.push(...dependencyContext.disable);
     return dependencyStructure;
@@ -61,12 +75,25 @@ const useDependency = <
           ...acc,
           [cur.id]: cur.current,
         }),
-        {},
+        {}
       );
       return component({ deps: resolvedDeps as never });
     }
     return component;
   }, [component, dependencies]);
+
+  useEffect(() => {
+    if (resolvedComponent.shouldReset || options?.shouldReset) {
+      const resolvedName = mergeName(name, resolvedComponent.name || "");
+      console.log(resolvedName);
+      if (
+        resolvedName &&
+        (dependencies.visibility.length === 0 ||
+          conditionArrayCalculator(dependencies.visibility))
+      )
+        formMethods.setValue(resolvedName as Path<TFields>, "" as any);
+    }
+  }, [resolvedComponent, value]);
 
   return [
     handleRenderDep({

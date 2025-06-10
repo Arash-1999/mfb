@@ -22,7 +22,7 @@ type GetInputs<
   TInternal extends boolean = false,
 > =
   | ((
-      props?: DefineFnProps,
+      props?: DefineFnProps
     ) => GetInputsImpl<TConfig, TFields, TInternal, true>)
   | GetInputsImpl<TConfig, TFields, TInternal>;
 
