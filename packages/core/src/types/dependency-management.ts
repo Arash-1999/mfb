@@ -19,13 +19,14 @@ type Dependency<
 > = (TFunc extends true
   ? Required<DependencyObject<TFields, TOnlyBoolean>>
   : Partial<DependencyObject<TFields, TOnlyBoolean>>) & {
-  shouldReset?: boolean;
+  dependencyShouldReset?: boolean;
 };
 
 interface DependencyContextDisable extends Condition {
   current: unknown;
 }
 interface DependencyContextValue {
+  // TODO: store calculated value of dependency
   disable: Array<DependencyContextDisable>;
 }
 
@@ -49,6 +50,9 @@ type DependencyStructure<TFields extends FieldValues> = Omit<
 > & {
   disable: Array<DependencyContextDisable>;
 };
+
+type DependencyType =
+  DependsOnUnion<false> extends { type: infer TType } ? TType : never;
 
 type DependsOn<
   TFields extends FieldValues,
@@ -87,6 +91,7 @@ export type {
   Dependency,
   DependencyContextValue,
   DependencyStructure,
+  DependencyType,
   DependsOn,
   DependsOnBase,
   DependsOnSingle,

@@ -2,6 +2,7 @@ import type {
   DefaultItem,
   DependencyContextValue,
   DependencyStructure,
+  DependencyType,
   DependsOn,
 } from "@/types";
 import type { FieldValues, Path } from "react-hook-form";
@@ -12,7 +13,7 @@ import {
   handleRenderDep,
   mergeName,
 } from "@/utils";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 interface UseDependencyProps<
@@ -26,7 +27,7 @@ interface UseDependencyProps<
 }
 
 interface UseDependencyOptions {
-  shouldReset?: boolean;
+  dependencyShouldReset?: boolean;
 }
 
 type UseDependencyReturn<
@@ -47,6 +48,12 @@ const useDependency = <
   options?: UseDependencyOptions
 ): UseDependencyReturn<TFields, TItem> => {
   const formMethods = useFormContext<TFields>();
+  const ref = useRef<Record<DependencyType, boolean | null>>({
+    "bind-value": null,
+    "def-props": null,
+    disable: null,
+    visibility: null,
+  });
 
   // TODO: provide default value (it's will be undefined when defaultValue passed to Controller)
   const value = useWatch<TFields>({
@@ -83,15 +90,34 @@ const useDependency = <
   }, [component, dependencies]);
 
   useEffect(() => {
-    if (resolvedComponent.shouldReset || options?.shouldReset) {
+    if (
+      resolvedComponent.dependencyShouldReset ||
+      options?.dependencyShouldReset
+    ) {
       const resolvedName = mergeName(name, resolvedComponent.name || "");
-      console.log(resolvedName);
+
+      const _visibility =
+        dependencies.visibility.length === 0 ||
+        conditionArrayCalculator(dependencies.visibility);
+
+      const _disable =
+        dependencies.disable.length > 0 &&
+        conditionArrayCalculator(dependencies.disable);
+
       if (
-        resolvedName &&
-        (dependencies.visibility.length === 0 ||
-          conditionArrayCalculator(dependencies.visibility))
-      )
-        formMethods.setValue(resolvedName as Path<TFields>, "" as any);
+        (typeof ref.current.visibility === "boolean" &&
+          _visibility &&
+          _visibility !== ref.current.visibility) ||
+        (typeof ref.current.disable === "boolean" &&
+          _disable &&
+          _disable !== ref.current.disable) ||
+        dependencies["bind-value"].length > 0 ||
+        dependencies["def-props"].length > 0
+      ) {
+        formMethods.resetField(resolvedName as Path<TFields>);
+      }
+      ref.current.visibility = _visibility;
+      ref.current.disable = _disable;
     }
   }, [resolvedComponent, value]);
 

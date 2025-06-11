@@ -282,7 +282,7 @@ class FormBuilder<
         dependsOn: dependency,
       },
       {
-        shouldReset: this.options.dependencyShouldReset,
+        dependencyShouldReset: this.options.dependencyShouldReset,
       }
     );
 
@@ -307,7 +307,7 @@ class FormBuilder<
     return withContext ? (
       <DependencyContext.Provider
         value={{
-          disable: [...dependencies.disable, ...dependencyContext.disable],
+          disable: dependencies.disable,
         }}
       >
         {children}
