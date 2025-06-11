@@ -18,6 +18,8 @@ const Test = () => {
         defaultValues: {
           is_columns_responsive: false,
           is_spacing_responsive: false,
+          columns: "",
+          spacing: "",
         },
       }}
       onSubmit={console.log}
