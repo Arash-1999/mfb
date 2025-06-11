@@ -3,6 +3,7 @@ import { FB } from "./form-builder";
 
 interface TestPageFields {
   is_multiple: boolean;
+  are_you_sure: string;
   value: string | { xs: string; md: string };
 }
 
@@ -29,13 +30,33 @@ const Page = () => {
             },
           },
           {
-            dependsOn: {
-              path: "is_multiple",
-              condition: "eq",
-              id: "is_multiple",
-              type: "visibility",
-              value: "yes",
+            type: "text",
+            name: "are_you_sure",
+            props: {
+              textFieldProps: {
+                size: "small",
+                label: "Are you sure",
+                placeholder: "Are you sure",
+              },
             },
+          },
+          {
+            dependsOn: [
+              {
+                path: "is_multiple",
+                condition: "not-eq",
+                id: "is_multiple",
+                type: "visibility",
+                value: "yes",
+              },
+              {
+                path: "are_you_sure",
+                condition: "eq",
+                id: "sure",
+                type: "visibility",
+                value: "akbar",
+              },
+            ],
             shouldReset: true,
             type: "text",
             name: "value",
@@ -50,7 +71,7 @@ const Page = () => {
           {
             dependsOn: {
               path: "is_multiple",
-              condition: "not-eq",
+              condition: "eq",
               id: "is_multiple",
               type: "visibility",
               value: "yes",
@@ -69,7 +90,7 @@ const Page = () => {
           {
             dependsOn: {
               path: "is_multiple",
-              condition: "not-eq",
+              condition: "eq",
               id: "is_multiple",
               type: "visibility",
               value: "yes",
@@ -105,6 +126,11 @@ const Page = () => {
           //     },
           //   })),
         ]}
+        options={{
+          defaultValues: {
+            value: "",
+          },
+        }}
         onSubmit={(data) => {
           console.log(data);
         }}
