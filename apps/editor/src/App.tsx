@@ -1,7 +1,8 @@
 import { CssBaseline } from "@mui/material";
+
 import { MuiFB } from "./builder";
-import { textFieldOptions } from "./builder/components/text-field";
 import { useGridContainerOptions } from "./builder/components/grid-container";
+import { textFieldOptions } from "./builder/components/text-field";
 
 const Test = () => {
   const gridContainerOptions = useGridContainerOptions();
@@ -9,20 +10,20 @@ const Test = () => {
   return (
     <MuiFB.BasicBuilder
       gridContainerProps={{
-        spacing: 2,
         padding: 2,
+        spacing: 2,
       }}
       id="form-2"
       inputs={Object.values(gridContainerOptions).flat()}
+      onSubmit={console.log}
       options={{
         defaultValues: {
+          columns: "",
           is_columns_responsive: false,
           is_spacing_responsive: false,
-          columns: "",
           spacing: "",
         },
       }}
-      onSubmit={console.log}
     />
   );
 };
@@ -35,8 +36,8 @@ const App = () => {
 
         <MuiFB.BasicBuilder
           gridContainerProps={{
-            spacing: 2,
             padding: 2,
+            spacing: 2,
           }}
           id="form-2"
           inputs={Object.values(textFieldOptions)}

@@ -1,25 +1,21 @@
-import type { GetInputsImpl } from "@mfb/core";
-import type { Breakpoint } from "@mui/material";
 import type { MuiConfig } from "@/builder";
+import type { GetInputsImpl } from "@mfb/core";
 
-import { useTheme } from "@mui/material";
-import { useCallback } from "react";
 import { useResponsiveStyle } from "../hooks/use-responsive-style";
+import { ResponsiveStyleValue } from "../types";
 
-type ResponsiveStyleValue<T> = T | { [key in Breakpoint]?: T | null };
-
-type ResponsiveKeys = "columns";
 interface GridContainerOptions {
   columns: ResponsiveStyleValue<number>;
   //   columnSpacing: number | string;
   //   direction: "column" | "column-reverse" | "row" | "row-reverse";
   //   rowSpacing: number | string;
-  spacing: number | string;
+  spacing: ResponsiveStyleValue<number | string>;
   //   wrap: "nowrap" | "wrap-reverse" | "wrap";
 }
-type GridContainerOptionsForm = {
+type GridContainerOptionsForm = GridContainerOptions & {
   [key in ResponsiveKeys as `is_${keyof GridContainerOptions}_responsive`]: boolean;
-} & GridContainerOptions;
+};
+type ResponsiveKeys = "columns" | "spacing";
 
 const useGridContainerOptions = (): Record<
   keyof GridContainerOptions,
@@ -32,6 +28,7 @@ const useGridContainerOptions = (): Record<
 
   return {
     columns: convertToResponsive({
+      name: "columns",
       props: {
         textFieldProps: {
           label: "Columns",
@@ -39,10 +36,10 @@ const useGridContainerOptions = (): Record<
           size: "small",
         },
       },
-      name: "columns",
       type: "text",
     }),
     spacing: convertToResponsive({
+      name: "spacing",
       props: {
         textFieldProps: {
           label: "Spacing",
@@ -50,7 +47,6 @@ const useGridContainerOptions = (): Record<
           size: "small",
         },
       },
-      name: "spacing",
       type: "text",
     }),
     // columnSpacing: {},
