@@ -16,18 +16,18 @@ import {
 import { useEffect, useMemo, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
+interface UseDependencyOptions {
+  dependencyShouldReset?: boolean;
+}
+
 interface UseDependencyProps<
   TFields extends FieldValues,
   TItem extends DefaultItem<TFields>,
 > {
   component: ((props?: { deps: never }) => TItem) | TItem;
-  name: string | undefined;
   dependencyContext: DependencyContextValue;
   dependsOn: DependsOn<TFields>;
-}
-
-interface UseDependencyOptions {
-  dependencyShouldReset?: boolean;
+  name: string | undefined;
 }
 
 type UseDependencyReturn<
@@ -41,11 +41,11 @@ const useDependency = <
 >(
   {
     component,
-    name = "",
     dependencyContext,
     dependsOn,
+    name = "",
   }: UseDependencyProps<TFields, TItem>,
-  options?: UseDependencyOptions
+  options?: UseDependencyOptions,
 ): UseDependencyReturn<TFields, TItem> => {
   const formMethods = useFormContext<TFields>();
   const ref = useRef<Record<DependencyType, boolean | null>>({
@@ -66,7 +66,7 @@ const useDependency = <
   const dependencies = useMemo(() => {
     const dependencyStructure = createDependencyStructure<TFields>(
       dependsOn,
-      value
+      value,
     );
     dependencyStructure.disable.push(...dependencyContext.disable);
     return dependencyStructure;
@@ -82,7 +82,7 @@ const useDependency = <
           ...acc,
           [cur.id]: cur.current,
         }),
-        {}
+        {},
       );
       return component({ deps: resolvedDeps as never });
     }
@@ -91,8 +91,9 @@ const useDependency = <
 
   useEffect(() => {
     if (
-      resolvedComponent.dependencyShouldReset ||
-      options?.dependencyShouldReset
+      typeof resolvedComponent.dependencyShouldReset === "undefined"
+        ? options?.dependencyShouldReset
+        : resolvedComponent.dependencyShouldReset
     ) {
       const resolvedName = mergeName(name, resolvedComponent.name || "");
 
@@ -119,7 +120,14 @@ const useDependency = <
       ref.current.visibility = _visibility;
       ref.current.disable = _disable;
     }
-  }, [resolvedComponent, value]);
+  }, [
+    dependencies,
+    formMethods,
+    name,
+    options?.dependencyShouldReset,
+    resolvedComponent,
+    value,
+  ]);
 
   return [
     handleRenderDep({

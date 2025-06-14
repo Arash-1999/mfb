@@ -20,6 +20,7 @@ import type {
 import type { Context } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
+import { options as defaultOptions } from "@/constants";
 import {
   useDependency,
   useDependsOnField,
@@ -41,7 +42,6 @@ import {
   useMemo,
 } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import { options as defaultOptions } from "@/constants";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
@@ -277,13 +277,13 @@ class FormBuilder<
     const [resolvedComponent, dependencies] = useDependency<TFields, TItem>(
       {
         component,
-        name,
         dependencyContext,
         dependsOn: dependency,
+        name,
       },
       {
         dependencyShouldReset: this.options.dependencyShouldReset,
-      }
+      },
     );
 
     if (resolvedComponent === null) return null;
@@ -339,7 +339,7 @@ class FormBuilder<
           action(detail.action);
         }
       },
-      [action, id, name]
+      [action, id, name],
     );
 
     useMfbGlobalEvent<TFields, TFormId>({
@@ -381,7 +381,7 @@ class FormBuilder<
     card:
       | GetCardsImpl<TConfig, TFields, TAdvanced, true>
       | GetCardsImpl<TConfig, TFields, TAdvanced>,
-    { dependsOn, index, name }: RenderFnOptions<TFields>
+    { dependsOn, index, name }: RenderFnOptions<TFields>,
   ) => {
     const resolvedName = mergeName(name || "", card.name || "");
     const { "grid-container": GridContainer, "grid-item": GridItem } =
@@ -499,7 +499,7 @@ class FormBuilder<
               ) : (
                 <InputMapper inputs={card.inputs} name={resolvedName} />
               )}
-            </GridContainer>
+            </GridContainer>,
           )}
         </GridItem>
       );
@@ -509,7 +509,7 @@ class FormBuilder<
 
   private renderInput = <TFields extends FieldValues>(
     input: GetInputsImpl<TConfig, TFields, true>,
-    { dependsOn, formMethods, name }: RenderFnOptions<TFields>
+    { dependsOn, formMethods, name }: RenderFnOptions<TFields>,
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {
