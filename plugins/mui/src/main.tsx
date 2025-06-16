@@ -39,5 +39,15 @@ const getConfig = () => {
   return config;
 };
 
-export { getConfig };
+const getInputComponents = () => ({
+  checkbox: MfbCheckbox,
+  radio: MfbRadioGroup,
+  rating: MfbRating,
+  select: MfbSelect,
+  slider: MfbSlider,
+  switch: MfbSwitch,
+  text: MfbTextField,
+});
+
+export { getConfig, getInputComponents, getLayoutConfig };
 export type { MuiConfig };
