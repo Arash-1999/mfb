@@ -1,6 +1,6 @@
+import type { MuiConfig } from "@/builder";
 import type { GetInputsImpl } from "@mfb/core";
 import type { FieldValues, Path } from "react-hook-form";
-import type { MuiConfig } from "@/builder";
 
 import { useTheme } from "@mui/material";
 
@@ -10,7 +10,7 @@ interface UseResponsiveStyleProps<TFields extends FieldValues> {
 
 interface UseResponsiveStyleReturn<TFields extends FieldValues> {
   convertToResponsive: (
-    item: GetInputsImpl<MuiConfig, TFields>
+    item: GetInputsImpl<MuiConfig, TFields>,
   ) => Array<GetInputsImpl<MuiConfig, TFields>>;
 }
 const useResponsiveStyle = <TFields extends FieldValues>({
@@ -22,18 +22,18 @@ const useResponsiveStyle = <TFields extends FieldValues>({
     (item) => {
       return [
         {
-          name: responsivePath(item.name),
-          type: "checkbox",
           gridProps: { size: 12 },
+          name: responsivePath(item.name),
           props: {
             label: "Is responsive",
           },
+          type: "checkbox",
         },
         {
           dependsOn: {
-            path: responsivePath(item.name),
             condition: "eq",
             id: "is_responsive",
+            path: responsivePath(item.name),
             type: "visibility",
             value: false,
           },
@@ -42,18 +42,19 @@ const useResponsiveStyle = <TFields extends FieldValues>({
         ...theme.breakpoints.keys.map(
           (key): GetInputsImpl<MuiConfig, TFields> => ({
             dependsOn: {
-              path: responsivePath(item.name),
               condition: "eq",
               id: "is_responsive",
+              path: responsivePath(item.name),
               type: "visibility",
               value: true,
             },
             gridProps: {
-              size: 12 / theme.breakpoints.keys.length,
+              size: 12,
+              // size: 12 / theme.breakpoints.keys.length,
             },
             ...item,
             name: `${item.name}.${key}`,
-          })
+          }),
         ),
       ];
     };

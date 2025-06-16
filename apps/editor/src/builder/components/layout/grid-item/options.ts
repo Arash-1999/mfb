@@ -1,17 +1,13 @@
 import type { MuiConfig } from "@/builder";
 import type { GetInputsImpl } from "@mfb/core";
 
-import { useResponsiveStyle } from "../hooks/use-responsive-style";
-import { ResponsiveStyleValue } from "../types";
+import { useResponsiveStyle } from "@/builder/hooks/use-responsive-style";
 
-interface GridItemOptions {
-  offset: ResponsiveStyleValue<number | string>;
-  size: ResponsiveStyleValue<number | string>;
-}
-type GridItemOptionsForm = GridItemOptions & {
-  [key in ResponsiveKeys as `is_${keyof GridItemOptions}_responsive`]: boolean;
-};
-type ResponsiveKeys = "offset";
+import type {
+  GridItemOptions,
+  GridItemOptionsForm,
+  ResponsiveKeys,
+} from "./type";
 
 const useGridItemOptions = (): Record<
   keyof GridItemOptions,
@@ -19,7 +15,8 @@ const useGridItemOptions = (): Record<
   | GetInputsImpl<MuiConfig, GridItemOptionsForm>
 > => {
   const { convertToResponsive } = useResponsiveStyle<GridItemOptionsForm>({
-    responsivePath: (name) => `is_${name as ResponsiveKeys}_responsive`,
+    responsivePath: (name) =>
+      `gridProps.is_${name as ResponsiveKeys}_responsive`,
   });
 
   return {
@@ -49,4 +46,3 @@ const useGridItemOptions = (): Record<
 };
 
 export { useGridItemOptions };
-export type { GridItemOptions };

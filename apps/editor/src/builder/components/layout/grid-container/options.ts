@@ -1,21 +1,13 @@
 import type { MuiConfig } from "@/builder";
 import type { GetInputsImpl } from "@mfb/core";
 
-import { useResponsiveStyle } from "../hooks/use-responsive-style";
-import { ResponsiveStyleValue } from "../types";
+import { useResponsiveStyle } from "@/builder/hooks/use-responsive-style";
 
-interface GridContainerOptions {
-  columns: ResponsiveStyleValue<number>;
-  //   columnSpacing: number | string;
-  //   direction: "column" | "column-reverse" | "row" | "row-reverse";
-  //   rowSpacing: number | string;
-  spacing: ResponsiveStyleValue<number | string>;
-  //   wrap: "nowrap" | "wrap-reverse" | "wrap";
-}
-type GridContainerOptionsForm = GridContainerOptions & {
-  [key in ResponsiveKeys as `is_${keyof GridContainerOptions}_responsive`]: boolean;
-};
-type ResponsiveKeys = "columns" | "spacing";
+import {
+  GridContainerOptions,
+  GridContainerOptionsForm,
+  ResponsiveKeys,
+} from "./type";
 
 const useGridContainerOptions = (): Record<
   keyof GridContainerOptions,
@@ -23,7 +15,8 @@ const useGridContainerOptions = (): Record<
   | GetInputsImpl<MuiConfig, GridContainerOptionsForm>
 > => {
   const { convertToResponsive } = useResponsiveStyle<GridContainerOptionsForm>({
-    responsivePath: (name) => `is_${name as ResponsiveKeys}_responsive`,
+    responsivePath: (name) =>
+      `gridContainerProps.is_${name as ResponsiveKeys}_responsive`,
   });
 
   return {
@@ -58,4 +51,3 @@ const useGridContainerOptions = (): Record<
 };
 
 export { useGridContainerOptions };
-export type { GridContainerOptions };
