@@ -452,28 +452,32 @@ class FormBuilder<
         key: `card-${index}`,
         nodes:
           "list" in card
-            ? card.list.map(({ gridContainerProps, list, name, title }) => ({
-                children: (
-                  <GridContainer {...gridContainerProps}>
-                    <AdvancedMapper
-                      list={list}
-                      name={mergeName(resolvedName, name || "")}
-                    />
-                  </GridContainer>
-                ),
-                title,
-              }))
-            : card.inputs.map(({ gridContainerProps, list, title }) => ({
-                children: (
-                  <GridContainer {...gridContainerProps}>
-                    <InputMapper
-                      inputs={list}
-                      name={mergeName(resolvedName, name || "")}
-                    />
-                  </GridContainer>
-                ),
-                title,
-              })),
+            ? card.list.map(
+                ({ gridContainerProps, list, name: itemName, title }) => ({
+                  children: (
+                    <GridContainer {...gridContainerProps}>
+                      <AdvancedMapper
+                        list={list}
+                        name={mergeName(resolvedName, itemName || "")}
+                      />
+                    </GridContainer>
+                  ),
+                  title,
+                }),
+              )
+            : card.inputs.map(
+                ({ gridContainerProps, list, name: itemName, title }) => ({
+                  children: (
+                    <GridContainer {...gridContainerProps}>
+                      <InputMapper
+                        inputs={list}
+                        name={mergeName(resolvedName, itemName || "")}
+                      />
+                    </GridContainer>
+                  ),
+                  title,
+                }),
+              ),
         ...card.props,
       });
     }

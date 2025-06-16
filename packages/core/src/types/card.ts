@@ -22,6 +22,7 @@ type GetCardBase<
         ? Array<{
             gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
             list: Array<GetInputs<TConfig, TFields>>;
+            name?: string;
             title: Header | string;
           }>
         : Array<GetInputs<TConfig, TFields>>;
