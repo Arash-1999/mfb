@@ -39,7 +39,7 @@ const TestPage2 = () => {
                 },
                 { shouldFocus: false },
               ],
-            }
+            },
           );
         }}
       >
@@ -57,7 +57,7 @@ const TestPage2 = () => {
             {
               type: "remove",
               params: [-1],
-            }
+            },
           );
         }}
       >
@@ -75,6 +75,11 @@ const TestPage2 = () => {
             name: "card-1",
             type: "paper",
             inputs: [
+              {
+                actionType: "append",
+                name: "card-1.akbar",
+                type: "field-array-action",
+              },
               {
                 type: "text",
                 name: "list-dep",
@@ -103,6 +108,11 @@ const TestPage2 = () => {
                   id: "list-dep",
                 },
                 inputs: [
+                  {
+                    actionType: "remove",
+                    name: "card-1.akbar",
+                    type: "field-array-action",
+                  },
                   {
                     type: "text",
                     gridProps: {
