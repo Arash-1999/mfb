@@ -49,7 +49,7 @@ const useMfbFieldArray = <TFields extends FieldValues>({
           break;
       }
     },
-    [methods]
+    [methods],
   );
   return { action, fields };
 };

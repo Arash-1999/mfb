@@ -16,6 +16,7 @@ import type {
   DefaultItem,
   GetLayoutProps,
   InputArray,
+  ListInputArray,
   RenderFn,
 } from "./utils";
 
@@ -150,7 +151,7 @@ interface InputMapperProps<
   TFields extends FieldValues,
 > {
   deps?: DependsOn<TFields>;
-  inputs: InputArray<TConfig, TFields>;
+  inputs: ListInputArray<TConfig, TFields>;
   name?: string;
 }
 

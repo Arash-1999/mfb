@@ -21,13 +21,13 @@ interface BaseComponentProps {
   disabled?: boolean;
 }
 
+type BaseInput = (
+  // TODO: use unknown instead of any for 'name' and 'formMethods' type-safety
+  props: any & BaseInputProps,
+) => JSX.Element;
 interface BaseInputProps extends BaseComponentProps {
   defaultValue?: never;
 }
-type BaseInput = (
-  // TODO: use unknown instead of any for 'name' and 'formMethods' type-safety
-  props: any & BaseInputProps
-) => JSX.Element;
 
 interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
   gridProps?: object;
@@ -56,7 +56,7 @@ type LayoutKey = "field" | "grid-container" | "grid-item";
 type ListInputArray<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = Array<ActionInput | GetInputs<TConfig, TFields>>;
+> = Array<ActionInput<TConfig, TFields> | GetInputs<TConfig, TFields>>;
 
 type RenderFn<
   TFields extends FieldValues,

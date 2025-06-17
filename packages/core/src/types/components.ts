@@ -1,20 +1,23 @@
-import type { JSX } from "react";
-import type { FieldValues } from "react-hook-form";
+// import type { JSX } from "react";
+import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
-import type { FieldArrayActions } from "./event";
-import type { GetInputs } from "./input";
-import type { AdvancedList, GetLayoutProps } from "./utils";
+// import type { FieldArrayActions } from "./event";
+// import type { GetInputs } from "./input";
+import type { AdvancedList, GetLayoutProps, ListInputArray } from "./utils";
 
-type ActionInput = {
-  render: <TFields extends FieldValues>(
-    props: ActionRenderProps<TFields>
-  ) => JSX.Element;
+type ActionInput<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = {
+  actionType: "append" | "prepend" | "remove";
+  gridProps?: GetLayoutProps<TConfig, "grid-item">;
+  name: ArrayPath<TFields>;
   type: "field-array-action";
 };
-type ActionRenderProps<TFields extends FieldValues> = {
-  methods: FieldArrayActions<TFields>;
-};
+// type ActionRenderProps<TFields extends FieldValues> = {
+//   methods: FieldArrayActions<TFields>;
+// };
 
 // type AdvancedFieldArrayList<
 //   TConfig extends FormBuilderConfig,
@@ -39,7 +42,7 @@ type ListInput<
   type: "list";
 } & (
   | {
-      inputs: Array<GetInputs<TConfig, TFields>>;
+      inputs: ListInputArray<TConfig, TFields>;
     }
   | {
       list: AdvancedList<TConfig, TFields>;

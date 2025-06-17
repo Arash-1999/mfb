@@ -1,4 +1,5 @@
 import type {
+  ActionInput,
   AdvancedBuilderProps,
   AdvancedMapperProps,
   BasicBuilderProps,
@@ -17,7 +18,7 @@ import type {
   InputMapperProps,
   RenderFnOptions,
 } from "@/types";
-import type { Context } from "react";
+import type { Context, PropsWithChildren } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import { options as defaultOptions } from "@/constants";
@@ -30,10 +31,11 @@ import {
 import {
   conditionArrayCalculator,
   convertDepsToObject,
+  listActionGuard,
   listInputGuard,
   mergeName,
 } from "@/utils";
-import { eventNames } from "@/utils/events";
+import { dispatchFieldArray, eventNames } from "@/utils/events";
 import {
   createContext,
   createElement,
@@ -52,12 +54,16 @@ class FormBuilder<
   config: TConfig;
   Context: Context<FormBuilderContext<TFormId> | null>;
   DependencyContext: Context<DependencyContextValue | null>;
+  FieldArrayContext: Context<null | { index: null | number }>;
   options: FormBuilderOptions;
 
   constructor(config: TConfig, options?: FormBuilderOptions) {
     this.config = config;
     this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
     this.DependencyContext = createContext<DependencyContextValue | null>(null);
+    this.FieldArrayContext = createContext<null | { index: null | number }>(
+      null,
+    );
     this.options = { ...defaultOptions, ...options };
   }
 
@@ -205,11 +211,61 @@ class FormBuilder<
     );
   };
 
+  private useMfbContext = () => {
+    const { Context } = this;
+    return useContext(Context);
+  };
+
+  private useMfbFieldArrayContext = () => {
+    const { FieldArrayContext } = this;
+    return useContext(FieldArrayContext);
+  };
+
+  private ActionButton = <TFields extends FieldValues>({
+    action,
+    children,
+    disabled,
+  }: PropsWithChildren<{
+    action: ActionInput<TConfig, TFields>;
+    disabled: boolean;
+  }>) => {
+    const { id } = this.useMfbContext() || { id: "" };
+    const { index } = this.useMfbFieldArrayContext() || { index: null };
+
+    const handleClick = () => {
+      switch (action.actionType) {
+        case "append":
+        case "prepend":
+          dispatchFieldArray<TFields>(id, action.name, {
+            // TODO: use config.input.defaultValues ot create correct deafultValue
+            params: [{} as never, {}],
+            type: "append",
+          });
+          break;
+        case "remove": {
+          const removeIndex = index === null ? -1 : index;
+          dispatchFieldArray<TFields>(id, action.name, {
+            params: [removeIndex],
+            type: "remove",
+          });
+          break;
+        }
+        default:
+          console.log("something");
+      }
+    };
+
+    return (
+      <button disabled={disabled} onClick={handleClick} type="button">
+        {children}
+      </button>
+    );
+  };
   private AdvancedMapper = <TFields extends FieldValues>({
     list,
     name,
   }: AdvancedMapperProps<TConfig, TFields>) => {
-    const { DependencyManager, renderCard, renderInput } = this;
+    const { DependencyManager, renderAction, renderCard, renderInput } = this;
 
     return list.map((item, index) => {
       if (item.mode === "card") {
@@ -229,6 +285,18 @@ class FormBuilder<
         );
       }
       if (item.mode === "input") {
+        if (listActionGuard<TConfig, TFields>(item)) {
+          return (
+            <DependencyManager<TFields, ActionInput<TConfig, TFields>>
+              component={item}
+              index={index}
+              key={`action-${index}`}
+              name={name}
+              render={renderAction}
+              withContext={false}
+            />
+          );
+        }
         const withContext =
           (typeof item === "function" ? item().type : item.type) === "list";
         return (
@@ -317,11 +385,6 @@ class FormBuilder<
     );
   };
 
-  private useMfbContext = () => {
-    const { Context } = this;
-    return useContext(Context);
-  };
-
   private FieldArray = <TFields extends FieldValues>({
     disabled,
     name,
@@ -355,9 +418,21 @@ class FormBuilder<
     inputs,
     name, // should passed in list input. optional in card or flat mode inputs.
   }: InputMapperProps<TConfig, TFields>) => {
-    const { DependencyManager, renderInput } = this;
+    const { DependencyManager, renderAction, renderInput } = this;
 
     return inputs.map((input, i) => {
+      if (listActionGuard<TConfig, TFields>(input)) {
+        return (
+          <DependencyManager<TFields, ActionInput<TConfig, TFields>>
+            component={input}
+            index={i}
+            key={`input-${i}`}
+            name={name}
+            render={renderAction}
+            withContext={false}
+          />
+        );
+      }
       const withContext =
         (typeof input === "function" ? input().type : input.type) === "list";
       return (
@@ -372,6 +447,25 @@ class FormBuilder<
         />
       );
     });
+  };
+
+  private renderAction = <TFields extends FieldValues>(
+    action: ActionInput<TConfig, TFields>,
+    { dependsOn }: RenderFnOptions<TFields>,
+  ) => {
+    const { ActionButton } = this;
+
+    return (
+      <ActionButton<TFields>
+        action={action}
+        disabled={
+          dependsOn.disable.length > 0 &&
+          conditionArrayCalculator(dependsOn.disable)
+        }
+      >
+        {action.actionType.toUpperCase()}
+      </ActionButton>
+    );
   };
 
   private renderCard = <
@@ -517,7 +611,8 @@ class FormBuilder<
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {
-      const { AdvancedMapper, FieldArray, InputMapper } = this;
+      const { AdvancedMapper, FieldArray, FieldArrayContext, InputMapper } =
+        this;
       const {
         layout: { "grid-container": GridContainer, "grid-item": GridItem },
       } = this.config;
@@ -533,25 +628,31 @@ class FormBuilder<
             <GridItem {...input.gridProps}>
               <GridContainer {...input.gridContainerProps}>
                 {fields.map((field, i) => {
+                  let children = <></>;
                   if ("inputs" in input) {
-                    return (
+                    children = (
                       <InputMapper
                         inputs={input.inputs}
-                        key={field.id}
                         name={`${resolvedName}.${i}`}
                       />
                     );
                   }
                   if ("list" in input) {
-                    return (
+                    children = (
                       <AdvancedMapper
-                        key={field.id}
                         list={input.list}
                         name={`${resolvedName}.${i}`}
                       />
                     );
                   }
-                  return null;
+                  return (
+                    <FieldArrayContext.Provider
+                      key={field.id}
+                      value={{ index: i }}
+                    >
+                      {children}
+                    </FieldArrayContext.Provider>
+                  );
                 })}
               </GridContainer>
             </GridItem>
