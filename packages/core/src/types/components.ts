@@ -21,12 +21,6 @@ type ButtonComponentProps = Pick<
   "disabled" | "onClick" | "type"
 >;
 
-type IconComponent = (props: IconComponentProps & unknown) => JSX.Element;
-
-interface IconComponentProps {
-  name: string;
-}
-
 type ListInput<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
@@ -47,10 +41,4 @@ interface ListInputBase<TConfig extends FormBuilderConfig> {
   type: "list";
 }
 
-export type {
-  ActionInput,
-  ButtonComponent,
-  ButtonComponentProps,
-  IconComponent,
-  ListInput,
-};
+export type { ActionInput, ButtonComponent, ButtonComponentProps, ListInput };

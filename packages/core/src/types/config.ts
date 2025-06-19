@@ -1,12 +1,11 @@
 import type { GroupCardComponent, SimpleCardObject } from "./card";
-import type { ButtonComponent, IconComponent } from "./components";
+import type { ButtonComponent } from "./components";
 import type { InputObject } from "./input";
 import type { BaseComponent, LayoutKey } from "./utils";
 
 interface FormBuilderConfig {
   button: {
     component: ButtonComponent;
-    icon: IconComponent;
   };
   card: {
     group?: Record<PropertyKey, GroupCardComponent>;
