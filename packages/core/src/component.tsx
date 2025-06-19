@@ -5,7 +5,6 @@ import type {
   BasicBuilderProps,
   BuilderProps,
   DefaultItem,
-  DependencyContextValue,
   DependencyManagerProps,
   FieldArrayEvent,
   FieldArrayProps,
@@ -18,7 +17,7 @@ import type {
   InputMapperProps,
   RenderFnOptions,
 } from "@/types";
-import type { Context, PropsWithChildren } from "react";
+import type { Context } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import { options as defaultOptions } from "@/constants";
@@ -29,7 +28,6 @@ import {
   useMfbGlobalEvent,
 } from "@/hooks";
 import {
-  conditionArrayCalculator,
   convertDepsToObject,
   listActionGuard,
   listInputGuard,
@@ -44,6 +42,12 @@ import {
   useMemo,
 } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import {
+  DependencyContext,
+  FieldArrayContext,
+  useDependencyContext,
+  useFieldArrayContext,
+} from "./context";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
@@ -53,17 +57,11 @@ class FormBuilder<
 {
   config: TConfig;
   Context: Context<FormBuilderContext<TFormId> | null>;
-  DependencyContext: Context<DependencyContextValue | null>;
-  FieldArrayContext: Context<null | { index: null | number }>;
   options: FormBuilderOptions;
 
   constructor(config: TConfig, options?: FormBuilderOptions) {
     this.config = config;
     this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
-    this.DependencyContext = createContext<DependencyContextValue | null>(null);
-    this.FieldArrayContext = createContext<null | { index: null | number }>(
-      null,
-    );
     this.options = { ...defaultOptions, ...options };
   }
 
@@ -216,21 +214,18 @@ class FormBuilder<
     return useContext(Context);
   };
 
-  private useMfbFieldArrayContext = () => {
-    const { FieldArrayContext } = this;
-    return useContext(FieldArrayContext);
-  };
-
   private ActionButton = <TFields extends FieldValues>({
     action,
-    children,
     disabled,
-  }: PropsWithChildren<{
+  }: {
     action: ActionInput<TConfig, TFields>;
     disabled: boolean;
-  }>) => {
+  }) => {
+    const {
+      button: { component: Button },
+    } = this.config;
     const { id } = this.useMfbContext() || { id: "" };
-    const { index } = this.useMfbFieldArrayContext() || { index: null };
+    const { index } = useFieldArrayContext();
 
     const handleClick = () => {
       switch (action.actionType) {
@@ -256,9 +251,12 @@ class FormBuilder<
     };
 
     return (
-      <button disabled={disabled} onClick={handleClick} type="button">
-        {children}
-      </button>
+      <Button
+        disabled={disabled}
+        onClick={handleClick}
+        type="button"
+        {...action.props}
+      />
     );
   };
   private AdvancedMapper = <TFields extends FieldValues>({
@@ -294,6 +292,7 @@ class FormBuilder<
               name={name}
               render={renderAction}
               withContext={false}
+              withGrid
             />
           );
         }
@@ -332,11 +331,10 @@ class FormBuilder<
     withContext,
     withGrid,
   }: DependencyManagerProps<TFields, TItem>) => {
-    const { DependencyContext } = this;
     const {
       layout: { "grid-item": GridItem },
     } = this.config;
-    const dependencyContext = useContext(DependencyContext) || { disable: [] };
+    const dependencyContext = useDependencyContext();
     const formMethods = useFormContext<TFields>();
     const dependency = useDependsOnField<TFields, TItem>({
       component,
@@ -430,6 +428,7 @@ class FormBuilder<
             name={name}
             render={renderAction}
             withContext={false}
+            withGrid
           />
         );
       }
@@ -456,15 +455,7 @@ class FormBuilder<
     const { ActionButton } = this;
 
     return (
-      <ActionButton<TFields>
-        action={action}
-        disabled={
-          dependsOn.disable.length > 0 &&
-          conditionArrayCalculator(dependsOn.disable)
-        }
-      >
-        {action.actionType.toUpperCase()}
-      </ActionButton>
+      <ActionButton<TFields> action={action} disabled={dependsOn.disable} />
     );
   };
 
@@ -495,10 +486,7 @@ class FormBuilder<
       if (card.variant === "list") {
         return (
           <FieldArray<TFields>
-            disabled={
-              dependsOn.disable.length > 0 &&
-              conditionArrayCalculator(dependsOn.disable)
-            }
+            disabled={dependsOn.disable}
             key={`card-${index}`}
             name={resolvedName}
             render={(fields) =>
@@ -508,27 +496,31 @@ class FormBuilder<
                     {node}
                   </GridItem>
                 ),
-                nodes: fields.map((field, i) => ({
-                  children: (
-                    <GridContainer {...card.gridContainerProps}>
-                      {"list" in card ? (
-                        <AdvancedMapper
-                          key={field.id}
-                          list={card.list}
-                          name={`${resolvedName}.${i}`}
-                        />
-                      ) : (
-                        <InputMapper
-                          inputs={card.inputs}
-                          key={field.id}
-                          name={`${resolvedName}.${i}`}
-                        />
-                      )}
-                    </GridContainer>
-                  ),
-                  // TODO: add titleFn to group card(list variant) for generating title
-                  title: `List Item ${i + 1}`,
-                })),
+                nodes: fields.map((field, i, { length }) => {
+                  return {
+                    children: (
+                      <FieldArrayContext.Provider value={{ index: i, length }}>
+                        <GridContainer {...card.gridContainerProps}>
+                          {"list" in card ? (
+                            <AdvancedMapper
+                              key={field.id}
+                              list={card.list}
+                              name={`${resolvedName}.${i}`}
+                            />
+                          ) : (
+                            <InputMapper
+                              inputs={card.inputs}
+                              key={field.id}
+                              name={`${resolvedName}.${i}`}
+                            />
+                          )}
+                        </GridContainer>
+                      </FieldArrayContext.Provider>
+                    ),
+                    // TODO: add titleFn to group card(list variant) for generating title
+                    title: `List Item ${i + 1}`,
+                  };
+                }),
                 ...card.props,
               })
             }
@@ -611,23 +603,19 @@ class FormBuilder<
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {
-      const { AdvancedMapper, FieldArray, FieldArrayContext, InputMapper } =
-        this;
+      const { AdvancedMapper, FieldArray, InputMapper } = this;
       const {
         layout: { "grid-container": GridContainer, "grid-item": GridItem },
       } = this.config;
 
       return (
         <FieldArray<TFields>
-          disabled={
-            dependsOn.disable.length > 0 &&
-            conditionArrayCalculator(dependsOn.disable)
-          }
+          disabled={dependsOn.disable}
           name={resolvedName}
           render={(fields) => (
             <GridItem {...input.gridProps}>
               <GridContainer {...input.gridContainerProps}>
-                {fields.map((field, i) => {
+                {fields.map((field, i, { length }) => {
                   let children = <></>;
                   if ("inputs" in input) {
                     children = (
@@ -648,7 +636,7 @@ class FormBuilder<
                   return (
                     <FieldArrayContext.Provider
                       key={field.id}
-                      value={{ index: i }}
+                      value={{ index: i, length }}
                     >
                       {children}
                     </FieldArrayContext.Provider>
@@ -673,9 +661,7 @@ class FormBuilder<
           name={resolvedName}
           {...Object.assign({}, input.props, {
             deps: convertDepsToObject(dependsOn["bind-value"]),
-            disabled:
-              dependsOn.disable.length > 0 &&
-              conditionArrayCalculator(dependsOn.disable),
+            disabled: dependsOn.disable,
           })}
         />
       );

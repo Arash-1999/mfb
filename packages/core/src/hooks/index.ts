@@ -1,3 +1,4 @@
+export { useConditionCalculator } from "./use-condition-calculator";
 export { useDependency } from "./use-dependency";
 export { useDependsOnField } from "./use-depends-on-field";
 export { useMfbFieldArray } from "./use-field-array";

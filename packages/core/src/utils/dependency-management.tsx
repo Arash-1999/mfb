@@ -1,11 +1,13 @@
+import type { FieldArrayContextValue } from "@/context";
 import type {
   Condition,
-  DependencyStructure,
+  DependencyDict,
   DependsOn,
   DependsOnSingle,
 } from "@/types/dependency-management";
-import type { PropsWithChildren } from "react";
 import type { FieldValues, Path, PathValue } from "react-hook-form";
+
+import { reFieldArrayValue } from "@/constants";
 
 interface DefaultDep {
   current: unknown;
@@ -23,46 +25,31 @@ const convertDepsToObject = <TDep extends DefaultDep = DefaultDep>(
   );
 };
 
-const handleRenderDep = <TFields extends FieldValues, TItem>({
-  children,
-  dependency,
-}: {
-  children: TItem;
-  dependency: DependencyStructure<TFields>["visibility"];
-}): null | TItem => {
-  const condition =
-    dependency.length === 0 || conditionArrayCalculator(dependency);
-  return condition ? children : null;
-};
-
-// TODO: check usage and remove
-type RenderHoCProps<TFields extends FieldValues> = PropsWithChildren<{
-  dependency: DependencyStructure<TFields>["visibility"];
-}>;
-
-// TODO: check usage and remove
-const RenderHoC = <TFields extends FieldValues>({
-  children,
-  dependency,
-}: RenderHoCProps<TFields>) => {
-  const condition =
-    dependency.length === 0 || conditionArrayCalculator(dependency);
-
-  return condition ? children : null;
-};
-
 const conditionCalculator = (
   { condition, value }: Condition,
   currentValue: unknown,
 ): boolean => {
+  // NOTE: in field array comparisions: value -> index, currentValue -> length
   let result: boolean = false;
 
   switch (condition) {
     case "eq":
       result = value === currentValue;
       break;
+    case "is-first-index":
+      result = value === 0;
+      break;
+    case "is-last-index":
+      if (typeof currentValue === "number") result = value === currentValue - 1;
+      break;
     case "not-eq":
       result = value !== currentValue;
+      break;
+    case "not-first-index":
+      result = value !== 0;
+      break;
+    case "not-last-index":
+      if (typeof currentValue === "number") result = value !== currentValue - 1;
       break;
   }
   return result;
@@ -75,9 +62,9 @@ const conditionArrayCalculator = (
 };
 
 const pushDependency = <TFields extends FieldValues>(
-  target: DependencyStructure<TFields>,
+  target: DependencyDict<TFields>,
   dependsOn: DependsOnSingle<TFields, false>,
-  value: PathValue<TFields, Path<TFields>> | undefined,
+  value: number | PathValue<TFields, Path<TFields>> | undefined,
 ) => {
   switch (dependsOn.type) {
     case "bind-value": {
@@ -88,20 +75,22 @@ const pushDependency = <TFields extends FieldValues>(
       target[dependsOn.type].push({ ...dependsOn, current: value });
       break;
     }
-    case "disable":
+    case "disable": {
       target[dependsOn.type].push({ ...dependsOn, current: value });
       break;
-
-    case "visibility":
+    }
+    case "visibility": {
       target[dependsOn.type].push({ ...dependsOn, current: value });
       break;
+    }
   }
 };
-const createDependencyStructure = <TFields extends FieldValues>(
+const createDependencyDict = <TFields extends FieldValues>(
   dependsOn: DependsOn<TFields>,
   value: readonly PathValue<TFields, Path<TFields>>[],
+  fieldArrayContext: FieldArrayContextValue,
 ) => {
-  const base: DependencyStructure<TFields> = {
+  const base: DependencyDict<TFields> = {
     "bind-value": [],
     "def-props": [],
     disable: [],
@@ -109,8 +98,29 @@ const createDependencyStructure = <TFields extends FieldValues>(
   };
 
   if (Array.isArray(dependsOn)) {
-    return dependsOn.reduce((acc, cur, index) => {
-      pushDependency(acc, cur, value[index]);
+    let valueIndex = 0;
+
+    return dependsOn.reduce((acc, cur) => {
+      if (
+        (cur.type === "disable" || cur.type === "visibility") &&
+        typeof cur.value === "string" &&
+        reFieldArrayValue.test(cur.value)
+      ) {
+        // NOTE: value -> index, currentValue -> length
+        pushDependency(
+          acc,
+          {
+            ...cur,
+            value: fieldArrayContext.index,
+          },
+          fieldArrayContext.index === null
+            ? undefined
+            : fieldArrayContext.index,
+        );
+      } else {
+        pushDependency(acc, cur, value[valueIndex]);
+        valueIndex += 1;
+      }
       return acc;
     }, base);
   } else {
@@ -123,7 +133,5 @@ export {
   conditionArrayCalculator,
   conditionCalculator,
   convertDepsToObject,
-  createDependencyStructure,
-  handleRenderDep,
-  RenderHoC,
+  createDependencyDict,
 };

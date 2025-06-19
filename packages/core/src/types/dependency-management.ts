@@ -5,8 +5,14 @@ type BindValueDependency = {
 };
 
 type Condition = {
-  condition: "eq" | "not-eq";
-  value: boolean | number | string;
+  condition:
+    | "eq"
+    | "is-first-index"
+    | "is-last-index"
+    | "not-eq"
+    | "not-first-index"
+    | "not-last-index";
+  value: boolean | null | number | string;
 };
 
 type DefPropsDependency = {
@@ -22,14 +28,14 @@ type Dependency<
   dependencyShouldReset?: boolean;
 };
 
-interface DependencyContextDisable extends Condition {
-  current: unknown;
-}
-interface DependencyContextValue {
-  // TODO: store calculated value of dependency
-  disable: Array<DependencyContextDisable>;
-}
-
+type DependencyDict<TFields extends FieldValues> = {
+  [TKey in DependsOnUnion<false> as TKey["type"]]: Array<
+    DependsOnBase<TFields> &
+      TKey & {
+        current: unknown;
+      }
+  >;
+};
 interface DependencyObject<
   TFields extends FieldValues,
   TOnlyBoolean extends boolean = false,
@@ -46,9 +52,10 @@ type DependencyStructure<TFields extends FieldValues> = Omit<
         }
     >;
   },
-  "disable"
+  "disable" | "visibility"
 > & {
-  disable: Array<DependencyContextDisable>;
+  disable: boolean;
+  visibility: boolean;
 };
 
 type DependencyType =
@@ -89,7 +96,7 @@ export type {
   BindValueDependency,
   Condition,
   Dependency,
-  DependencyContextValue,
+  DependencyDict,
   DependencyStructure,
   DependencyType,
   DependsOn,

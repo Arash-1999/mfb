@@ -1,52 +1,56 @@
-// import type { JSX } from "react";
+import type { ComponentProps, JSX } from "react";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
-// import type { FieldArrayActions } from "./event";
-// import type { GetInputs } from "./input";
 import type { AdvancedList, GetLayoutProps, ListInputArray } from "./utils";
 
-type ActionInput<
+interface ActionInput<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = {
+> {
   actionType: "append" | "prepend" | "remove";
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   name: ArrayPath<TFields>;
+  props?: Parameters<TConfig["button"]["component"]>[0];
   type: "field-array-action";
-};
-// type ActionRenderProps<TFields extends FieldValues> = {
-//   methods: FieldArrayActions<TFields>;
-// };
+}
 
-// type AdvancedFieldArrayList<
-//   TConfig extends FormBuilderConfig,
-//   // TFields extends FieldValues,
-// > = {
-//   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-//   gridProps?: GetLayoutProps<TConfig, "grid-item">;
-//   // TODO: change unknown type
-//   list?: Array<unknown>;
-//   name: string;
-//   type: 'advanced-list';
-// }
+type ButtonComponent = (props: ButtonComponentProps & unknown) => JSX.Element;
+type ButtonComponentProps = Pick<
+  ComponentProps<"button">,
+  "disabled" | "onClick" | "type"
+>;
 
-// TODO: add ActionInput type to ListInput inputs
+type IconComponent = (props: IconComponentProps & unknown) => JSX.Element;
+
+interface IconComponentProps {
+  name: string;
+}
+
 type ListInput<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = {
+> = ListInputBase<TConfig> &
+  (
+    | {
+        inputs: ListInputArray<TConfig, TFields>;
+      }
+    | {
+        list: AdvancedList<TConfig, TFields>;
+      }
+  );
+
+interface ListInputBase<TConfig extends FormBuilderConfig> {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   name: string;
   type: "list";
-} & (
-  | {
-      inputs: ListInputArray<TConfig, TFields>;
-    }
-  | {
-      list: AdvancedList<TConfig, TFields>;
-    }
-);
+}
 
-export type { ActionInput, ListInput };
+export type {
+  ActionInput,
+  ButtonComponent,
+  ButtonComponentProps,
+  IconComponent,
+  ListInput,
+};

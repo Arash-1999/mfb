@@ -1,18 +1,16 @@
+import type { DependencyContextValue } from "@/context";
 import type {
   DefaultItem,
-  DependencyContextValue,
   DependencyStructure,
   DependencyType,
   DependsOn,
 } from "@/types";
 import type { FieldValues, Path } from "react-hook-form";
 
-import {
-  conditionArrayCalculator,
-  createDependencyStructure,
-  handleRenderDep,
-  mergeName,
-} from "@/utils";
+import { reFieldArrayValue } from "@/constants";
+import { useFieldArrayContext } from "@/context";
+import { useConditionCalculator } from "@/hooks";
+import { convertDepsToObject, createDependencyDict, mergeName } from "@/utils";
 import { useEffect, useMemo, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
@@ -47,6 +45,8 @@ const useDependency = <
   }: UseDependencyProps<TFields, TItem>,
   options?: UseDependencyOptions,
 ): UseDependencyReturn<TFields, TItem> => {
+  const fieldArrayContext = useFieldArrayContext();
+  const { reduceCalc } = useConditionCalculator();
   const formMethods = useFormContext<TFields>();
   const ref = useRef<Record<DependencyType, boolean | null>>({
     "bind-value": null,
@@ -59,37 +59,42 @@ const useDependency = <
   const value = useWatch<TFields>({
     control: formMethods.control,
     name: Array.isArray(dependsOn)
-      ? dependsOn.map((dep) => dep.path)
-      : [dependsOn.path],
+      ? dependsOn
+          .filter(
+            (dep) =>
+              (dep.type === "disable" || dep.type === "visibility") &&
+              typeof dep.value === "string" &&
+              reFieldArrayValue.test(dep.value),
+          )
+          .map((dep) => dep.path)
+      : (dependsOn.type === "disable" || dependsOn.type === "visibility") &&
+          typeof dependsOn.value === "string" &&
+          reFieldArrayValue.test(dependsOn.value)
+        ? []
+        : [dependsOn.path],
   });
 
-  const dependencies = useMemo(() => {
-    const dependencyStructure = createDependencyStructure<TFields>(
-      dependsOn,
-      value,
-    );
-    dependencyStructure.disable.push(...dependencyContext.disable);
-    return dependencyStructure;
-  }, [value, dependsOn, dependencyContext]);
+  const dependencies = useMemo<DependencyStructure<TFields>>(() => {
+    const { disable: disableDict, ...dependencyDict } =
+      createDependencyDict<TFields>(dependsOn, value, fieldArrayContext);
+
+    return {
+      ...dependencyDict,
+      disable: dependencyContext.disable || reduceCalc(disableDict),
+      visibility: reduceCalc(disableDict),
+    };
+  }, [fieldArrayContext, reduceCalc, value, dependsOn, dependencyContext]);
 
   const resolvedComponent = useMemo(() => {
     if (typeof component === "function") {
-      // TODO: move this function to dependency manager file as a helper function
-      const resolvedDeps = dependencies["def-props"].reduce<
-        Record<string, unknown>
-      >(
-        (acc, cur) => ({
-          ...acc,
-          [cur.id]: cur.current,
-        }),
-        {},
-      );
+      const resolvedDeps = convertDepsToObject(dependencies["def-props"]);
       return component({ deps: resolvedDeps as never });
     }
     return component;
   }, [component, dependencies]);
 
   useEffect(() => {
+    // NOTE: detect conditon diff between rerenders to reset field
     if (
       typeof resolvedComponent.dependencyShouldReset === "undefined"
         ? options?.dependencyShouldReset
@@ -97,13 +102,8 @@ const useDependency = <
     ) {
       const resolvedName = mergeName(name, resolvedComponent.name || "");
 
-      const _visibility =
-        dependencies.visibility.length === 0 ||
-        conditionArrayCalculator(dependencies.visibility);
-
-      const _disable =
-        dependencies.disable.length > 0 &&
-        conditionArrayCalculator(dependencies.disable);
+      const _visibility = dependencies.visibility;
+      const _disable = dependencies.disable;
 
       if (
         (typeof ref.current.visibility === "boolean" &&
@@ -130,10 +130,7 @@ const useDependency = <
   ]);
 
   return [
-    handleRenderDep({
-      children: resolvedComponent,
-      dependency: dependencies["visibility"],
-    }),
+    dependencies.visibility !== null ? resolvedComponent : null,
     dependencies,
   ];
 };
