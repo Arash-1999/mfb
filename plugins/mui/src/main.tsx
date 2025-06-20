@@ -13,6 +13,10 @@ import {
 import { getLayoutConfig } from "./components/layout";
 
 const config = {
+  button: {
+    // TODO: use button in playground
+    component: () => <></>,
+  },
   card: {
     simple: {
       paper: () => <></>,
