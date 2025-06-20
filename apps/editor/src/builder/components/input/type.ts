@@ -1,5 +1,3 @@
-interface InputPropsOptions<TProps> {
-  props: TProps;
-}
+type InputFormKey = "fieldInputs" | "gridItemInputs" | "propsInputs";
 
-export type { InputPropsOptions };
+export type { InputFormKey };

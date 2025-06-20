@@ -1,9 +1,14 @@
+import { FieldOptionsForm, GridItemOptionsForm } from "../../layout";
+
+interface RadioForm extends FieldOptionsForm, GridItemOptionsForm {
+  props: RadioOptions;
+}
 interface RadioOptions {
-  options: Array<number | string | { label: string; value: number | string }>;
   formControlLabelProps: {
     disableTypography: boolean;
     labelPlacement: "bottom" | "end" | "start" | "top";
   };
+  options: Array<number | string | { label: string; value: number | string }>;
   radioProps: {
     color: "error" | "info" | "primary" | "secondary" | "success" | "warning";
     disableRipple: boolean;
@@ -11,8 +16,4 @@ interface RadioOptions {
   };
 }
 
-interface RadioOptionsForm {
-  props: RadioOptions;
-}
-
-export type { RadioOptions, RadioOptionsForm };
+export type { RadioForm, RadioOptions };

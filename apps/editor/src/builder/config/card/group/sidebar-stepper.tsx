@@ -1,5 +1,7 @@
 import type { GroupCardProps } from "@mfb/core";
 
+import { ChevronLeft } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 import { useState } from "react";
 
 type MfbSidebarStepperProps = GroupCardProps<{
@@ -19,14 +21,15 @@ const MfbSidebarStepper = ({
         <div className="stikcy top-14 w-48 h-[calc(100vh-60px)] p-2">
           <div>
             <div className="flex justify-between mb-2">
-              <button
+              <IconButton
                 onClick={() => {
                   setStep(null);
                 }}
+                size="small"
                 type="button"
               >
-                &lt;-
-              </button>
+                <ChevronLeft />
+              </IconButton>
               <button type="submit">SUBMIT</button>
             </div>
             <input

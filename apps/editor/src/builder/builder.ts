@@ -4,11 +4,15 @@ import { FormBuilder } from "@mfb/core";
 import { getInputComponents, getLayoutConfig } from "@mfb/plugin-mui";
 import { createElement } from "react";
 
+import { MfbButton } from "./config/button";
 import { MfbSidebarStepper } from "./config/card/group";
 
 type FormId = `form-${number}`;
 
 const config = {
+  button: {
+    component: MfbButton,
+  },
   card: {
     group: {
       "sidebar-stepper": MfbSidebarStepper,
@@ -24,9 +28,7 @@ const config = {
   },
   layout: getLayoutConfig(),
 } satisfies FormBuilderConfig;
-// const config = getConfig() satisfies FormBuilderConfig;
 
-const fuck = config.input.components.fuck;
 type MuiConfig = typeof config;
 
 const MuiFB = new FormBuilder<MuiConfig, FormId>(config);

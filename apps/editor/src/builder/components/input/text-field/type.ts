@@ -1,3 +1,9 @@
+import type { FieldOptionsForm, GridItemOptionsForm } from "../../layout";
+
+interface TestForm extends FieldOptionsForm, GridItemOptionsForm {
+  props: TextFieldOptionsForm;
+}
+
 interface TextFieldOptions {
   color: "error" | "info" | "primary" | "secondary" | "success" | "warning";
   fullWidth: boolean;
@@ -15,7 +21,7 @@ interface TextFieldOptions {
 }
 
 interface TextFieldOptionsForm {
-  props: TextFieldOptions;
+  textFieldProps: Partial<TextFieldOptions>;
 }
 
-export type { TextFieldOptions, TextFieldOptionsForm };
+export type { TestForm, TextFieldOptions, TextFieldOptionsForm };

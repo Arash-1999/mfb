@@ -8,6 +8,6 @@ interface FieldOptions {
 }
 
 interface FieldOptionsForm {
-  field: FieldOptions;
+  field?: Partial<FieldOptions>;
 }
 export type { FieldOptions, FieldOptionsForm };

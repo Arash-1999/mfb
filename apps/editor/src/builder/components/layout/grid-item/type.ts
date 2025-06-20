@@ -6,10 +6,11 @@ interface GridItemOptions {
 }
 
 interface GridItemOptionsForm {
-  gridProps: GridItemOptions & {
+  gridProps: Partial<GridItemOptions> & {
     [key in ResponsiveKeys as `is_${keyof GridItemOptions}_responsive`]: boolean;
   };
 }
+
 type ResponsiveKeys = "offset" | "size";
 
 export type { GridItemOptions, GridItemOptionsForm, ResponsiveKeys };

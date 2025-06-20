@@ -1,26 +1,24 @@
 import type { MuiConfig } from "@/builder";
-import type { GetInputsImpl } from "@mfb/core";
+import type { GetInputs } from "@mfb/core";
+import type { Path } from "react-hook-form";
 
 import { useResponsiveStyle } from "@/builder/hooks/use-responsive-style";
 
-import type {
-  GridItemOptions,
-  GridItemOptionsForm,
-  ResponsiveKeys,
-} from "./type";
+import type { GridItemOptionsForm, ResponsiveKeys } from "./type";
 
-const useGridItemOptions = (): Record<
-  keyof GridItemOptions,
-  | Array<GetInputsImpl<MuiConfig, GridItemOptionsForm>>
-  | GetInputsImpl<MuiConfig, GridItemOptionsForm>
-> => {
-  const { convertToResponsive } = useResponsiveStyle<GridItemOptionsForm>({
-    responsivePath: (name) =>
-      `gridProps.is_${name as ResponsiveKeys}_responsive`,
+interface UseGridItemOptionsProps<TForm extends GridItemOptionsForm> {
+  responsivePath: (name: ResponsiveKeys) => Path<TForm>;
+}
+
+const useGridItemOptions = <TForm extends GridItemOptionsForm>({
+  responsivePath,
+}: UseGridItemOptionsProps<TForm>): Array<GetInputs<MuiConfig, TForm>> => {
+  const { convertToResponsive } = useResponsiveStyle<TForm>({
+    responsivePath: (name) => responsivePath(name as ResponsiveKeys),
   });
 
-  return {
-    offset: convertToResponsive({
+  return [
+    ...convertToResponsive({
       name: "offset",
       props: {
         textFieldProps: {
@@ -31,7 +29,7 @@ const useGridItemOptions = (): Record<
       },
       type: "text",
     }),
-    size: convertToResponsive({
+    ...convertToResponsive({
       name: "size",
       props: {
         textFieldProps: {
@@ -42,7 +40,7 @@ const useGridItemOptions = (): Record<
       },
       type: "text",
     }),
-  };
+  ];
 };
 
 export { useGridItemOptions };

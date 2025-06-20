@@ -1,15 +1,12 @@
 import type { MuiConfig } from "@/builder/builder";
-import type { GetInputsImpl } from "@mfb/core";
+import type { GetInputs } from "@mfb/core";
 
-import type { TextFieldOptions, TextFieldOptionsForm } from "./type";
+import type { TestForm } from "./type";
 
-const textFieldOptions: Record<
-  keyof TextFieldOptions,
-  GetInputsImpl<MuiConfig, TextFieldOptionsForm>
-> = {
-  color: {
+const textFieldOptions: GetInputs<MuiConfig, TestForm>[] = [
+  {
     gridProps: { size: 12 },
-    name: "color",
+    name: "textFieldProps.color",
     props: {
       textFieldProps: {
         fullWidth: true,
@@ -20,18 +17,18 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  fullWidth: {
+  {
     gridProps: { size: 12 },
-    name: "fullWidth",
+    name: "textFieldProps.fullWidth",
     props: {
       defaultValue: true,
       label: "Full width",
     },
     type: "checkbox",
   },
-  helperText: {
+  {
     gridProps: { size: 12 },
-    name: "helperText",
+    name: "textFieldProps.helperText",
     props: {
       textFieldProps: {
         fullWidth: true,
@@ -42,9 +39,9 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  id: {
+  {
     gridProps: { size: 12 },
-    name: "id",
+    name: "textFieldProps.id",
     props: {
       textFieldProps: {
         fullWidth: true,
@@ -55,9 +52,9 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  label: {
+  {
     gridProps: { size: 12 },
-    name: "label",
+    name: "textFieldProps.label",
     props: {
       textFieldProps: {
         fullWidth: true,
@@ -68,9 +65,9 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  margin: {
+  {
     gridProps: { size: 12 },
-    name: "margin",
+    name: "textFieldProps.margin",
     props: {
       textFieldProps: {
         fullWidth: true,
@@ -81,16 +78,16 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  maxRows: {
+  {
     dependsOn: {
       condition: "not-eq",
       id: "is_multiline",
-      path: "props.multiline",
+      path: "props.textFieldProps.multiline",
       type: "disable",
       value: true,
     },
     gridProps: { size: 12 },
-    name: "maxRows",
+    name: "textFieldProps.maxRows",
     props: {
       textFieldProps: {
         fullWidth: true,
@@ -101,16 +98,16 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  minRows: {
+  {
     dependsOn: {
       condition: "not-eq",
       id: "is_multiline",
-      path: "props.multiline",
+      path: "props.textFieldProps.multiline",
       type: "disable",
       value: true,
     },
     gridProps: { size: 12 },
-    name: "minRows",
+    name: "textFieldProps.minRows",
     props: {
       textFieldProps: {
         fullWidth: true,
@@ -121,18 +118,18 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  multiline: {
+  {
     gridProps: { size: 12 },
-    name: "multiline",
+    name: "textFieldProps.multiline",
     props: {
       defaultValue: false,
       label: "Multi-line",
     },
     type: "checkbox",
   },
-  placeholder: {
+  {
     gridProps: { size: 12 },
-    name: "placeholder",
+    name: "textFieldProps.placeholder",
     props: {
       textFieldProps: {
         fullWidth: true,
@@ -143,16 +140,16 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  rows: {
+  {
     dependsOn: {
       condition: "not-eq",
       id: "is_multiline",
-      path: "props.multiline",
+      path: "props.textFieldProps.multiline",
       type: "disable",
       value: true,
     },
     gridProps: { size: 12 },
-    name: "rows",
+    name: "textFieldProps.rows",
     props: {
       textFieldProps: {
         fullWidth: true,
@@ -163,9 +160,9 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  size: {
+  {
     gridProps: { size: 12 },
-    name: "size",
+    name: "textFieldProps.size",
     props: {
       defaultValue: "small",
       textFieldProps: {
@@ -177,18 +174,15 @@ const textFieldOptions: Record<
     },
     type: "text",
   },
-  variant: {
+  {
     gridProps: { size: 12 },
-    name: "variant",
+    name: "textFieldProps.variant",
     props: {
       defaultValue: "standard",
       options: ["filled", "outlined", "standard"],
-      radioGroupProps: {
-        row: true,
-      },
     },
     type: "radio",
   },
-};
+];
 
 export { textFieldOptions };

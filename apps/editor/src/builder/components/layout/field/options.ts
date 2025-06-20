@@ -1,23 +1,14 @@
 import type { MuiConfig } from "@/builder";
-// import type { ResponsiveStyleValue } from "@/builder/types";
-import type { GetInputsImpl } from "@mfb/core";
+import type { GetInputs } from "@mfb/core";
 
 import { FieldOptionsForm } from "./type";
-// import { useResponsiveStyle } from "@/builder/hooks/use-responsive-style";
 
-// type FieldOptionsForm = FieldOptions & {
-//   [key in FieldOptions as `is_${keyof FieldOptions}_responsive`]: boolean;
-// };
-//
-// type ResponsiveKeys = never;
-
-const useFieldOptions = (): Record<
-  keyof FieldOptions,
-  // | Array<GetInputsImpl<MuiConfig, GridContainerOptionsForm>>
-  GetInputsImpl<MuiConfig, FieldOptionsForm>
-> => {
-  return {
-    color: {
+const useFieldOptions = <TForm extends FieldOptionsForm>(): GetInputs<
+  MuiConfig,
+  TForm
+>[] => {
+  return [
+    {
       gridProps: { size: 12 },
       name: "color",
       props: {
@@ -30,7 +21,7 @@ const useFieldOptions = (): Record<
       },
       type: "text",
     },
-    fullWidth: {
+    {
       gridProps: { size: 12 },
       name: "fullWidth",
       props: {
@@ -39,7 +30,7 @@ const useFieldOptions = (): Record<
       },
       type: "checkbox",
     },
-    hiddenLabel: {
+    {
       gridProps: { size: 12 },
       name: "hiddenLabel",
       props: {
@@ -47,7 +38,7 @@ const useFieldOptions = (): Record<
       },
       type: "checkbox",
     },
-    margin: {
+    {
       gridProps: { size: 12 },
       name: "margin",
       props: {
@@ -56,7 +47,7 @@ const useFieldOptions = (): Record<
       },
       type: "radio",
     },
-    size: {
+    {
       gridProps: { size: 12 },
       name: "size",
       props: {
@@ -65,19 +56,16 @@ const useFieldOptions = (): Record<
       },
       type: "radio",
     },
-    variant: {
+    {
       gridProps: { size: 12 },
       name: "variant",
       props: {
         defaultValue: "standard",
         options: ["filled", "outlined", "standard"],
-        radioGroupProps: {
-          row: true,
-        },
       },
       type: "radio",
     },
-  };
+  ];
 };
 
 export { useFieldOptions };

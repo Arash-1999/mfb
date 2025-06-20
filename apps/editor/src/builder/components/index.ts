@@ -3,8 +3,7 @@
 /* Input */
 export { checkboxOptions } from "./input";
 export type { CheckboxOptions, CheckboxOptionsForm } from "./input";
-export { textFieldOptions } from "./input";
-export type { TextFieldOptions, TextFieldOptionsForm } from "./input";
+export { useTextFieldOptionsForm } from "./input";
 
 /* Layout */
 export { useFieldOptions } from "./layout";
