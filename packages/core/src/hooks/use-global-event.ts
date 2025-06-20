@@ -16,7 +16,6 @@ const useMfbGlobalEvent = <
   eventName: EventName;
   handler: (event: CustomEventInit<FieldArrayEvent<TFields, TFormId>>) => void;
 }) => {
-  console.log("use mfb global event", disabled);
   useEffect(() => {
     if (disabled) return;
     window.addEventListener(eventName, handler);

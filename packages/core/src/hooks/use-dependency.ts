@@ -58,20 +58,14 @@ const useDependency = <
   // TODO: provide default value (it's will be undefined when defaultValue passed to Controller)
   const value = useWatch<TFields>({
     control: formMethods.control,
-    name: Array.isArray(dependsOn)
-      ? dependsOn
-          .filter(
-            (dep) =>
-              (dep.type === "disable" || dep.type === "visibility") &&
-              typeof dep.value === "string" &&
-              reFieldArrayValue.test(dep.value),
-          )
-          .map((dep) => dep.path)
-      : (dependsOn.type === "disable" || dependsOn.type === "visibility") &&
-          typeof dependsOn.value === "string" &&
-          reFieldArrayValue.test(dependsOn.value)
-        ? []
-        : [dependsOn.path],
+    name: (Array.isArray(dependsOn) ? dependsOn : [dependsOn])
+      .filter(
+        (dep) =>
+          (dep.type === "disable" || dep.type === "visibility") &&
+          typeof dep.value === "string" &&
+          !reFieldArrayValue.test(dep.value),
+      )
+      .map((dep) => dep.path),
   });
 
   const dependencies = useMemo<DependencyStructure<TFields>>(() => {

@@ -22,6 +22,12 @@ import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import { options as defaultOptions } from "@/constants";
 import {
+  DependencyContext,
+  FieldArrayContext,
+  useDependencyContext,
+  useFieldArrayContext,
+} from "@/context";
+import {
   useDependency,
   useDependsOnField,
   useMfbFieldArray,
@@ -42,12 +48,6 @@ import {
   useMemo,
 } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import {
-  DependencyContext,
-  FieldArrayContext,
-  useDependencyContext,
-  useFieldArrayContext,
-} from "./context";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
