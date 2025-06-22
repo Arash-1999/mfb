@@ -1,6 +1,6 @@
 import type { FormBuilderConfig } from "@mfb/core";
 
-// import { FormBuilder } from "@mfb/core";
+import { MfbAccordion, MfbAccordionGroup, MfbPaper } from "./components/cards";
 import {
   MfbCheckbox,
   MfbRadioGroup,
@@ -18,8 +18,12 @@ const config = {
     component: () => <></>,
   },
   card: {
+    group: {
+      "accordion-group": MfbAccordionGroup,
+    },
     simple: {
-      paper: () => <></>,
+      accordion: MfbAccordion,
+      paper: MfbPaper,
     },
   },
   input: {
