@@ -9,13 +9,12 @@ import { getGroupCard, getSimpleCard } from "./card";
 const config = {
   button: {
     component: MfbButton,
-    icon: () => <></>,
   },
   card: {
     group: getGroupCard(),
     simple: getSimpleCard(),
   },
-  input: { components: getInput(), defaultValues: { text: "" } },
+  input: { components: getInput(), defaultValues: { select: "fab67329-8854-4e22-a0e6-8207be509905", text: "" } },
   layout: getLayout(),
 } satisfies FormBuilderConfig;
 
@@ -30,5 +29,5 @@ type FormId =
 
 const FB = new FormBuilder<Config, FormId>(config);
 
-export { FB };
-export type { MfbInput };
+export { config, FB };
+export type { Config, MfbInput };
