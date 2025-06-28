@@ -52,10 +52,10 @@ type DependencyStructure<TFields extends FieldValues> = Omit<
         }
     >;
   },
-  "disable" | "visibility"
+  "disable" | "hide"
 > & {
   disable: boolean;
-  visibility: boolean;
+  hide: boolean;
 };
 
 type DependencyType =
@@ -82,14 +82,14 @@ type DependsOnUnion<TOnlyBoolean extends boolean = false> =
   | DefPropsDependency
   | DisableDependency
   | (TOnlyBoolean extends false ? BindValueDependency : never)
-  | VisibilityDependency;
+  | HideDependency;
 
 type DisableDependency = Condition & {
   type: "disable";
 };
 
-type VisibilityDependency = Condition & {
-  type: "visibility";
+type HideDependency = Condition & {
+  type: "hide";
 };
 
 export type {
@@ -103,5 +103,5 @@ export type {
   DependsOnBase,
   DependsOnSingle,
   DisableDependency,
-  VisibilityDependency,
+  HideDependency,
 };
