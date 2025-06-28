@@ -6,19 +6,19 @@ import type {
   BuilderProps,
   DefaultItem,
   DependencyManagerProps,
-  FieldArrayEvent,
+  FieldArrayOverrideProps,
   FieldArrayProps,
   FormBuilderConfig,
   FormBuilderContext,
   FormBuilderOptions,
-  FormBuilderProps,
+  FormBuilderOverrides,
   GetCardsImpl,
   GetInputsImpl,
   InputMapperProps,
   RenderFnOptions,
 } from "@/types";
-import type { Context } from "react";
-import type { ArrayPath, FieldValues } from "react-hook-form";
+import type { Context, ReactNode } from "react";
+import type { FieldValues } from "react-hook-form";
 
 import { options as defaultOptions } from "@/constants";
 import {
@@ -27,42 +27,44 @@ import {
   useDependencyContext,
   useFieldArrayContext,
 } from "@/context";
-import {
-  useDependency,
-  useDependsOnField,
-  useMfbFieldArray,
-  useMfbGlobalEvent,
-} from "@/hooks";
+import { useDependency, useDependsOnField } from "@/hooks";
 import {
   convertDepsToObject,
   listActionGuard,
   listInputGuard,
   mergeName,
 } from "@/utils";
-import { dispatchFieldArray, eventNames } from "@/utils/events";
-import {
-  createContext,
-  createElement,
-  useCallback,
-  useContext,
-  useMemo,
-} from "react";
+import { dispatchFieldArray } from "@/utils/events";
+import { createContext, createElement, useContext, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
+
+import { MfbFieldArray } from "./field-array";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
   TConfig extends FormBuilderConfig,
   TFormId extends string = string,
-> implements FormBuilderProps<TConfig>
-{
-  config: TConfig;
-  Context: Context<FormBuilderContext<TFormId> | null>;
-  options: FormBuilderOptions;
+> {
+  private config: TConfig;
+  private Context: Context<FormBuilderContext<TFormId> | null>;
+  private FieldArrayOverride?: <
+    TFields extends FieldValues,
+    TFormId extends string,
+  >(
+    props: FieldArrayOverrideProps<TFields, TFormId>,
+  ) => ReactNode;
+  private options: FormBuilderOptions;
 
-  constructor(config: TConfig, options?: FormBuilderOptions) {
+  constructor(
+    config: TConfig,
+    options?: Partial<FormBuilderOptions>,
+    overrides?: FormBuilderOverrides,
+  ) {
     this.config = config;
     this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
     this.options = { ...defaultOptions, ...options };
+
+    if (overrides?.FieldArray) this.FieldArrayOverride = overrides.FieldArray;
   }
 
   public AdvancedBuilder = <TFields extends FieldValues>({
@@ -209,9 +211,9 @@ class FormBuilder<
     );
   };
 
-  private useMfbContext = () => {
+  private useMfbContext = (): FormBuilderContext<TFormId> => {
     const { Context } = this;
-    return useContext(Context);
+    return useContext(Context) || { id: "" as TFormId };
   };
 
   private ActionButton = <TFields extends FieldValues>({
@@ -232,7 +234,7 @@ class FormBuilder<
         case "append":
         case "prepend":
           dispatchFieldArray<TFields>(id, action.name, {
-            // TODO: use config.input.defaultValues ot create correct deafultValue
+            // TODO: use config.input.defaultValues to create correct deafultValue
             params: [{} as never, {}],
             type: "append",
           });
@@ -388,28 +390,20 @@ class FormBuilder<
     name,
     render,
   }: FieldArrayProps<TFields>) => {
-    const { action, fields } = useMfbFieldArray<TFields>({
-      name: name as ArrayPath<TFields>,
-    });
-    const { id } = this.useMfbContext() || { id: "" };
+    const { FieldArrayOverride } = this;
+    const { id } = this.useMfbContext();
 
-    const handler = useCallback(
-      (event: CustomEventInit<FieldArrayEvent<TFields, TFormId>>) => {
-        const { detail } = event;
-        if (detail && detail.id === id && detail.name === name) {
-          action(detail.action);
-        }
-      },
-      [action, id, name],
-    );
-
-    useMfbGlobalEvent<TFields, TFormId>({
+    const props = {
       disabled,
-      eventName: eventNames["field-array"],
-      handler,
-    });
-
-    return render(fields);
+      id,
+      name,
+      render,
+    };
+    if (FieldArrayOverride) {
+      return <FieldArrayOverride<TFields, TFormId> {...props} />;
+    } else {
+      return <MfbFieldArray<TFields, TFormId> {...props} />;
+    }
   };
 
   private InputMapper = <TFields extends FieldValues>({
