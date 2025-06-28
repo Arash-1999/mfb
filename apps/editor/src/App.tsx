@@ -7,6 +7,7 @@ import { MuiFB } from "./builder";
 import { useRadioForm } from "./builder/components/input/radio";
 import { useTextFieldForm } from "./builder/components/input/text-field";
 import { Layout } from "./components/layout";
+import { BasicPreview } from "./components/basic-preview";
 
 const Test_2 = () => {
   const { fieldInputs, gridItemInputs, propsInputs } = useRadioForm();
@@ -138,6 +139,7 @@ const App = () => {
       <CssBaseline />
       <Layout title="MFB Editor">
         <p>something special</p>
+        <BasicPreview />
         {/* <MuiFB.BasicBuilder */}
         {/*   gridContainerProps={{ */}
         {/*     padding: 2, */}
