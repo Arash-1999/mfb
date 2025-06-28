@@ -47,6 +47,10 @@ const getConfig = () => {
   return config;
 };
 
+const getGroupCards = () => ({
+  "accordion-group": MfbAccordionGroup,
+});
+
 const getInputComponents = () => ({
   checkbox: MfbCheckbox,
   radio: MfbRadioGroup,
@@ -57,5 +61,16 @@ const getInputComponents = () => ({
   text: MfbTextField,
 });
 
-export { getConfig, getInputComponents, getLayoutConfig };
+const getSimpleCards = () => ({
+  accordion: MfbAccordion,
+  paper: MfbPaper,
+});
+
+export {
+  getConfig,
+  getGroupCards,
+  getInputComponents,
+  getLayoutConfig,
+  getSimpleCards,
+};
 export type { MuiConfig };
