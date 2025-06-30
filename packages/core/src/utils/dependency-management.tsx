@@ -14,20 +14,20 @@ interface DefaultDep {
   id: string;
 }
 const convertDepsToObject = <TDep extends DefaultDep = DefaultDep>(
-  dependencies: Array<TDep>,
+  dependencies: Array<TDep>
 ): Record<string, unknown> => {
   return dependencies.reduce<Record<string, unknown>>(
     (acc, cur) => ({
       ...acc,
       [cur.id]: cur.current,
     }),
-    {},
+    {}
   );
 };
 
 const conditionCalculator = (
   { condition, value }: Condition,
-  currentValue: unknown,
+  currentValue: unknown
 ): boolean => {
   // NOTE: in field array comparisions: value -> index, currentValue -> length
   let result: boolean = false;
@@ -56,7 +56,7 @@ const conditionCalculator = (
 };
 
 const conditionArrayCalculator = (
-  list: Array<Condition & { current: unknown }>,
+  list: Array<Condition & { current: unknown }>
 ) => {
   return list.every((dep) => conditionCalculator(dep, dep.current));
 };
@@ -64,7 +64,7 @@ const conditionArrayCalculator = (
 const pushDependency = <TFields extends FieldValues>(
   target: DependencyDict<TFields>,
   dependsOn: DependsOnSingle<TFields, false>,
-  value: number | PathValue<TFields, Path<TFields>> | undefined,
+  value: number | PathValue<TFields, Path<TFields>> | undefined
 ) => {
   switch (dependsOn.type) {
     case "bind-value": {
@@ -79,7 +79,7 @@ const pushDependency = <TFields extends FieldValues>(
       target[dependsOn.type].push({ ...dependsOn, current: value });
       break;
     }
-    case "visibility": {
+    case "hide": {
       target[dependsOn.type].push({ ...dependsOn, current: value });
       break;
     }
@@ -88,13 +88,13 @@ const pushDependency = <TFields extends FieldValues>(
 const createDependencyDict = <TFields extends FieldValues>(
   dependsOn: DependsOn<TFields>,
   value: readonly PathValue<TFields, Path<TFields>>[],
-  fieldArrayContext: FieldArrayContextValue,
+  fieldArrayContext: FieldArrayContextValue
 ) => {
   const base: DependencyDict<TFields> = {
     "bind-value": [],
     "def-props": [],
     disable: [],
-    visibility: [],
+    hide: [],
   };
 
   if (Array.isArray(dependsOn)) {
@@ -102,7 +102,7 @@ const createDependencyDict = <TFields extends FieldValues>(
 
     return dependsOn.reduce((acc, cur) => {
       if (
-        (cur.type === "disable" || cur.type === "visibility") &&
+        (cur.type === "disable" || cur.type === "hide") &&
         typeof cur.value === "string" &&
         reFieldArrayValue.test(cur.value)
       ) {
@@ -113,9 +113,7 @@ const createDependencyDict = <TFields extends FieldValues>(
             ...cur,
             value: fieldArrayContext.index,
           },
-          fieldArrayContext.index === null
-            ? undefined
-            : fieldArrayContext.index,
+          fieldArrayContext.index === null ? undefined : fieldArrayContext.index
         );
       } else {
         pushDependency(acc, cur, value[valueIndex]);

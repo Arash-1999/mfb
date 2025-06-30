@@ -1,6 +1,6 @@
 import type { FormBuilderConfig } from "@mfb/core";
 
-// import { FormBuilder } from "@mfb/core";
+import { MfbAccordion, MfbAccordionGroup, MfbPaper } from "./components/cards";
 import {
   MfbCheckbox,
   MfbRadioGroup,
@@ -18,8 +18,12 @@ const config = {
     component: () => <></>,
   },
   card: {
+    group: {
+      "accordion-group": MfbAccordionGroup,
+    },
     simple: {
-      paper: () => <></>,
+      accordion: MfbAccordion,
+      paper: MfbPaper,
     },
   },
   input: {
@@ -43,6 +47,10 @@ const getConfig = () => {
   return config;
 };
 
+const getGroupCards = () => ({
+  "accordion-group": MfbAccordionGroup,
+});
+
 const getInputComponents = () => ({
   checkbox: MfbCheckbox,
   radio: MfbRadioGroup,
@@ -53,5 +61,16 @@ const getInputComponents = () => ({
   text: MfbTextField,
 });
 
-export { getConfig, getInputComponents, getLayoutConfig };
+const getSimpleCards = () => ({
+  accordion: MfbAccordion,
+  paper: MfbPaper,
+});
+
+export {
+  getConfig,
+  getGroupCards,
+  getInputComponents,
+  getLayoutConfig,
+  getSimpleCards,
+};
 export type { MuiConfig };

@@ -147,10 +147,12 @@ type SimpleCardBase = (props: SimpleCardPropsBase & unknown) => JSX.Element;
 
 type SimpleCardObject = Record<PropertyKey, SimpleCardBase>;
 
-type SimpleCardProps<TProps> = BaseComponentProps &
-  TProps & {
-    header: Header | string;
-  };
+type SimpleCardProps<TProps> = PropsWithChildren<
+  BaseComponentProps &
+    TProps & {
+      header: Header | string;
+    }
+>;
 
 interface SimpleCardPropsBase
   extends BaseComponentProps,

@@ -15,7 +15,13 @@ type UseTextFieldFormReturn = Record<
 const useRadioForm = (): UseTextFieldFormReturn => {
   const fieldInputs = useFieldOptions<RadioForm>();
   const gridItemInputs = useGridItemOptions<RadioForm>({
-    responsivePath: (name) => `gridProps.is_${name}_responsive`,
+    depPrefix: "gridProps",
+    responsivePath: (name) => {
+      if (!/\./.test(name)) return `is_${name}_responsive` as never;
+
+      const splitedPath = name.split(".");
+      return `${splitedPath.slice(0, -1).join(".")}.is_${splitedPath.at(-1)}_responsive` as never;
+    },
   });
 
   return {

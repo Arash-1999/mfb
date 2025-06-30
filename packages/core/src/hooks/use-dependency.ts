@@ -43,7 +43,7 @@ const useDependency = <
     dependsOn,
     name = "",
   }: UseDependencyProps<TFields, TItem>,
-  options?: UseDependencyOptions,
+  options?: UseDependencyOptions
 ): UseDependencyReturn<TFields, TItem> => {
   const fieldArrayContext = useFieldArrayContext();
   const { reduceCalc } = useConditionCalculator();
@@ -52,30 +52,36 @@ const useDependency = <
     "bind-value": null,
     "def-props": null,
     disable: null,
-    visibility: null,
+    hide: null,
   });
 
   // TODO: provide default value (it's will be undefined when defaultValue passed to Controller)
   const value = useWatch<TFields>({
     control: formMethods.control,
     name: (Array.isArray(dependsOn) ? dependsOn : [dependsOn])
-      .filter(
-        (dep) =>
-          (dep.type === "disable" || dep.type === "visibility") &&
-          typeof dep.value === "string" &&
-          !reFieldArrayValue.test(dep.value),
+      .filter((dep) =>
+        dep.type === "disable" || dep.type === "hide"
+          ? typeof dep.value === "string"
+            ? !reFieldArrayValue.test(dep.value)
+            : true
+          : true
       )
-      .map((dep) => dep.path),
+      .map((dep) => {
+        return dep.path;
+      }),
   });
 
   const dependencies = useMemo<DependencyStructure<TFields>>(() => {
-    const { disable: disableDict, ...dependencyDict } =
-      createDependencyDict<TFields>(dependsOn, value, fieldArrayContext);
+    const {
+      disable: disableDict,
+      hide: hideDict,
+      ...dependencyDict
+    } = createDependencyDict<TFields>(dependsOn, value, fieldArrayContext);
 
     return {
       ...dependencyDict,
       disable: dependencyContext.disable || reduceCalc(disableDict),
-      visibility: reduceCalc(disableDict),
+      hide: reduceCalc(hideDict),
     };
   }, [fieldArrayContext, reduceCalc, value, dependsOn, dependencyContext]);
 
@@ -96,13 +102,13 @@ const useDependency = <
     ) {
       const resolvedName = mergeName(name, resolvedComponent.name || "");
 
-      const _visibility = dependencies.visibility;
+      const _hide = dependencies.hide;
       const _disable = dependencies.disable;
 
       if (
-        (typeof ref.current.visibility === "boolean" &&
-          _visibility &&
-          _visibility !== ref.current.visibility) ||
+        (typeof ref.current.hide === "boolean" &&
+          _hide &&
+          _hide !== ref.current.hide) ||
         (typeof ref.current.disable === "boolean" &&
           _disable &&
           _disable !== ref.current.disable) ||
@@ -111,7 +117,7 @@ const useDependency = <
       ) {
         formMethods.resetField(resolvedName as Path<TFields>);
       }
-      ref.current.visibility = _visibility;
+      ref.current.hide = _hide;
       ref.current.disable = _disable;
     }
   }, [
@@ -123,10 +129,7 @@ const useDependency = <
     value,
   ]);
 
-  return [
-    dependencies.visibility !== null ? resolvedComponent : null,
-    dependencies,
-  ];
+  return [dependencies.hide ? null : resolvedComponent, dependencies];
 };
 
 export { useDependency };

@@ -5,15 +5,17 @@ import type { FieldValues, Path } from "react-hook-form";
 import { useTheme } from "@mui/material";
 
 interface UseResponsiveStyleProps<TFields extends FieldValues> {
+  depPrefix: string;
   responsivePath: (name: string) => Path<TFields>;
 }
 
 interface UseResponsiveStyleReturn<TFields extends FieldValues> {
   convertToResponsive: (
-    item: GetInputsImpl<MuiConfig, TFields>,
+    item: GetInputsImpl<MuiConfig, TFields>
   ) => Array<GetInputsImpl<MuiConfig, TFields>>;
 }
 const useResponsiveStyle = <TFields extends FieldValues>({
+  depPrefix,
   responsivePath,
 }: UseResponsiveStyleProps<TFields>): UseResponsiveStyleReturn<TFields> => {
   const theme = useTheme();
@@ -33,9 +35,9 @@ const useResponsiveStyle = <TFields extends FieldValues>({
           dependsOn: {
             condition: "eq",
             id: "is_responsive",
-            path: responsivePath(item.name),
-            type: "visibility",
-            value: false,
+            path: `${depPrefix}.${responsivePath(item.name)}` as Path<TFields>,
+            type: "hide",
+            value: true,
           },
           ...item,
         },
@@ -44,9 +46,9 @@ const useResponsiveStyle = <TFields extends FieldValues>({
             dependsOn: {
               condition: "eq",
               id: "is_responsive",
-              path: responsivePath(item.name),
-              type: "visibility",
-              value: true,
+              path: `${depPrefix}.${responsivePath(item.name)}` as Path<TFields>,
+              type: "hide",
+              value: false,
             },
             gridProps: {
               size: 12,
@@ -54,7 +56,7 @@ const useResponsiveStyle = <TFields extends FieldValues>({
             },
             ...item,
             name: `${item.name}.${key}`,
-          }),
+          })
         ),
       ];
     };

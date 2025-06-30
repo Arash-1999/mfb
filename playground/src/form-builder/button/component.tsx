@@ -21,7 +21,7 @@ const MfbButton = ({ icon, text, ...props }: MfbButtonProps) => {
   ) : icon ? (
     <IconButton {...props}>{createElement(icons[icon])}</IconButton>
   ) : (
-    <></> 
+    <></>
   );
 };
 
