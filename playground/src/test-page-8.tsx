@@ -1,5 +1,5 @@
-import { getDefaultValues, testItems } from './form-builder/default-value';
-import { config, } from './form-builder';
+import { getDefaultValues, testItems } from "./form-builder/default-value";
+import { config } from "./form-builder";
 
 const Page = () => {
   return (
@@ -7,7 +7,7 @@ const Page = () => {
       <p>Default Value</p>
 
       <pre>
-        {JSON.stringify(getDefaultValues(config, testItems), null, 2)}
+        {JSON.stringify(getDefaultValues({ config, list: testItems }), null, 2)}
       </pre>
     </>
   );
