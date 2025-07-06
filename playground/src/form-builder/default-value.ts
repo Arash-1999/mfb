@@ -1,9 +1,12 @@
 import type {
+  Condition,
+  DependsOn,
+  DefineFnProps,
   DependsOnBase,
   FormBuilderConfig,
-  GetInputsImpl,
   HideDependency,
   InputArray,
+  AdvancedList,
 } from "@mfb/core";
 import type { FieldValues } from "react-hook-form";
 
@@ -32,6 +35,56 @@ interface TestForm {
     };
   };
 }
+
+interface TestForm2 {
+  size: string | { [key in "xs" | "md"]: string };
+  is_size_responsive: string;
+}
+const testForm2: InputArray<Config, TestForm2> = [
+  {
+    name: "is_size_responsive",
+    type: "text",
+    props: {
+      defaultValue: "fuck",
+    },
+  },
+  {
+    dependsOn: {
+      path: "is_size_responsive",
+      condition: "eq",
+      value: "fuck",
+      id: "is_size_responsive",
+      type: "hide",
+    },
+    name: "size",
+    type: "text",
+    props: {},
+  },
+  {
+    dependsOn: {
+      path: "is_size_responsive",
+      condition: "not-eq",
+      value: "fuck",
+      id: "is_size_responsive",
+      type: "hide",
+    },
+    name: "size.xs",
+    type: "text",
+    props: {},
+  },
+  {
+    dependsOn: {
+      path: "is_size_responsive",
+      condition: "not-eq",
+      value: "fuck",
+      id: "is_size_responsive",
+      type: "hide",
+    },
+    name: "size.md",
+    type: "text",
+    props: {},
+  },
+];
 
 const testItems: InputArray<Config, TestForm> = [
   {
@@ -80,48 +133,136 @@ const testItems: InputArray<Config, TestForm> = [
   },
 ];
 
-interface GetDefaultValuesProps<
-  TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
-> {
-  config: TConfig;
-  falseSet: Set<string>;
-  list: InputArray<TConfig, TFields>;
-  paths: Set<string>;
-  prefix?: string;
+const testAdvancedList: AdvancedList<Config, TestForm> = [
+  {
+    mode: "input",
+    name: "a",
+    props: {},
+    type: "text",
+  },
+  {
+    mode: "input",
+    name: "b",
+    props: {},
+    type: "text",
+  },
+  {
+    isGroup: false,
+    name: "c",
+    list: [
+      {
+        mode: "input",
+        name: "d",
+        type: "text",
+        props: {},
+      },
+      {
+        dependsOn: {
+          type: "hide",
+          path: "a",
+          condition: "not-eq",
+          id: "a",
+          value: "",
+        },
+        mode: "card",
+        name: "e",
+        isGroup: false,
+        list: [
+          {
+            mode: "input",
+            name: "f",
+            type: "text",
+            props: {},
+          },
+          {
+            mode: "input",
+            name: "g",
+            type: "text",
+            props: {},
+          },
+          {
+            mode: "input",
+            name: "h",
+            type: "text",
+            props: {},
+          },
+        ],
+        header: "e",
+        type: "paper",
+      },
+    ],
+    header: "c",
+    type: "paper",
+    mode: "card",
+  },
+];
+/*
+  value: unkown
+  field array items: Map<ArrayPath<TFields>, unknown>
+*/
+interface Item<TFields extends FieldValues> {
+  dependsOn?: DependsOn<TFields>;
+  name?: string;
+  inputs?: ItemArray<TFields>;
+  list?: ItemArray<TFields>;
+  type: string;
+  props?: unknown;
 }
+type ItemArray<TFields extends FieldValues> = Array<
+  Item<TFields> | ((props?: DefineFnProps) => Item<TFields>)
+>;
+type Dep<TFields extends FieldValues> = DependsOnBase<TFields> &
+  Condition & { type: "hide" };
 
-function getDefaultValuesImpl<
+function getDefaultValues<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
->({
-  config,
-  list,
-  paths,
-  prefix,
-}: GetDefaultValuesProps<TConfig, TFields>): unknown {
+  TList extends ItemArray<TFields> = ItemArray<TFields>,
+>({ config, list }: { config: TConfig; list: TList }) {
+  const dequeue: Array<Item<TFields>> = [];
+  const falseSet = new Set<string>();
+  const paths = new Set<string>();
   const result = {};
 
-  const dequeue: Array<GetInputsImpl<TConfig, TFields>> = [];
-  // all valid paths
-  // paths those have true hidden dependency
-  const falseSet = new Set<string>();
+  function parseItems(
+    items: ItemArray<TFields>,
+    prefix?: string,
+    parentDeps: Array<Dep<TFields>> = [],
+  ) {
+    items.forEach((_item) => {
+      const item = typeof _item === "function" ? _item() : _item;
 
-  // process items and separate based on dependency
-  list.forEach((item) => {
-    const resolvedItem = typeof item === "function" ? item() : item;
+      const name = mergeName(prefix || "", item.name || "");
+      paths.add(name);
 
-    const name = mergeName(prefix || "", resolvedItem.name);
-    paths.add(name);
+      const deps = (
+        typeof item.dependsOn !== "undefined"
+          ? Array.isArray(item.dependsOn)
+            ? item.dependsOn
+            : [item.dependsOn]
+          : []
+      )
+        .filter((item) => item.type === "hide")
+        .concat(parentDeps);
 
-    if ("dependsOn" in resolvedItem && resolvedItem.dependsOn) {
-      dequeue.push(resolvedItem);
-    } else {
-      const value = config.input.defaultValues[resolvedItem.type];
+      if (deps.length > 0) {
+        dequeue.push({ ...item, name, dependsOn: deps });
+      } else {
+        const value = config.input.defaultValues[item.type];
 
-      if (typeof value !== "undefined") set(result, name, value) as never;
-    }
-  });
+        if (typeof value !== "undefined") set(result, name, value) as never;
+      }
+
+      if (Array.isArray(item.inputs)) {
+        parseItems(item.inputs, name, deps.length > 0 ? deps : undefined);
+      }
+      if (Array.isArray(item.list)) {
+        parseItems(item.list, name, deps.length > 0 ? deps : undefined);
+      }
+    });
+  }
+
+  parseItems(list);
 
   while (dequeue.length > 0) {
     for (let i = 0, len = dequeue.length; i < len; i++) {
@@ -134,7 +275,7 @@ function getDefaultValuesImpl<
       const deps = (
         Array.isArray(item.dependsOn) ? item.dependsOn : [item.dependsOn]
       )
-        .filter((dep) => dep && dep.type === "hide" && paths.has(dep.path))
+        .filter((dep) => dep && paths.has(dep.path))
         .reduce<
           Array<DependsOnBase<TFields> & HideDependency & { current: unknown }>
         >((_deps, dep) => {
@@ -165,75 +306,27 @@ function getDefaultValuesImpl<
         continue;
       }
 
-      const name = mergeName(prefix || "", item.name);
-
       if (!isHidden && !conditionArrayCalculator(deps)) {
         let value: unknown;
-        if ("props" in item && "deafultValue" in item.props) {
+        if (
+          item.props &&
+          typeof item.props === "object" &&
+          "defaultValue" in item.props
+        ) {
           value = item.props.defaultValue;
         } else {
           value = config.input.defaultValues[item.type];
         }
 
-        set(result, name, value);
+        set(result, item.name || "", value);
       } else {
-        falseSet.add(name);
+        falseSet.add(item.name || "");
       }
     }
   }
 
   return result;
 }
-/*
-  value: unkown
-  field array items: Map<ArrayPath<TFields>, unknown>
-*/
-function getDefaultValues<
-  TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
->({ config, list }: { config: TConfig; list: InputArray<TConfig, TFields> }) {
-  // const dequeue: Array<
-  //   | GetInputsImpl<TConfig, TFields>
-  //   | GetCardsImpl<TConfig, TFields>
-  //   | GetCardsImpl<TConfig, TFields, true>
-  // > = [];
-  const falseSet = new Set<string>();
-  const paths = new Set<string>();
-  // const result = {};
 
-  // function parseItems(
-  //   items:
-  //     | InputArray<TConfig, TFields>
-  //     | GetCardsImpl<TConfig, TFields>[]
-  //     | AdvancedList<TConfig, TFields>,
-  //   prefix?: string
-  // ) {
-  //   items.forEach((item) => {
-  //     const resolvedItem = typeof item === "function" ? item() : item;
-
-  //     const name = mergeName(prefix || "", resolvedItem.name || "");
-  //     paths.add(name);
-
-  //     if ("dependsOn" in resolvedItem && resolvedItem.dependsOn) {
-  //       dequeue.push(resolvedItem);
-  //     } else {
-  //       const value = config.input.defaultValues[resolvedItem.type];
-
-  //       if (typeof value !== "undefined") set(result, name, value) as never;
-  //     }
-  //   });
-  // }
-
-  // parseItems(list);
-
-  // return {};
-  return getDefaultValuesImpl({
-    config,
-    falseSet,
-    list,
-    paths,
-    prefix: "",
-  });
-}
-
-export { getDefaultValues, testItems };
+export { getDefaultValues, testItems, testForm2, testAdvancedList };
+export type { TestForm, TestForm2 };
