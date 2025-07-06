@@ -42,9 +42,12 @@ type GetCards<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TAdvanced extends boolean = false,
+  TExtra = unknown,
 > =
-  | ((props?: DefineFnProps) => GetCardsImpl<TConfig, TFields, TAdvanced, true>)
-  | GetCardsImpl<TConfig, TFields, TAdvanced>;
+  | ((
+      props?: DefineFnProps,
+    ) => GetCardsImpl<TConfig, TFields, TAdvanced, true> & TExtra)
+  | (GetCardsImpl<TConfig, TFields, TAdvanced> & TExtra);
 
 type GetCardsImpl<
   TConfig extends FormBuilderConfig,

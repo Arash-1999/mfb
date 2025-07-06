@@ -11,8 +11,8 @@ type AdvancedList<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > = Array<
-  | (GetCards<TConfig, TFields, true> & { mode: "card" })
-  | (GetInputs<TConfig, TFields> & { mode: "input" })
+  | GetCards<TConfig, TFields, true, { mode: "card" }>
+  | GetInputs<TConfig, TFields, false, { mode: "input" }>
 >;
 
 type BaseComponent = (props: any) => JSX.Element;

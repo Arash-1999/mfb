@@ -267,7 +267,8 @@ class FormBuilder<
   }: AdvancedMapperProps<TConfig, TFields>) => {
     const { DependencyManager, renderAction, renderCard, renderInput } = this;
 
-    return list.map((item, index) => {
+    return list.map((_item, index) => {
+      const item = typeof _item === "function" ? _item() : _item;
       if (item.mode === "card") {
         return (
           <DependencyManager<
@@ -298,8 +299,7 @@ class FormBuilder<
             />
           );
         }
-        const withContext =
-          (typeof item === "function" ? item().type : item.type) === "list";
+        const withContext = item.type === "list";
         return (
           <DependencyManager<TFields, GetInputsImpl<TConfig, TFields>>
             component={item}

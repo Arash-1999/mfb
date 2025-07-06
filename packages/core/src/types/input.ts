@@ -20,13 +20,14 @@ type GetInputs<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TInternal extends boolean = false,
+  TExtra = unknown,
 > =
-  | ((props?: DefineFnProps) => ActionInput<TConfig, TFields>)
+  | ((props?: DefineFnProps) => ActionInput<TConfig, TFields> & TExtra)
   | ((
       props?: DefineFnProps,
-    ) => GetInputsImpl<TConfig, TFields, TInternal, true>)
-  | ActionInput<TConfig, TFields>
-  | GetInputsImpl<TConfig, TFields, TInternal>;
+    ) => GetInputsImpl<TConfig, TFields, TInternal, true> & TExtra)
+  | (ActionInput<TConfig, TFields> & TExtra)
+  | (GetInputsImpl<TConfig, TFields, TInternal> & TExtra);
 
 type GetInputsImpl<
   TConfig extends FormBuilderConfig,
