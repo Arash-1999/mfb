@@ -34,6 +34,7 @@ interface TestForm {
       h: boolean;
     };
   };
+  list: { "list-item-1": string; "list-item-2": string }[];
 }
 
 interface TestForm2 {
@@ -131,6 +132,22 @@ const testItems: InputArray<Config, TestForm> = [
     props: {},
     type: "text",
   },
+  {
+    type: "list",
+    name: "list",
+    inputs: [
+      {
+        name: "list-item-1",
+        props: {},
+        type: "text",
+      },
+      {
+        name: "list-item-2",
+        props: {},
+        type: "text",
+      },
+    ],
+  },
 ];
 
 const testAdvancedList: AdvancedList<Config, TestForm> = [
@@ -207,6 +224,7 @@ interface Item<TFields extends FieldValues> {
   list?: ItemArray<TFields>;
   type: string;
   props?: unknown;
+  variant?: "list" | "normal";
 }
 type ItemArray<TFields extends FieldValues> = Array<
   Item<TFields> | ((props?: DefineFnProps) => Item<TFields>)
@@ -223,11 +241,22 @@ function getDefaultValues<
   const falseSet = new Set<string>();
   const paths = new Set<string>();
   const result = {};
+  const fieldArray = new Map<string, unknown>();
+
+  function parseFieldArray(items: ItemArray<TFields>, path: string) {
+    const fieldArrayItem: Record<PropertyKey, unknown> = {};
+
+    console.log(items);
+    // TODO: create default value for field array
+
+    fieldArray.set(path, fieldArrayItem);
+  }
 
   function parseItems(
     items: ItemArray<TFields>,
+    // TODO: pass result, dequeue, falseSet
     prefix?: string,
-    parentDeps: Array<Dep<TFields>> = [],
+    parentDeps: Array<Dep<TFields>> = []
   ) {
     items.forEach((_item) => {
       const item = typeof _item === "function" ? _item() : _item;
@@ -250,14 +279,22 @@ function getDefaultValues<
       } else {
         const value = config.input.defaultValues[item.type];
 
-        if (typeof value !== "undefined") set(result, name, value) as never;
+        if (typeof value !== "undefined") set(result, name, value);
       }
 
+      let currentItems: ItemArray<TFields> = [];
       if (Array.isArray(item.inputs)) {
-        parseItems(item.inputs, name, deps.length > 0 ? deps : undefined);
+        currentItems = item.inputs;
       }
       if (Array.isArray(item.list)) {
-        parseItems(item.list, name, deps.length > 0 ? deps : undefined);
+        currentItems = item.list;
+      }
+
+      if (item.type === "list" || item.variant === "list") {
+        set(result, name, []);
+        parseFieldArray(currentItems, name);
+      } else {
+        parseItems(currentItems, name, deps.length > 0 ? deps : undefined);
       }
     });
   }
