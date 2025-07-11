@@ -8,7 +8,7 @@ import type {
   InputArray,
   AdvancedList,
 } from "@mfb/core";
-import type { FieldValues } from "react-hook-form";
+import type { ArrayPath, FieldArray, FieldValues } from "react-hook-form";
 
 import { conditionArrayCalculator, mergeName } from "@mfb/core";
 import { set } from "react-hook-form";
@@ -237,32 +237,51 @@ function getDefaultValues<
   TFields extends FieldValues,
   TList extends ItemArray<TFields> = ItemArray<TFields>,
 >({ config, list }: { config: TConfig; list: TList }) {
-  const dequeue: Array<Item<TFields>> = [];
+  const _dequeue: Array<Item<TFields>> = [];
+  const _paths = new Set<string>();
+  const _result = {};
   const falseSet = new Set<string>();
-  const paths = new Set<string>();
-  const result = {};
-  const fieldArray = new Map<string, unknown>();
+  const fieldArray: Record<string, unknown> = {};
 
   function parseFieldArray(items: ItemArray<TFields>, path: string) {
-    const fieldArrayItem: Record<PropertyKey, unknown> = {};
+    const fieldArrayItem: FieldValues = {};
+    // const fieldArrayItem: Record<PropertyKey, unknown> = {};
 
-    console.log(items);
     // TODO: create default value for field array
+    parseItems(items, {
+      paths: _paths,
+      prefix: '',
+      dequeue: [],
+      parentDeps: [],
+      result: fieldArrayItem,
+    });
 
-    fieldArray.set(path, fieldArrayItem);
+    fieldArray[path] = fieldArrayItem;
+    console.log(path, fieldArrayItem, items, fieldArray);
   }
 
   function parseItems(
     items: ItemArray<TFields>,
     // TODO: pass result, dequeue, falseSet
-    prefix?: string,
-    parentDeps: Array<Dep<TFields>> = []
+    options: {
+      prefix: string;
+      parentDeps: Array<Dep<TFields>>
+      paths: Set<string>,
+      dequeue: ItemArray<TFields>,
+      result: FieldValues,
+    } = {
+        prefix: '',
+        dequeue: [],
+        parentDeps: [],
+        paths: new Set(),
+        result: _result,
+      },
   ) {
     items.forEach((_item) => {
       const item = typeof _item === "function" ? _item() : _item;
 
-      const name = mergeName(prefix || "", item.name || "");
-      paths.add(name);
+      const name = mergeName(options.prefix || "", item.name || "");
+      options.paths.add(name);
 
       const deps = (
         typeof item.dependsOn !== "undefined"
@@ -272,14 +291,14 @@ function getDefaultValues<
           : []
       )
         .filter((item) => item.type === "hide")
-        .concat(parentDeps);
+        .concat(options.parentDeps);
 
       if (deps.length > 0) {
-        dequeue.push({ ...item, name, dependsOn: deps });
+        options.dequeue.push({ ...item, name, dependsOn: deps });
       } else {
         const value = config.input.defaultValues[item.type];
 
-        if (typeof value !== "undefined") set(result, name, value);
+        if (typeof value !== "undefined") set(options.result, name, value);
       }
 
       let currentItems: ItemArray<TFields> = [];
@@ -291,19 +310,26 @@ function getDefaultValues<
       }
 
       if (item.type === "list" || item.variant === "list") {
-        set(result, name, []);
+        set(options.result, name, []);
         parseFieldArray(currentItems, name);
       } else {
-        parseItems(currentItems, name, deps.length > 0 ? deps : undefined);
+        parseItems(currentItems,
+          {
+            dequeue: options.dequeue,
+            paths: options.paths,
+            prefix: name,
+            parentDeps: deps.length > 0 ? deps : [],
+            result: _result,
+          });
       }
     });
   }
 
   parseItems(list);
 
-  while (dequeue.length > 0) {
-    for (let i = 0, len = dequeue.length; i < len; i++) {
-      const item = dequeue.shift();
+  while (_dequeue.length > 0) {
+    for (let i = 0, len = _dequeue.length; i < len; i++) {
+      const item = _dequeue.shift();
       if (!item) continue;
 
       let flag = false;
@@ -312,7 +338,7 @@ function getDefaultValues<
       const deps = (
         Array.isArray(item.dependsOn) ? item.dependsOn : [item.dependsOn]
       )
-        .filter((dep) => dep && paths.has(dep.path))
+        .filter((dep) => dep && _paths.has(dep.path))
         .reduce<
           Array<DependsOnBase<TFields> & HideDependency & { current: unknown }>
         >((_deps, dep) => {
@@ -320,7 +346,7 @@ function getDefaultValues<
             const currentValue = (
               isKey(dep.path) ? [dep.path] : stringToPath(dep.path)
             ).reduce((acc, key) => {
-              if (isNullOrUndefined(acc)) return result;
+              if (isNullOrUndefined(acc)) return _result;
 
               // check dep is not calculated yet
               if (!(key in acc) && !falseSet.has(dep.path)) {
@@ -330,7 +356,7 @@ function getDefaultValues<
               if (falseSet.has(dep.path)) isHidden = true;
 
               return acc[key as never];
-            }, result);
+            }, _result);
 
             _deps.push({ ...dep, current: currentValue });
           }
@@ -339,7 +365,7 @@ function getDefaultValues<
 
       if (!deps) continue;
       if (flag) {
-        dequeue.push(item);
+        _dequeue.push(item);
         continue;
       }
 
@@ -355,14 +381,17 @@ function getDefaultValues<
           value = config.input.defaultValues[item.type];
         }
 
-        set(result, item.name || "", value);
+        set(_result, item.name || "", value);
       } else {
         falseSet.add(item.name || "");
       }
     }
   }
 
-  return result;
+  return {
+    defaultValue: _result,
+    fieldArray: fieldArray as Record<ArrayPath<TFields>, FieldArray<TFields>>
+  };
 }
 
 export { getDefaultValues, testItems, testForm2, testAdvancedList };
