@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
-import type { FieldValues } from "react-hook-form";
+import type { DeepPartial, FieldValues } from "react-hook-form";
 
 import type { FieldArrayOverrideProps } from "./builder-methods";
 import type { GroupCardComponent, SimpleCardObject } from "./card";
 import type { ButtonComponent } from "./components";
+import type { FieldArrayValues } from "./default-value";
 import type { InputObject } from "./input";
 import type { BaseComponent, LayoutKey } from "./utils";
 
@@ -24,6 +25,8 @@ interface FormBuilderConfig {
 }
 
 interface FormBuilderContext<TFormId extends string = string> {
+  defaultValues: FieldValues;
+  fieldArray: FieldValues;
   id: TFormId;
 }
 
@@ -37,9 +40,19 @@ interface FormBuilderOverrides {
   ) => ReactNode;
 }
 
+interface MfbContextValue<
+  TFields extends FieldValues,
+  TFormId extends string = string,
+> {
+  defaultValues: DeepPartial<TFields>;
+  fieldArray: FieldArrayValues<TFields>;
+  id: TFormId;
+}
+
 export type {
   FormBuilderConfig,
   FormBuilderContext,
   FormBuilderOptions,
   FormBuilderOverrides,
+  MfbContextValue,
 };

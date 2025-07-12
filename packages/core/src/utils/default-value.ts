@@ -1,62 +1,35 @@
 import type {
-  Condition,
-  DefineFnProps,
-  DependsOn,
   DependsOnBase,
+  FieldArrayValues,
   FormBuilderConfig,
   HideDependency,
+  Item,
+  ItemArray,
+  ParseItemsOptions,
 } from "@/types";
 import type {
   ArrayPath,
-  DeepPartial,
   DefaultValues,
   FieldArray,
   FieldValues,
 } from "react-hook-form";
 
-import { mergeName } from "./merge-names";
 import { set } from "react-hook-form";
+
 import { conditionArrayCalculator } from "./dependency-management";
-
-type Dep<TFields extends FieldValues> = Condition &
-  DependsOnBase<TFields> & { type: "hide" };
-
-interface Item<TFields extends FieldValues> {
-  dependsOn?: DependsOn<TFields>;
-  name?: string;
-  inputs?: ItemArray<TFields>;
-  list?: ItemArray<TFields>;
-  type: string;
-  props?: unknown;
-  variant?: "list" | "normal";
-}
-type ItemArray<TFields extends FieldValues> = Array<
-  ((props?: DefineFnProps) => Item<TFields>) | Item<TFields>
->;
-type FieldArrayValues<TFields extends FieldValues> = Record<
-  ArrayPath<TFields>,
-  FieldArray<TFields>
->;
-
-interface ParseItemsOptions<TFields extends FieldValues> {
-  prefix: string;
-  parentDeps: Array<Dep<TFields>>;
-  paths: Set<string>;
-  dequeue: ItemArray<TFields>;
-  result: FieldValues;
-}
+import { mergeName } from "./merge-names";
 
 class DefaultValue<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > {
-  private dequeue: Array<Item<TFields>>;
-  private falseSet: Set<string>;
+  public fieldArray: FieldArrayValues<TFields>;
+  public result: DefaultValues<TFields>;
+
   private _paths: Set<string>;
   private config: TConfig;
-
-  public result: DefaultValues<TFields>;
-  public fieldArray: FieldArrayValues<TFields>;
+  private dequeue: Array<Item<TFields>>;
+  private falseSet: Set<string>;
 
   constructor(config: TConfig, list: ItemArray<TFields>) {
     this.config = config;
@@ -68,43 +41,16 @@ class DefaultValue<
 
     this.resovle(list);
   }
-
-  private compact = <TValue>(value: TValue[]) =>
-    Array.isArray(value) ? value.filter(Boolean) : [];
-
-  private isKey = (value: string) => /^\w*$/.test(value);
-
-  private isNullOrUndefined = (value: unknown): value is null | undefined =>
-    value == null;
-
-  private stringToPath = (input: string): string[] =>
-    this.compact(input.replace(/["|']|\]/g, "").split(/\.|\[/));
-
-  private parseFieldArray = (items: ItemArray<TFields>, path: string) => {
-    const fieldArrayItem: FieldValues = {};
-
-    this.parseItems(items, {
-      paths: this._paths,
-      prefix: "",
-      dequeue: [],
-      parentDeps: [],
-      result: fieldArrayItem,
-    });
-
-    this.fieldArray[path as ArrayPath<TFields>] =
-      fieldArrayItem as FieldArray<TFields>;
-  };
-
   private parseItems = (
     items: ItemArray<TFields>,
     // TODO: pass result, dequeue, falseSet
     options: ParseItemsOptions<TFields> = {
-      prefix: "",
       dequeue: [],
       parentDeps: [],
       paths: new Set(),
+      prefix: "",
       result: this.result,
-    }
+    },
   ) => {
     items.forEach((_item) => {
       const item = typeof _item === "function" ? _item() : _item;
@@ -123,11 +69,13 @@ class DefaultValue<
         .concat(options.parentDeps);
 
       if (deps.length > 0) {
-        options.dequeue.push({ ...item, name, dependsOn: deps });
+        options.dequeue.push({ ...item, dependsOn: deps, name });
       } else {
-        const value = this.config.input.defaultValues[item.type];
+        if ("type" in item && typeof item.type !== "undefined") {
+          const value = this.config.input.defaultValues[item.type];
 
-        if (typeof value !== "undefined") set(options.result, name, value);
+          if (typeof value !== "undefined") set(options.result, name, value);
+        }
       }
 
       let currentItems: ItemArray<TFields> = [];
@@ -144,15 +92,14 @@ class DefaultValue<
       } else {
         this.parseItems(currentItems, {
           dequeue: options.dequeue,
+          parentDeps: deps.length > 0 ? deps : [],
           paths: options.paths,
           prefix: name,
-          parentDeps: deps.length > 0 ? deps : [],
           result: options.result,
         });
       }
     });
   };
-
   public resovle = (list: ItemArray<TFields>) => {
     this.parseItems(list, {
       dequeue: this.dequeue,
@@ -215,7 +162,9 @@ class DefaultValue<
           ) {
             value = item.props.defaultValue;
           } else {
-            value = this.config.input.defaultValues[item.type];
+            if ("type" in item && typeof item.type !== "undefined") {
+              value = this.config.input.defaultValues[item.type];
+            }
           }
 
           set(this.result, item.name || "", value);
@@ -225,6 +174,32 @@ class DefaultValue<
       }
     }
   };
+
+  private compact = <TValue>(value: TValue[]) =>
+    Array.isArray(value) ? value.filter(Boolean) : [];
+
+  private isKey = (value: string) => /^\w*$/.test(value);
+
+  private isNullOrUndefined = (value: unknown): value is null | undefined =>
+    value == null;
+
+  private parseFieldArray = (items: ItemArray<TFields>, path: string) => {
+    const fieldArrayItem: FieldValues = {};
+
+    this.parseItems(items, {
+      dequeue: [],
+      parentDeps: [],
+      paths: this._paths,
+      prefix: "",
+      result: fieldArrayItem,
+    });
+
+    this.fieldArray[path as ArrayPath<TFields>] =
+      fieldArrayItem as FieldArray<TFields>;
+  };
+
+  private stringToPath = (input: string): string[] =>
+    this.compact(input.replace(/["|']|\]/g, "").split(/\.|\[/));
 }
 
 export { DefaultValue };

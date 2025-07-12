@@ -19,6 +19,7 @@ import type {
   ListInputArray,
   RenderFn,
 } from "./utils";
+import type { FieldArrayValues } from "./default-value";
 
 interface AdvancedBuilderProps<
   TConfig extends FormBuilderConfig,
@@ -138,6 +139,7 @@ interface FieldArrayOverrideProps<
 
 interface FieldArrayProps<TFields extends FieldValues> {
   disabled: boolean | undefined;
+  fieldArray: FieldArrayValues<TFields>;
   // TODO: use ArrayPath generic type instead of string
   name: string;
   render: (fields: UseFieldArrayReturn<TFields>["fields"]) => ReactNode;

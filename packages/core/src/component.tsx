@@ -15,6 +15,7 @@ import type {
   GetCardsImpl,
   GetInputsImpl,
   InputMapperProps,
+  MfbContextValue,
   RenderFnOptions,
 } from "@/types";
 import type { Context, ReactNode } from "react";
@@ -39,6 +40,7 @@ import { createContext, createElement, useContext, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { MfbFieldArray } from "./field-array";
+import { useDefaultValue } from "./hooks/use-default-value";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
@@ -92,9 +94,13 @@ class FormBuilder<
       return list;
     }, [list]);
 
+    const defaultValues = useDefaultValue(this.config, resolvedList);
+
     return (
       <Context.Provider
         value={{
+          defaultValues: defaultValues.defaultValues,
+          fieldArray: defaultValues.fieldArray,
           id,
         }}
       >
@@ -133,9 +139,13 @@ class FormBuilder<
       return inputs;
     }, [inputs]);
 
+    const defaultValues = useDefaultValue(this.config, resolvedInputs);
+
     return (
       <Context.Provider
         value={{
+          defaultValues: defaultValues.defaultValues,
+          fieldArray: defaultValues.fieldArray,
           id,
         }}
       >
@@ -178,9 +188,13 @@ class FormBuilder<
       return cards;
     }, [cards]);
 
+    const defaultValues = useDefaultValue(this.config, resolvedCards);
+
     return (
       <Context.Provider
         value={{
+          defaultValues: defaultValues.defaultValues,
+          fieldArray: defaultValues.fieldArray,
           id,
         }}
       >
@@ -211,9 +225,17 @@ class FormBuilder<
     );
   };
 
-  private useMfbContext = (): FormBuilderContext<TFormId> => {
+  private useMfbContext = <TFields extends FieldValues>() => {
     const { Context } = this;
-    return useContext(Context) || { id: "" as TFormId };
+
+    return (
+      (useContext(Context) as MfbContextValue<TFields, TFormId>) ||
+      ({
+        defaultValues: {},
+        fieldArray: {},
+        id: "",
+      } as MfbContextValue<TFields, TFormId>)
+    );
   };
 
   private ActionButton = <TFields extends FieldValues>({
@@ -226,7 +248,7 @@ class FormBuilder<
     const {
       button: { component: Button },
     } = this.config;
-    const { id } = this.useMfbContext() || { id: "" };
+    const { id } = this.useMfbContext<TFields>();
     const { index } = useFieldArrayContext();
 
     const handleClick = () => {
@@ -389,12 +411,14 @@ class FormBuilder<
     disabled,
     name,
     render,
-  }: FieldArrayProps<TFields>) => {
+    // TODO: remvoe omit and create a new type for internal field array
+  }: Omit<FieldArrayProps<TFields>, "fieldArray">) => {
     const { FieldArrayOverride } = this;
-    const { id } = this.useMfbContext();
+    const { fieldArray, id } = this.useMfbContext<TFields>();
 
     const props = {
       disabled,
+      fieldArray,
       id,
       name,
       render,

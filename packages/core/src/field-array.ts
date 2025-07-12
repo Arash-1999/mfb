@@ -7,11 +7,13 @@ import { useCallback } from "react";
 
 const MfbFieldArray = <TFields extends FieldValues, TFormId extends string>({
   disabled,
+  fieldArray,
   id,
   name,
   render,
 }: FieldArrayOverrideProps<TFields>) => {
   const { action, fields } = useMfbFieldArray<TFields>({
+    fieldArray,
     name: name as ArrayPath<TFields>,
   });
 
