@@ -28,7 +28,7 @@ import {
   useDependencyContext,
   useFieldArrayContext,
 } from "@/context";
-import { useDependency, useDependsOnField } from "@/hooks";
+import { useDependency, useDefaultValue, useDependsOnField } from "@/hooks";
 import {
   convertDepsToObject,
   listActionGuard,
@@ -40,7 +40,6 @@ import { createContext, createElement, useContext, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { MfbFieldArray } from "./field-array";
-import { useDefaultValue } from "./hooks/use-default-value";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
@@ -53,14 +52,14 @@ class FormBuilder<
     TFields extends FieldValues,
     TFormId extends string,
   >(
-    props: FieldArrayOverrideProps<TFields, TFormId>,
+    props: FieldArrayOverrideProps<TFields, TFormId>
   ) => ReactNode;
   private options: FormBuilderOptions;
 
   constructor(
     config: TConfig,
     options?: Partial<FormBuilderOptions>,
-    overrides?: FormBuilderOverrides,
+    overrides?: FormBuilderOverrides
   ) {
     this.config = config;
     this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
@@ -373,7 +372,7 @@ class FormBuilder<
       },
       {
         dependencyShouldReset: this.options.dependencyShouldReset,
-      },
+      }
     );
 
     if (resolvedComponent === null) return null;
@@ -468,7 +467,7 @@ class FormBuilder<
 
   private renderAction = <TFields extends FieldValues>(
     action: ActionInput<TConfig, TFields>,
-    { dependsOn }: RenderFnOptions<TFields>,
+    { dependsOn }: RenderFnOptions<TFields>
   ) => {
     const { ActionButton } = this;
 
@@ -484,7 +483,7 @@ class FormBuilder<
     card:
       | GetCardsImpl<TConfig, TFields, TAdvanced, true>
       | GetCardsImpl<TConfig, TFields, TAdvanced>,
-    { dependsOn, index, name }: RenderFnOptions<TFields>,
+    { dependsOn, index, name }: RenderFnOptions<TFields>
   ) => {
     const resolvedName = mergeName(name || "", card.name || "");
     const { "grid-container": GridContainer, "grid-item": GridItem } =
@@ -567,7 +566,7 @@ class FormBuilder<
                     </GridContainer>
                   ),
                   title,
-                }),
+                })
               )
             : card.inputs.map(
                 ({ gridContainerProps, list, name: itemName, title }) => ({
@@ -580,7 +579,7 @@ class FormBuilder<
                     </GridContainer>
                   ),
                   title,
-                }),
+                })
               ),
         ...card.props,
       });
@@ -607,7 +606,7 @@ class FormBuilder<
               ) : (
                 <InputMapper inputs={card.inputs} name={resolvedName} />
               )}
-            </GridContainer>,
+            </GridContainer>
           )}
         </GridItem>
       );
@@ -617,7 +616,7 @@ class FormBuilder<
 
   private renderInput = <TFields extends FieldValues>(
     input: GetInputsImpl<TConfig, TFields, true>,
-    { dependsOn, formMethods, name }: RenderFnOptions<TFields>,
+    { dependsOn, formMethods, name }: RenderFnOptions<TFields>
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {

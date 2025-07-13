@@ -43,7 +43,6 @@ class DefaultValue<
   }
   private parseItems = (
     items: ItemArray<TFields>,
-    // TODO: pass result, dequeue, falseSet
     options: ParseItemsOptions<TFields> = {
       dequeue: [],
       parentDeps: [],
