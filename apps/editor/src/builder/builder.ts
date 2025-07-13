@@ -24,7 +24,11 @@ const config = {
       ...getInputComponents(),
       fuck: (props: { fuck: string }) => createElement("div", props),
     },
-    defaultValues: {},
+    defaultValues: {
+      checkbox: false,
+      radio: "",
+      text: "",
+    },
   },
   layout: getLayoutConfig(),
 } satisfies FormBuilderConfig;
@@ -33,5 +37,5 @@ type MuiConfig = typeof config;
 
 const MuiFB = new FormBuilder<MuiConfig, FormId>(config);
 
-export { MuiFB };
+export { config, MuiFB };
 export type { MuiConfig };
