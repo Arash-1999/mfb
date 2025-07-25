@@ -1,5 +1,5 @@
+'use client';
 import type { BuilderMessage } from "@/types/message";
-import type { FieldValues } from "react-hook-form";
 
 import { MuiFB } from "@/builder";
 import { useEffect, useState } from "react";

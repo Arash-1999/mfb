@@ -1,19 +1,10 @@
-import type { Route } from "./+types/index";
-
-import { useState } from "react";
-
-export async function clientLoader() {
-  const innerWidth = window.innerWidth - 16;
-
-  return { innerWidth };
-}
+"use client";
+import { useState } from 'react';
 
 const breakpoints = [600, 900, 1200, 1536];
 
-export default function Page({ loaderData }: Route.ComponentProps) {
-  const [width, setWidth] = useState<number>(() => {
-    return loaderData.innerWidth;
-  });
+export default function Page() {
+  const [width, setWidth] = useState<number>(breakpoints[0]);
 
   return (
     <main>
@@ -36,10 +27,10 @@ export default function Page({ loaderData }: Route.ComponentProps) {
 
       <div className="max-w-screen overflow-auto p-1">
         <iframe
-          width={width}
+          className="border border-amber-700 resize"
           height={500}
           src="/preview"
-          className="border border-amber-700 resize"
+          width={width}
         />
       </div>
     </main>
