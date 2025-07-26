@@ -5,10 +5,11 @@ import { useRadioForm } from "@/builder/components/input/radio";
 import { MuiFB } from "@/builder";
 
 const Page = () => {
-  const {fieldInputs, gridItemInputs, propsInputs} = useRadioForm();
+  const { fieldInputs, gridItemInputs, propsInputs } = useRadioForm();
   return (
     <div>
       <MuiFB.Builder<RadioForm>
+        gridContainerProps={{ enabled: false }}
         cards={[
           {
             inputs: [
