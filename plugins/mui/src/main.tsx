@@ -10,7 +10,7 @@ import {
   MfbSwitch,
   MfbTextField,
 } from "./components/inputs";
-import { getLayoutConfig } from "./components/layout";
+import { FormField, getLayoutConfig, GridContainer, GridItem } from "./components/layout";
 
 const config = {
   button: {
@@ -67,10 +67,13 @@ const getSimpleCards = () => ({
 });
 
 export {
+  FormField,
   getConfig,
   getGroupCards,
   getInputComponents,
   getLayoutConfig,
   getSimpleCards,
+  GridContainer,
+  GridItem,
 };
 export type { MuiConfig };

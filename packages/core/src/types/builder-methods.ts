@@ -9,6 +9,7 @@ import type {
 
 import type { GetCards, GetCardsImpl } from "./card";
 import type { FormBuilderConfig } from "./config";
+import type { FieldArrayValues } from "./default-value";
 import type { DependsOn } from "./dependency-management";
 import type { GetInputsImpl } from "./input";
 import type {
@@ -19,7 +20,6 @@ import type {
   ListInputArray,
   RenderFn,
 } from "./utils";
-import type { FieldArrayValues } from "./default-value";
 
 interface AdvancedBuilderProps<
   TConfig extends FormBuilderConfig,

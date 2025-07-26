@@ -1,11 +1,12 @@
 import type { FormBuilderConfig } from "@mfb/core";
 
 import { FormBuilder } from "@mfb/core";
-import { getInputComponents, getLayoutConfig } from "@mfb/plugin-mui";
+import { FormField, getInputComponents } from "@mfb/plugin-mui";
 import { createElement } from "react";
 
 import { MfbButton } from "./config/button";
 import { MfbSidebarStepper } from "./config/card/group";
+import { DraggableGridContainer, DraggableGridItem } from "./config/layout";
 
 type FormId = `form-${number}`;
 
@@ -30,7 +31,11 @@ const config = {
       text: "",
     },
   },
-  layout: getLayoutConfig(),
+  layout: {
+    field: FormField,
+    "grid-container": DraggableGridContainer,
+    "grid-item": DraggableGridItem,
+  },
 } satisfies FormBuilderConfig;
 
 type MuiConfig = typeof config;
