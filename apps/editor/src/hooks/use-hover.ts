@@ -1,5 +1,3 @@
-import type { RefObject } from "react";
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseHoverProps {
@@ -8,12 +6,17 @@ interface UseHoverProps {
 
 interface UseHoverReturn<TElement extends HTMLElement> {
   isHovered: boolean;
-  ref: RefObject<null | TElement>;
+  ref: (node: null | TElement) => void;
 }
 
 const useHover = <TElement extends HTMLElement>(props: UseHoverProps = { enabled: true }): UseHoverReturn<TElement> => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const ref = useRef<TElement>(null);
+  const setRef = useCallback((element: null | TElement) => {
+    if(element !== null) {
+      ref.current = element;
+    }
+  }, []);
 
   const handleMouseOver = useCallback((event: MouseEvent) => {
     event.stopPropagation()
@@ -42,7 +45,7 @@ const useHover = <TElement extends HTMLElement>(props: UseHoverProps = { enabled
     };
   }, [props.enabled, handleMouseOut, handleMouseOver]);
 
-  return { isHovered, ref, };
+  return { isHovered, ref: setRef, };
 }
 
 export { useHover };

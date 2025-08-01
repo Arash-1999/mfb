@@ -28,7 +28,7 @@ import {
   useDependencyContext,
   useFieldArrayContext,
 } from "@/context";
-import { useDependency, useDefaultValue, useDependsOnField } from "@/hooks";
+import { useDefaultValue, useDependency, useDependsOnField } from "@/hooks";
 import {
   convertDepsToObject,
   listActionGuard,
@@ -339,9 +339,9 @@ class FormBuilder<
 
   private defineItem =
     <TItem,>() =>
-    <TDeps extends FieldValues>(func: (props?: { deps: TDeps }) => TItem) => {
-      return func;
-    };
+      <TDeps extends FieldValues>(func: (props?: { deps: TDeps }) => TItem) => {
+        return func;
+      };
 
   private DependencyManager = <
     TFields extends FieldValues,
@@ -556,31 +556,31 @@ class FormBuilder<
         nodes:
           "list" in card
             ? card.list.map(
-                ({ gridContainerProps, list, name: itemName, title }) => ({
-                  children: (
-                    <GridContainer {...gridContainerProps}>
-                      <AdvancedMapper
-                        list={list}
-                        name={mergeName(resolvedName, itemName || "")}
-                      />
-                    </GridContainer>
-                  ),
-                  title,
-                })
-              )
+              ({ gridContainerProps, list, name: itemName, title }) => ({
+                children: (
+                  <GridContainer {...gridContainerProps}>
+                    <AdvancedMapper
+                      list={list}
+                      name={mergeName(resolvedName, itemName || "")}
+                    />
+                  </GridContainer>
+                ),
+                title,
+              })
+            )
             : card.inputs.map(
-                ({ gridContainerProps, list, name: itemName, title }) => ({
-                  children: (
-                    <GridContainer {...gridContainerProps}>
-                      <InputMapper
-                        inputs={list}
-                        name={mergeName(resolvedName, itemName || "")}
-                      />
-                    </GridContainer>
-                  ),
-                  title,
-                })
-              ),
+              ({ gridContainerProps, list, name: itemName, title }) => ({
+                children: (
+                  <GridContainer {...gridContainerProps}>
+                    <InputMapper
+                      inputs={list}
+                      name={mergeName(resolvedName, itemName || "")}
+                    />
+                  </GridContainer>
+                ),
+                title,
+              })
+            ),
         ...card.props,
       });
     }

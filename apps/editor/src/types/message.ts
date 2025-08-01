@@ -1,30 +1,31 @@
 import type { MuiConfig } from "@/builder";
 import type {
+  AdvancedBuilderProps,
   BasicBuilderProps,
   BuilderProps,
-  AdvancedBuilderProps,
 } from "@mfb/core";
 import type { FieldValues } from "react-hook-form";
 
-interface BasicBuilderMessage {
-  type: "basic";
-  list: BasicBuilderProps<MuiConfig, FieldValues>["inputs"];
-}
-
-interface NormalBuilderMessage {
-  type: "normal";
-  list: BuilderProps<MuiConfig, FieldValues>["cards"];
-}
-
 interface AdvancedBuilderMessage {
-  type: "advanced";
   list: AdvancedBuilderProps<MuiConfig, FieldValues>["list"];
+  type: "advanced";
+}
+
+interface BasicBuilderMessage {
+  list: BasicBuilderProps<MuiConfig, FieldValues>["inputs"];
+  type: "basic";
 }
 
 type BuilderMessage =
   | AdvancedBuilderMessage
   | BasicBuilderMessage
   | NormalBuilderMessage;
+
+interface NormalBuilderMessage {
+  list: BuilderProps<MuiConfig, FieldValues>["cards"];
+  type: "normal";
+}
+
 
 export type {
   AdvancedBuilderMessage,

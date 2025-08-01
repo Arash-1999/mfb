@@ -2,6 +2,7 @@ import type { Grid2Props } from "@mui/material";
 import type { PropsWithChildren } from "react";
 
 import { useHover } from '@/hooks';
+import { SortableContext } from "@dnd-kit/sortable";
 import { DragHandle } from "@mui/icons-material";
 import { Box, Grid2, IconButton, } from "@mui/material";
 
@@ -19,6 +20,7 @@ const DraggableGridContainer = ({
 
   return (
     <Grid2 container={true} ref={ref} {...gridProps}>
+      <SortableContext items={[]}>
       {/* TODO: make position absolute */}
       {isHovered ? (
         <Box>
@@ -29,6 +31,7 @@ const DraggableGridContainer = ({
         </Box>
       ) : null}
       {children}
+      </SortableContext>
     </Grid2>
   );
 };

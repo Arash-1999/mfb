@@ -1,15 +1,16 @@
 "use client";
 import type { RadioForm } from "@/builder/components/input/radio/type";
 
-import { useRadioForm } from "@/builder/components/input/radio";
 import { MuiFB } from "@/builder";
+import { useRadioForm } from "@/builder/components/input/radio";
+import { DndContext } from "@dnd-kit/core";
 
 const Page = () => {
   const { fieldInputs, gridItemInputs, propsInputs } = useRadioForm();
   return (
     <div>
+      <DndContext onDragEnd={console.log}>
       <MuiFB.Builder<RadioForm>
-        gridContainerProps={{ enabled: false }}
         cards={[
           {
             inputs: [
@@ -43,9 +44,11 @@ const Page = () => {
             variant: "normal",
           },
         ]}
+        gridContainerProps={{ enabled: false }}
         id="form-1025"
         onSubmit={console.log}
       />
+      </DndContext>
     </div>
   );
 };

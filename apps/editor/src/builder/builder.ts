@@ -1,46 +1,16 @@
-import type { FormBuilderConfig } from "@mfb/core";
-
 import { FormBuilder } from "@mfb/core";
-import { FormField, getInputComponents } from "@mfb/plugin-mui";
-import { createElement } from "react";
 
-import { MfbButton } from "./config/button";
-import { MfbSidebarStepper } from "./config/card/group";
-import { DraggableGridContainer, DraggableGridItem } from "./config/layout";
+import type { EditableMuiConfig, FormId, NormalMuiConfig } from './config';
 
-type FormId = `form-${number}`;
+import { editableConfig, normalConfig } from './config';
 
-const config = {
-  button: {
-    component: MfbButton,
-  },
-  card: {
-    group: {
-      "sidebar-stepper": MfbSidebarStepper,
-    },
-    simple: {},
-  },
-  input: {
-    components: {
-      ...getInputComponents(),
-      fuck: (props: { fuck: string }) => createElement("div", props),
-    },
-    defaultValues: {
-      checkbox: false,
-      radio: "",
-      text: "",
-    },
-  },
-  layout: {
-    field: FormField,
-    "grid-container": DraggableGridContainer,
-    "grid-item": DraggableGridItem,
-  },
-} satisfies FormBuilderConfig;
+/* 
+ * mui form builder with draggable grid components
+ * it should be used for in edit mode
+ * */
+const EditableMuiFB = new FormBuilder<EditableMuiConfig, FormId>(editableConfig);
 
-type MuiConfig = typeof config;
+const NormalMuiFB = new FormBuilder<NormalMuiConfig, FormId>(normalConfig);
 
-const MuiFB = new FormBuilder<MuiConfig, FormId>(config);
-
-export { config, MuiFB };
-export type { MuiConfig };
+export {  EditableMuiFB, NormalMuiFB };
+export type { EditableMuiConfig, FormId, NormalMuiConfig };

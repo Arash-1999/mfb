@@ -1,2 +1,2 @@
-export { MuiFB } from "./builder";
-export type { MuiConfig } from "./builder";
+export { EditableMuiFB, NormalMuiFB } from "./builder";
+export type { EditableMuiConfig, FormId, NormalMuiConfig } from "./builder";

@@ -1,6 +1,6 @@
 import type { FieldOptionsForm, GridItemOptionsForm } from "../../layout";
 
-interface RadioForm extends FieldOptionsForm, GridItemOptionsForm {
+interface RadioFormValue extends FieldOptionsForm, GridItemOptionsForm {
   props: RadioOptions;
 }
 interface RadioOptions {
@@ -16,4 +16,4 @@ interface RadioOptions {
   };
 }
 
-export type { RadioForm, RadioOptions };
+export type { RadioFormValue, RadioOptions };
