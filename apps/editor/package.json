@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack -p 8000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -20,7 +20,8 @@
     "@mui/icons-material": "^6.4.5",
     "@mui/material": "^6.4.5",
     "@mui/material-nextjs": "^7.2.0",
-    "next": "15.4.3",
+    "jotai": "^2.12.5",
+    "next": "15.4.5",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:"

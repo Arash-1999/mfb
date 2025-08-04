@@ -1,7 +1,7 @@
 'use client';
 import type { BuilderMessage } from "@/types/message";
 
-import { NormalMuiFB } from "@/builder";
+import { MuiFB } from "@/builder";
 import { useEffect, useState } from "react";
 
 const Page = () => {
@@ -27,11 +27,11 @@ const Page = () => {
 
     switch (builder.type) {
       case "advanced":
-        return <NormalMuiFB.AdvancedBuilder list={builder.list} {...baseProps} />;
+        return <MuiFB.AdvancedBuilder list={builder.list} {...baseProps} />;
       case "basic":
-        return <NormalMuiFB.BasicBuilder inputs={builder.list} {...baseProps} />;
+        return <MuiFB.BasicBuilder inputs={builder.list} {...baseProps} />;
       case "normal":
-        return <NormalMuiFB.Builder cards={builder.list} {...baseProps} />;
+        return <MuiFB.Builder cards={builder.list} {...baseProps} />;
     }
   };
 

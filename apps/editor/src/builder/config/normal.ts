@@ -6,8 +6,7 @@ import { createElement } from "react";
 import { MfbButton } from "./button";
 import { MfbSidebarStepper } from "./card/group";
 
-
-const normalConfig = {
+const muiConfig = {
   button: {
     component: MfbButton,
   },
@@ -31,7 +30,7 @@ const normalConfig = {
   layout: getLayoutConfig(),
 } satisfies FormBuilderConfig;
 
-type NormalMuiConfig = typeof normalConfig;
+type MuiConfig = typeof muiConfig;
 
-export { normalConfig };
-export type { NormalMuiConfig, };
+export { muiConfig };
+export type { MuiConfig };

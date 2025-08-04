@@ -5,9 +5,9 @@ import { createElement } from "react";
 
 import { MfbButton } from "./button";
 import { MfbSidebarStepper } from "./card/group";
-import { DraggableGridContainer, GridItemEdit } from "./layout";
+import { DraggableGridContainer, GridItemDrag } from "./layout";
 
-const editableConfig = {
+const draggableConfig = {
   button: {
     component: MfbButton,
   },
@@ -31,11 +31,11 @@ const editableConfig = {
   layout: {
     field: FormField,
     "grid-container": DraggableGridContainer,
-    "grid-item": GridItemEdit,
+    "grid-item": GridItemDrag,
   },
 } satisfies FormBuilderConfig;
 
-type EditableMuiConfig = typeof editableConfig;
+type DraggableMuiConfig = typeof draggableConfig;
 
-export { editableConfig };
-export type { EditableMuiConfig };
+export { draggableConfig };
+export type { DraggableMuiConfig };

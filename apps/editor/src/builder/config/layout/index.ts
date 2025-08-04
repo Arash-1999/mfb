@@ -1,2 +1,3 @@
-export { DraggableGridContainer } from './draggable-grid-container';
-export { DraggableGridItem } from './draggable-grid-item';
+export { DraggableGridContainer } from "./grid-container";
+export { GridItemDrag, GridItemEdit } from "./grid-item";
+export type { DraggableGridItemProps } from "./grid-item";
