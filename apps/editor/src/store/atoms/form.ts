@@ -1,23 +1,25 @@
 import type { MuiConfig } from "@/builder";
+import { BUILDER_MODE, type BuilderMode } from "@/types/builder";
 import type { InputArray } from "@mfb/core";
 import type { FieldValues } from "react-hook-form";
 
 import { atom } from "jotai";
 
-// interface AdvancedForm {
-//   type: "advanced";
-// }
+interface AdvancedForm {
+  type: (typeof BUILDER_MODE)["ADVANCED"];
+}
 interface BasicForm {
   list: InputArray<MuiConfig, FieldValues>;
-  type: "basic";
+  type: (typeof BUILDER_MODE)["BASIC"];
 }
-// interface NormalForm {
-//   type: "normal";
-// }
+interface NormalForm {
+  type: (typeof BUILDER_MODE)["NORMAL"];
+}
 
-const formAtom = atom<BasicForm>({
-  list: [],
-  type: "basic",
+const formAtom = atom<AdvancedForm | BasicForm | NormalForm | null>(null);
+const readonlyBuilderMode = atom<BuilderMode>((get) => {
+  const formAtomValue = get(formAtom);
+  return formAtomValue !== null ? formAtomValue.type : BUILDER_MODE.BASIC;
 });
 
-export { formAtom };
+export { formAtom, readonlyBuilderMode };
