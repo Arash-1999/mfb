@@ -1,9 +1,9 @@
 import type { MuiConfig } from "@/builder/builder";
 import type { GetInputs } from "@mfb/core";
 
-import type { RadioForm } from "./type";
+import type { RadioFormValue } from "./type";
 
-const radioOptions: Array<GetInputs<MuiConfig, RadioForm>> = [
+const radioOptions: Array<GetInputs<MuiConfig, RadioFormValue>> = [
   {
     gridProps: { size: 12 },
     name: "formControlLabelProps.disableTypography",

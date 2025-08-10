@@ -2,19 +2,19 @@ import type { MuiConfig } from "@/builder";
 import type { GetInputs } from "@mfb/core";
 
 import type { InputFormKey } from "../type";
-import type { RadioFormValue } from "./type";
+import type { RatingOptionsForm } from "./type";
 
 import { useFieldOptions, useGridItemOptions } from "../../layout";
-import { radioOptions } from "./options";
+import { ratingOptions } from "./options";
 
 type UseTextFieldFormReturn = Record<
   InputFormKey,
-  GetInputs<MuiConfig, RadioFormValue>[]
+  GetInputs<MuiConfig, RatingOptionsForm>[]
 >;
 
-const useRadioForm = (): UseTextFieldFormReturn => {
-  const fieldInputs = useFieldOptions<RadioFormValue>();
-  const gridItemInputs = useGridItemOptions<RadioFormValue>({
+const useRatingOptionsForm = (): UseTextFieldFormReturn => {
+  const fieldInputs = useFieldOptions<RatingOptionsForm>();
+  const gridItemInputs = useGridItemOptions<RatingOptionsForm>({
     depPrefix: "gridProps",
     responsivePath: (name) => {
       if (!/\./.test(name)) return `is_${name}_responsive` as never;
@@ -27,8 +27,8 @@ const useRadioForm = (): UseTextFieldFormReturn => {
   return {
     fieldInputs,
     gridItemInputs,
-    propsInputs: radioOptions,
+    propsInputs: ratingOptions,
   };
 };
 
-export { useRadioForm };
+export { useRatingOptionsForm };

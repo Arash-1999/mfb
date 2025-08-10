@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 
 import { RadioForm } from "@/builder/components/input/radio";
+import { RatingForm } from "@/builder/components/input/rating";
+
 import { MuiConfig } from "@mfb/plugin-mui";
 import { Input } from "@mui/icons-material";
 import { BuilderMode } from "@/types/builder";
@@ -45,7 +47,7 @@ const renderInputForm = (type: InputKey) => {
     case "radio":
       return <RadioForm />;
     case "rating":
-      return <></>;
+      return <RatingForm />;
     case "select":
       return <></>;
     case "slider":

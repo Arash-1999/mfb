@@ -3,20 +3,17 @@ import type { GetInputsImpl } from "@mfb/core";
 
 import type { RatingOptions, RatingOptionsForm } from "./type";
 
-const ratingOptions: Record<
-  keyof RatingOptions["ratingProps"],
-  GetInputsImpl<MuiConfig, RatingOptionsForm>
-> = {
-  highlightSelectedOnly: {
+const ratingOptions: Array<GetInputsImpl<MuiConfig, RatingOptionsForm>> = [
+  {
     gridProps: { size: 12 },
-    name: "raintProps.highlightSelectedOnly",
+    name: "ratingProps.highlightSelectedOnly",
     props: {
       defaultValue: true,
       label: "Full width",
     },
     type: "checkbox",
   },
-  max: {
+  {
     gridProps: { size: 12 },
     name: "ratingProps.max",
     props: {
@@ -29,7 +26,7 @@ const ratingOptions: Record<
     },
     type: "text",
   },
-  precision: {
+  {
     gridProps: { size: 12 },
     name: "ratingProps.precision",
     props: {
@@ -42,16 +39,16 @@ const ratingOptions: Record<
     },
     type: "text",
   },
-  readOnly: {
+  {
     gridProps: { size: 12 },
-    name: "raintProps.readOnly",
+    name: "ratingProps.readOnly",
     props: {
       defaultValue: true,
       label: "Readonly",
     },
     type: "checkbox",
   },
-  size: {
+  {
     gridProps: { size: 12 },
     name: "ratingProps.size",
     props: {
@@ -65,6 +62,6 @@ const ratingOptions: Record<
     },
     type: "text",
   },
-};
+];
 
 export { ratingOptions };

@@ -1,3 +1,5 @@
+import { FieldOptionsForm, GridItemOptionsForm } from "../../layout";
+
 interface RatingOptions {
   ratingProps: {
     highlightSelectedOnly: boolean;
@@ -8,7 +10,7 @@ interface RatingOptions {
   };
 }
 
-interface RatingOptionsForm {
+interface RatingOptionsForm extends FieldOptionsForm, GridItemOptionsForm {
   props: RatingOptions;
 }
 
