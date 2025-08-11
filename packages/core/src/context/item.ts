@@ -2,17 +2,17 @@ import type { ChildrenPathResult } from "@/types";
 
 import { createContext, useContext } from "react";
 
-interface ItemContextValue {
-  path: string;
-  mode: "advanced" | "normal";
+interface MfbItemContextValue {
   childrenPath: ChildrenPathResult;
+  mode: "advanced" | "normal";
+  path: string;
 }
 
-const ItemContext = createContext<ItemContextValue | null>(null);
+const MfbItemContext = createContext<MfbItemContextValue | null>(null);
 
-const useItemContext = () => {
-  return useContext(ItemContext);
+const useMfbItemContext = () => {
+  return useContext(MfbItemContext);
 };
 
-export { ItemContext, useItemContext };
-export type { ItemContextValue };
+export { MfbItemContext, useMfbItemContext };
+export type { MfbItemContextValue };

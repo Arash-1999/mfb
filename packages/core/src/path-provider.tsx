@@ -1,18 +1,17 @@
-import type { ItemContextValue } from "@/context";
+import type { MfbItemContextValue } from "@/context";
+import type { ChildrenPathResult, DefaultItem } from "@/types";
 import type { PropsWithChildren } from "react";
 import type { FieldValues } from "react-hook-form";
 
+import { MfbItemContext, useMfbItemContext } from "@/context";
 import { useMemo } from "react";
-
-import { ItemContext, useItemContext } from "@/context";
-import type { ChildrenPathResult, DefaultItem } from "@/types";
 
 interface PathProviderProps<
   TFields extends FieldValues,
   TItem extends DefaultItem<TFields>,
 > {
   getItemInfo: (item: TItem) => ChildrenPathResult;
-  index: number | null;
+  index: null | number;
   item: TItem;
 }
 
@@ -25,9 +24,9 @@ const MfbItemProvider = <
   index,
   item,
 }: PropsWithChildren<PathProviderProps<TFields, TItem>>) => {
-  const parent = useItemContext();
+  const parent = useMfbItemContext();
 
-  const contextValue = useMemo<ItemContextValue | null>(() => {
+  const contextValue = useMemo<MfbItemContextValue | null>(() => {
     const path = [
       parent?.path ?? null,
       parent?.childrenPath?.hasChild ? parent.childrenPath.path : null,
@@ -41,10 +40,12 @@ const MfbItemProvider = <
       mode: "normal",
       path,
     };
-  }, [getItemInfo, item, parent]);
+  }, [getItemInfo, index, item, parent]);
 
   return (
-    <ItemContext.Provider value={contextValue}>{children}</ItemContext.Provider>
+    <MfbItemContext.Provider value={contextValue}>
+      {children}
+    </MfbItemContext.Provider>
   );
 };
 

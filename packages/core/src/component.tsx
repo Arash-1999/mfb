@@ -16,7 +16,7 @@ import type {
   GetInputsImpl,
   InputMapperProps,
   MfbContextValue,
-  NormalCardItem,
+  RenderCardItemProps,
   RenderFnOptions,
 } from "@/types";
 import type { Context, ReactNode } from "react";
@@ -31,8 +31,8 @@ import {
 } from "@/context";
 import { useDefaultValue, useDependency, useDependsOnField } from "@/hooks";
 import {
-  ItemInfo,
   convertDepsToObject,
+  ItemInfo,
   listActionGuard,
   listInputGuard,
   mergeName,
@@ -49,21 +49,21 @@ class FormBuilder<
   TConfig extends FormBuilderConfig,
   TFormId extends string = string,
 > {
-  private config: TConfig;
   private childrenPath: ItemInfo<TConfig>;
+  private config: TConfig;
   private Context: Context<FormBuilderContext<TFormId> | null>;
   private FieldArrayOverride?: <
     TFields extends FieldValues,
     TFormId extends string,
   >(
-    props: FieldArrayOverrideProps<TFields, TFormId>
+    props: FieldArrayOverrideProps<TFields, TFormId>,
   ) => ReactNode;
   private options: FormBuilderOptions;
 
   constructor(
     config: TConfig,
     options?: Partial<FormBuilderOptions>,
-    overrides?: FormBuilderOverrides
+    overrides?: FormBuilderOverrides,
   ) {
     this.config = config;
     this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
@@ -204,7 +204,7 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <MfbItemProvider getItemInfo={() => null} item={{}} index={null}>
+            <MfbItemProvider getItemInfo={() => null} index={null} item={{}}>
               <GridContainer {...(gridContainerProps || {})}>
                 {resolvedCards.map((card, index) => {
                   return (
@@ -384,7 +384,7 @@ class FormBuilder<
       },
       {
         dependencyShouldReset: this.options.dependencyShouldReset,
-      }
+      },
     );
 
     if (resolvedComponent === null) return null;
@@ -407,9 +407,9 @@ class FormBuilder<
 
     return (
       <MfbItemProvider<TFields, TItem>
+        getItemInfo={getItemInfo}
         index={index}
         item={resolvedComponent}
-        getItemInfo={getItemInfo}
       >
         {withContext ? (
           <DependencyContext.Provider
@@ -489,7 +489,7 @@ class FormBuilder<
 
   private renderAction = <TFields extends FieldValues>(
     action: ActionInput<TConfig, TFields>,
-    { dependsOn }: RenderFnOptions<TFields>
+    { dependsOn }: RenderFnOptions<TFields>,
   ) => {
     const { ActionButton } = this;
 
@@ -505,7 +505,7 @@ class FormBuilder<
     card:
       | GetCardsImpl<TConfig, TFields, TAdvanced, true>
       | GetCardsImpl<TConfig, TFields, TAdvanced>,
-    { dependsOn, index, name }: RenderFnOptions<TFields>
+    { dependsOn, index, name }: RenderFnOptions<TFields>,
   ) => {
     const resolvedName = mergeName(name || "", card.name || "");
     const { "grid-container": GridContainer, "grid-item": GridItem } =
@@ -567,7 +567,7 @@ class FormBuilder<
         );
       }
 
-      const { DependencyManager } = this;
+      const { DependencyManager, renderCardItem } = this;
       /* Card Group Normal*/
       return createElement(RenderGroupCard, {
         addGrid: (node, index) => (
@@ -578,104 +578,38 @@ class FormBuilder<
         key: `card-${index}`,
         nodes:
           "list" in card
-            ? card.list.map(
-                (
-                  {
-                    gridContainerProps,
-                    list,
-                    name: itemName,
-                    title,
-                    ...component
-                  },
-                  cardIndex
-                ) => ({
-                  children: (
-                    <DependencyManager<
-                      TFields,
-                      NormalCardItem<TConfig, TFields, true>
-                    >
-                      component={{ list, title, ...component }}
-                      getItemInfo={() => this.childrenPath.cardItem(true)}
-                      index={cardIndex}
-                      render={() => (
-                        <>
-                          {/* <MfbItemProvider
-                            index={cardIndex}
-                            getItemInfo={() => ({
-                              hasChild: true,
-                              mode: "advanced",
-                              path: "list",
-                            })}
-                            item={{
-                              name,
-                              list,
-                            }}
-                          > */}
-                          <GridContainer {...gridContainerProps}>
-                            <AdvancedMapper
-                              list={list}
-                              name={mergeName(resolvedName, itemName || "")}
-                            />
-                          </GridContainer>
-                          {/* </MfbItemProvider> */}
-                        </>
-                      )}
-                      withContext
-                      name={name}
-                    />
-                  ),
-                  title,
-                })
-              )
-            : card.inputs.map(
-                (
-                  {
-                    gridContainerProps,
-                    list,
-                    name: itemName,
-                    title,
-                    ...component
-                  },
-                  cardIndex
-                ) => ({
-                  children: (
-                    <DependencyManager<
-                      TFields,
-                      NormalCardItem<TConfig, TFields>
-                    >
-                      component={{ list, title, ...component }}
-                      getItemInfo={() => this.childrenPath.cardItem(true)}
-                      index={cardIndex}
-                      render={() => (
-                        <>
-                          {/* <MfbItemProvider
-                            index={cardIndex}
-                            getItemInfo={() => ({
-                              hasChild: true,
-                              mode: "normal",
-                              path: "list",
-                            })}
-                            item={{
-                              name,
-                              list,
-                            }}
-                          > */}
-                          <GridContainer {...gridContainerProps}>
-                            <InputMapper
-                              inputs={list}
-                              name={mergeName(resolvedName, itemName || "")}
-                            />
-                          </GridContainer>
-                          {/* </MfbItemProvider> */}
-                        </>
-                      )}
-                      withContext
-                      name={name}
-                    />
-                  ),
-                  title,
-                })
-              ),
+            ? card.list.map((component, cardIndex) => ({
+                children: (
+                  <DependencyManager<
+                    TFields,
+                    RenderCardItemProps<TConfig, TFields>
+                  >
+                    component={{ advanced: true, ...component }}
+                    getItemInfo={() => this.childrenPath.cardItem(true)}
+                    index={cardIndex}
+                    name={name}
+                    render={renderCardItem}
+                    withContext
+                  />
+                ),
+                title: component.title,
+              }))
+            : card.inputs.map((component, cardIndex) => ({
+                children: (
+                  <DependencyManager<
+                    TFields,
+                    RenderCardItemProps<TConfig, TFields>
+                  >
+                    component={{ advanced: false, ...component }}
+                    getItemInfo={() => this.childrenPath.cardItem(true)}
+                    index={cardIndex}
+                    name={resolvedName}
+                    render={renderCardItem}
+                    withContext
+                  />
+                ),
+                title: component.title,
+              })),
         ...card.props,
       });
     }
@@ -701,7 +635,7 @@ class FormBuilder<
               ) : (
                 <InputMapper inputs={card.inputs} name={resolvedName} />
               )}
-            </GridContainer>
+            </GridContainer>,
           )}
         </GridItem>
       );
@@ -709,9 +643,35 @@ class FormBuilder<
     return null;
   };
 
+  private renderCardItem = <TFields extends FieldValues>(
+    cardItem: RenderCardItemProps<TConfig, TFields>,
+    { name }: RenderFnOptions<TFields>,
+  ) => {
+    const {
+      layout: { "grid-container": GridContainer },
+    } = this.config;
+    const { AdvancedMapper, InputMapper } = this;
+
+    return (
+      <GridContainer {...cardItem.gridContainerProps}>
+        {cardItem.advanced ? (
+          <AdvancedMapper
+            list={cardItem.list}
+            name={mergeName(name || "", cardItem.name || "")}
+          />
+        ) : (
+          <InputMapper
+            inputs={cardItem.list}
+            name={mergeName(name || "", cardItem.name || "")}
+          />
+        )}
+      </GridContainer>
+    );
+  };
+
   private renderInput = <TFields extends FieldValues>(
     input: GetInputsImpl<TConfig, TFields, true>,
-    { dependsOn, formMethods, name }: RenderFnOptions<TFields>
+    { dependsOn, formMethods, name }: RenderFnOptions<TFields>,
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {

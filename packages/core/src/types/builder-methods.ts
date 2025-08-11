@@ -7,7 +7,8 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 
-import type { GetCards, GetCardsImpl } from "./card";
+import type { GetCards, GetCardsImpl, NormalCardItem } from "./card";
+import type { ChildrenPathResult } from "./children-path";
 import type { FormBuilderConfig } from "./config";
 import type { FieldArrayValues } from "./default-value";
 import type { DependsOn } from "./dependency-management";
@@ -20,7 +21,6 @@ import type {
   ListInputArray,
   RenderFn,
 } from "./utils";
-import type { ChildrenPathResult } from "./children-path";
 
 interface AdvancedBuilderProps<
   TConfig extends FormBuilderConfig,
@@ -32,7 +32,7 @@ interface AdvancedBuilderProps<
         defineCard: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" }
+          }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" },
         ) => (props?: {
           deps: TDeps;
         }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" };
@@ -44,7 +44,7 @@ interface AdvancedBuilderProps<
             true
           > & {
             mode: "input";
-          }
+          },
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" };
@@ -72,7 +72,7 @@ interface BasicBuilderProps<
         define: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetInputsImpl<TConfig, TFields, false, true>
+          }) => GetInputsImpl<TConfig, TFields, false, true>,
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true>;
@@ -104,14 +104,14 @@ interface BuilderProps<
         defineCard: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetCardsImpl<TConfig, TFields, false, true>
+          }) => GetCardsImpl<TConfig, TFields, false, true>,
         ) => (props?: {
           deps: TDeps;
         }) => GetCardsImpl<TConfig, TFields, false, true>;
         defineInput: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetInputsImpl<TConfig, TFields, false, true>
+          }) => GetInputsImpl<TConfig, TFields, false, true>,
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true>;
@@ -162,6 +162,13 @@ interface InputMapperProps<
   name?: string;
 }
 
+type RenderCardItemProps<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> =
+  | (NormalCardItem<TConfig, TFields, true> & { advanced: true })
+  | (NormalCardItem<TConfig, TFields> & { advanced: false });
+
 type RenderCardProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
@@ -200,6 +207,7 @@ export type {
   FormBuilderConfig,
   InputMapFnOptions,
   InputMapperProps,
+  RenderCardItemProps,
   RenderCardProps,
   RenderInputOptions,
 };
