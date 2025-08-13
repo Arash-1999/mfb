@@ -24,25 +24,24 @@ import type { FieldValues } from "react-hook-form";
 
 import { options as defaultOptions } from "@/constants";
 import {
-  DependencyContext,
   FieldArrayContext,
-  useDependencyContext,
   useFieldArrayContext,
+  useMfbItemContext,
 } from "@/context";
 import { useDefaultValue, useDependency, useDependsOnField } from "@/hooks";
+import { MfbItemProvider } from "@/providers";
 import {
   convertDepsToObject,
+  dispatchFieldArray,
   ItemInfo,
   listActionGuard,
   listInputGuard,
   mergeName,
 } from "@/utils";
-import { dispatchFieldArray } from "@/utils/events";
 import { createContext, createElement, useContext, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { MfbFieldArray } from "./field-array";
-import { MfbItemProvider } from "./path-provider";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
@@ -56,14 +55,14 @@ class FormBuilder<
     TFields extends FieldValues,
     TFormId extends string,
   >(
-    props: FieldArrayOverrideProps<TFields, TFormId>,
+    props: FieldArrayOverrideProps<TFields, TFormId>
   ) => ReactNode;
   private options: FormBuilderOptions;
 
   constructor(
     config: TConfig,
     options?: Partial<FormBuilderOptions>,
-    overrides?: FormBuilderOverrides,
+    overrides?: FormBuilderOverrides
   ) {
     this.config = config;
     this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
@@ -110,9 +109,11 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <GridContainer {...gridContainerProps}>
-              <AdvancedMapper list={resolvedList} />
-            </GridContainer>
+            <MfbItemProvider>
+              <GridContainer {...gridContainerProps}>
+                <AdvancedMapper list={resolvedList} />
+              </GridContainer>
+            </MfbItemProvider>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
           </form>
@@ -155,9 +156,11 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <GridContainer {...gridContainerProps}>
-              <InputMapper inputs={resolvedInputs} />
-            </GridContainer>
+            <MfbItemProvider>
+              <GridContainer {...gridContainerProps}>
+                <InputMapper inputs={resolvedInputs} />
+              </GridContainer>
+            </MfbItemProvider>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
           </form>
@@ -204,7 +207,7 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <MfbItemProvider getItemInfo={() => null} index={null} item={{}}>
+            <MfbItemProvider>
               <GridContainer {...(gridContainerProps || {})}>
                 {resolvedCards.map((card, index) => {
                   return (
@@ -218,7 +221,6 @@ class FormBuilder<
                       index={index}
                       key={`card-${index}`}
                       render={renderCard}
-                      withContext
                     />
                   );
                 })}
@@ -311,7 +313,6 @@ class FormBuilder<
             key={`card-${index}`}
             name={name}
             render={renderCard}
-            withContext
           />
         );
       }
@@ -325,12 +326,10 @@ class FormBuilder<
               key={`action-${index}`}
               name={name}
               render={renderAction}
-              withContext={false}
               withGrid
             />
           );
         }
-        const withContext = item.type === "list";
         return (
           <DependencyManager<TFields, GetInputsImpl<TConfig, TFields>>
             component={item}
@@ -339,7 +338,6 @@ class FormBuilder<
             key={`input-${index}`}
             name={name}
             render={renderInput}
-            withContext={withContext}
             withGrid
           />
         );
@@ -363,13 +361,12 @@ class FormBuilder<
     index,
     name,
     render,
-    withContext,
     withGrid,
   }: DependencyManagerProps<TFields, TItem>) => {
     const {
       layout: { "grid-item": GridItem },
     } = this.config;
-    const dependencyContext = useDependencyContext();
+    const { deps: parentDeps } = useMfbItemContext();
     const formMethods = useFormContext<TFields>();
     const dependency = useDependsOnField<TFields, TItem>({
       component,
@@ -378,13 +375,13 @@ class FormBuilder<
     const [resolvedComponent, dependencies] = useDependency<TFields, TItem>(
       {
         component,
-        dependencyContext,
+        dependencyContext: parentDeps,
         dependsOn: dependency,
         name,
       },
       {
         dependencyShouldReset: this.options.dependencyShouldReset,
-      },
+      }
     );
 
     if (resolvedComponent === null) return null;
@@ -410,18 +407,9 @@ class FormBuilder<
         getItemInfo={getItemInfo}
         index={index}
         item={resolvedComponent}
+        disable={dependencies.disable}
       >
-        {withContext ? (
-          <DependencyContext.Provider
-            value={{
-              disable: dependencies.disable,
-            }}
-          >
-            {children}
-          </DependencyContext.Provider>
-        ) : (
-          children
-        )}
+        {children}
       </MfbItemProvider>
     );
   };
@@ -465,13 +453,10 @@ class FormBuilder<
             key={`input-${i}`}
             name={name}
             render={renderAction}
-            withContext={false}
             withGrid
           />
         );
       }
-      const withContext =
-        (typeof input === "function" ? input().type : input.type) === "list";
       return (
         <DependencyManager<TFields, GetInputsImpl<TConfig, TFields>>
           component={input}
@@ -480,7 +465,6 @@ class FormBuilder<
           key={`input-${i}`}
           name={name}
           render={renderInput}
-          withContext={withContext}
           withGrid
         />
       );
@@ -489,7 +473,7 @@ class FormBuilder<
 
   private renderAction = <TFields extends FieldValues>(
     action: ActionInput<TConfig, TFields>,
-    { dependsOn }: RenderFnOptions<TFields>,
+    { dependsOn }: RenderFnOptions<TFields>
   ) => {
     const { ActionButton } = this;
 
@@ -505,7 +489,7 @@ class FormBuilder<
     card:
       | GetCardsImpl<TConfig, TFields, TAdvanced, true>
       | GetCardsImpl<TConfig, TFields, TAdvanced>,
-    { dependsOn, index, name }: RenderFnOptions<TFields>,
+    { dependsOn, index, name }: RenderFnOptions<TFields>
   ) => {
     const resolvedName = mergeName(name || "", card.name || "");
     const { "grid-container": GridContainer, "grid-item": GridItem } =
@@ -589,7 +573,6 @@ class FormBuilder<
                     index={cardIndex}
                     name={name}
                     render={renderCardItem}
-                    withContext
                   />
                 ),
                 title: component.title,
@@ -605,7 +588,6 @@ class FormBuilder<
                     index={cardIndex}
                     name={resolvedName}
                     render={renderCardItem}
-                    withContext
                   />
                 ),
                 title: component.title,
@@ -635,7 +617,7 @@ class FormBuilder<
               ) : (
                 <InputMapper inputs={card.inputs} name={resolvedName} />
               )}
-            </GridContainer>,
+            </GridContainer>
           )}
         </GridItem>
       );
@@ -645,7 +627,7 @@ class FormBuilder<
 
   private renderCardItem = <TFields extends FieldValues>(
     cardItem: RenderCardItemProps<TConfig, TFields>,
-    { name }: RenderFnOptions<TFields>,
+    { name }: RenderFnOptions<TFields>
   ) => {
     const {
       layout: { "grid-container": GridContainer },
@@ -671,7 +653,7 @@ class FormBuilder<
 
   private renderInput = <TFields extends FieldValues>(
     input: GetInputsImpl<TConfig, TFields, true>,
-    { dependsOn, formMethods, name }: RenderFnOptions<TFields>,
+    { dependsOn, formMethods, name }: RenderFnOptions<TFields>
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {

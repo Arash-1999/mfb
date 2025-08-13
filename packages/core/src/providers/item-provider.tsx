@@ -10,9 +10,10 @@ interface PathProviderProps<
   TFields extends FieldValues,
   TItem extends DefaultItem<TFields>,
 > {
-  getItemInfo: (item: TItem) => ChildrenPathResult;
-  index: null | number;
-  item: TItem;
+  disable?: boolean;
+  getItemInfo?: (item: TItem) => ChildrenPathResult;
+  index?: number;
+  item?: TItem;
 }
 
 const MfbItemProvider = <
@@ -20,6 +21,7 @@ const MfbItemProvider = <
   TItem extends DefaultItem<TFields>,
 >({
   children,
+  disable = false,
   getItemInfo,
   index,
   item,
@@ -36,11 +38,12 @@ const MfbItemProvider = <
       .join(".");
 
     return {
-      childrenPath: getItemInfo(item),
+      childrenPath: getItemInfo && item ? getItemInfo(item) : null,
       mode: "normal",
       path,
+      deps: { disable: Boolean(disable) },
     };
-  }, [getItemInfo, index, item, parent]);
+  }, [disable, getItemInfo, index, item, parent]);
 
   return (
     <MfbItemContext.Provider value={contextValue}>

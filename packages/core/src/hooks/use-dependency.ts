@@ -1,4 +1,4 @@
-import type { DependencyContextValue } from "@/context";
+import type { ParentDeps } from "@/context";
 import type {
   DefaultItem,
   DependencyStructure,
@@ -23,7 +23,7 @@ interface UseDependencyProps<
   TItem extends DefaultItem<TFields>,
 > {
   component: ((props?: { deps: never }) => TItem) | TItem;
-  dependencyContext: DependencyContextValue;
+  dependencyContext: ParentDeps;
   dependsOn: DependsOn<TFields>;
   name: string | undefined;
 }

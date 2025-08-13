@@ -32,7 +32,7 @@ interface AdvancedBuilderProps<
         defineCard: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" },
+          }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" }
         ) => (props?: {
           deps: TDeps;
         }) => GetCardsImpl<TConfig, TFields, false, true> & { mode: "card" };
@@ -44,7 +44,7 @@ interface AdvancedBuilderProps<
             true
           > & {
             mode: "input";
-          },
+          }
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true> & { mode: "input" };
@@ -72,7 +72,7 @@ interface BasicBuilderProps<
         define: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetInputsImpl<TConfig, TFields, false, true>,
+          }) => GetInputsImpl<TConfig, TFields, false, true>
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true>;
@@ -104,14 +104,14 @@ interface BuilderProps<
         defineCard: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetCardsImpl<TConfig, TFields, false, true>,
+          }) => GetCardsImpl<TConfig, TFields, false, true>
         ) => (props?: {
           deps: TDeps;
         }) => GetCardsImpl<TConfig, TFields, false, true>;
         defineInput: <TDeps extends FieldValues>(
           func: (props?: {
             deps: TDeps;
-          }) => GetInputsImpl<TConfig, TFields, false, true>,
+          }) => GetInputsImpl<TConfig, TFields, false, true>
         ) => (props?: {
           deps: TDeps;
         }) => GetInputsImpl<TConfig, TFields, false, true>;
@@ -128,7 +128,6 @@ interface DependencyManagerProps<
   index: number;
   name?: string;
   render: RenderFn<TFields, TItem>;
-  withContext: boolean;
   withGrid?: boolean;
 }
 
