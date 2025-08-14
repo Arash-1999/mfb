@@ -8,6 +8,8 @@ import { BuilderMode } from "@/types/builder";
 import { CheckboxForm } from "@/builder/components/input/checkbox";
 import { SelectForm } from "@/builder/components/input/select";
 import { SliderForm } from "@/builder/components/input/slider";
+import { SwitchForm } from "@/builder/components/input/switch";
+import { TextFieldsForm } from "@/builder/components/input/text-field";
 
 type Category =
   | ""
@@ -55,9 +57,9 @@ const renderInputForm = (type: InputKey) => {
     case "slider":
       return <SliderForm />;
     case "switch":
-      return <></>;
+      return <SwitchForm />;
     case "text":
-      return <></>;
+      return <TextFieldsForm />;
   }
 };
 
