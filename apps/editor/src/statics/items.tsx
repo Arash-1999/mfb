@@ -6,6 +6,7 @@ import { RatingForm } from "@/builder/components/input/rating";
 import { MuiConfig } from "@mfb/plugin-mui";
 import { Input } from "@mui/icons-material";
 import { BuilderMode } from "@/types/builder";
+import { CheckboxForm } from "@/builder/components/input/checkbox";
 
 type Category =
   | ""
@@ -43,7 +44,7 @@ const categories: Array<CategoryItem> = [
 const renderInputForm = (type: InputKey) => {
   switch (type) {
     case "checkbox":
-      return <></>;
+      return <CheckboxForm />;
     case "radio":
       return <RadioForm />;
     case "rating":

@@ -1,13 +1,14 @@
 import { MuiFB } from "@/builder";
 
-import type { RatingOptionsForm } from "./type";
-import { useRatingOptionsForm } from "./hook";
+import type { CheckboxOptionsForm } from "./type";
 
-const RatingForm = () => {
-  const { fieldInputs, gridItemInputs, propsInputs } = useRatingOptionsForm();
+import { useCheckboxForm } from "./hook";
+
+const CheckboxForm = () => {
+  const { fieldInputs, gridItemInputs, propsInputs } = useCheckboxForm();
 
   return (
-    <MuiFB.Builder<RatingOptionsForm>
+    <MuiFB.Builder<CheckboxOptionsForm>
       cards={[
         {
           inputs: [
@@ -47,18 +48,10 @@ const RatingForm = () => {
       }}
       options={{
         defaultValues: {
-          gridProps: {
-            is_offset_responsive: false,
-            is_size_responsive: false,
-          },
           props: {
-            ratingProps: {
-              highlightSelectedOnly: false,
-              max: 1,
-              precision: 1,
-              readOnly: false,
-              size: "medium",
-            },
+            color: "primary",
+            disableRipple: false,
+            size: "medium",
           },
         },
       }}
@@ -66,4 +59,4 @@ const RatingForm = () => {
   );
 };
 
-export { RatingForm };
+export { CheckboxForm };

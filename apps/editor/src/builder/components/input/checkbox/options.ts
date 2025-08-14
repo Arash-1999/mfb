@@ -3,11 +3,8 @@ import type { GetInputsImpl } from "@mfb/core";
 
 import type { CheckboxOptions, CheckboxOptionsForm } from "./type";
 
-const checkboxOptions: Record<
-  keyof CheckboxOptions,
-  GetInputsImpl<MuiConfig, CheckboxOptionsForm>
-> = {
-  color: {
+const checkboxOptions: Array<GetInputsImpl<MuiConfig, CheckboxOptionsForm>> = [
+  {
     gridProps: { size: 12 },
     name: "color",
     props: {
@@ -20,7 +17,7 @@ const checkboxOptions: Record<
     },
     type: "text",
   },
-  disableRipple: {
+  {
     gridProps: { size: 12 },
     name: "disableRipple",
     props: {
@@ -29,7 +26,7 @@ const checkboxOptions: Record<
     },
     type: "checkbox",
   },
-  size: {
+  {
     gridProps: { size: 12 },
     name: "size",
     props: {
@@ -43,6 +40,6 @@ const checkboxOptions: Record<
     },
     type: "text",
   },
-};
+];
 
 export { checkboxOptions };
