@@ -1,3 +1,5 @@
+import { FieldOptionsForm, GridItemOptionsForm } from "../../layout";
+
 interface SliderOptions {
   sliderProps: {
     color: "error" | "info" | "primary" | "secondary" | "success" | "warning";
@@ -15,7 +17,7 @@ interface SliderOptions {
   };
 }
 
-interface SliderOptionsForm {
+interface SliderOptionsForm extends FieldOptionsForm, GridItemOptionsForm {
   props: SliderOptions;
 }
 

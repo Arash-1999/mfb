@@ -3,11 +3,8 @@ import type { GetInputsImpl } from "@mfb/core";
 
 import type { SliderOptions, SliderOptionsForm } from "./type";
 
-const sliderOptions: Record<
-  keyof SliderOptions["sliderProps"],
-  GetInputsImpl<MuiConfig, SliderOptionsForm>
-> = {
-  color: {
+const sliderOptions: Array<GetInputsImpl<MuiConfig, SliderOptionsForm>> = [
+  {
     gridProps: { size: 12 },
     name: "color",
     props: {
@@ -20,7 +17,7 @@ const sliderOptions: Record<
     },
     type: "text",
   },
-  disableSwap: {
+  {
     gridProps: { size: 12 },
     name: "sliderPorps.disableSwap",
     props: {
@@ -30,7 +27,7 @@ const sliderOptions: Record<
     type: "checkbox",
   },
   // marks: {},
-  max: {
+  {
     gridProps: { size: 12 },
     name: "sliderProps.max",
     props: {
@@ -43,7 +40,7 @@ const sliderOptions: Record<
     },
     type: "text",
   },
-  min: {
+  {
     gridProps: { size: 12 },
     name: "sliderProps.min",
     props: {
@@ -56,7 +53,7 @@ const sliderOptions: Record<
     },
     type: "text",
   },
-  orientation: {
+  {
     name: "sliderProps.orientation",
     props: {
       defaultValue: "horizontal",
@@ -64,7 +61,7 @@ const sliderOptions: Record<
     },
     type: "radio",
   },
-  shiftStep: {
+  {
     gridProps: { size: 12 },
     name: "sliderProps.shiftStep",
     props: {
@@ -77,7 +74,7 @@ const sliderOptions: Record<
     },
     type: "text",
   },
-  size: {
+  {
     gridProps: { size: 12 },
     name: "sliderProps.size",
     props: {
@@ -91,7 +88,7 @@ const sliderOptions: Record<
     },
     type: "text",
   },
-  step: {
+  {
     gridProps: { size: 12 },
     name: "sliderProps.step",
     props: {
@@ -104,7 +101,7 @@ const sliderOptions: Record<
     },
     type: "text",
   },
-  track: {
+  {
     name: "sliderProps.track",
     props: {
       defaultValue: "normal",
@@ -112,7 +109,7 @@ const sliderOptions: Record<
     },
     type: "radio",
   },
-  valueLabelDisplay: {
+  {
     name: "sliderProps.valueLabelDisplay",
     props: {
       defaultValue: "off",
@@ -120,7 +117,7 @@ const sliderOptions: Record<
     },
     type: "radio",
   },
-  valueLabelFormat: {
+  {
     gridProps: { size: 12 },
     name: "sliderProps.valueLabelFormat",
     props: {
@@ -133,6 +130,6 @@ const sliderOptions: Record<
     },
     type: "text",
   },
-};
+];
 
 export { sliderOptions };
