@@ -2,11 +2,11 @@ import type { ReactNode } from "react";
 
 import { RadioForm } from "@/builder/components/input/radio";
 import { RatingForm } from "@/builder/components/input/rating";
-
 import { MuiConfig } from "@mfb/plugin-mui";
 import { Input } from "@mui/icons-material";
 import { BuilderMode } from "@/types/builder";
 import { CheckboxForm } from "@/builder/components/input/checkbox";
+import { SelectForm } from "@/builder/components/input/select";
 
 type Category =
   | ""
@@ -50,7 +50,7 @@ const renderInputForm = (type: InputKey) => {
     case "rating":
       return <RatingForm />;
     case "select":
-      return <></>;
+      return <SelectForm />;
     case "slider":
       return <></>;
     case "switch":

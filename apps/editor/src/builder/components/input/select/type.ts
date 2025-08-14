@@ -1,3 +1,5 @@
+import type { FieldOptionsForm, GridItemOptionsForm } from "../../layout";
+
 interface SelectOptions {
   formControlProps: {
     color: "error" | "info" | "primary" | "secondary" | "success" | "warning";
@@ -23,7 +25,7 @@ interface SelectOptions {
   };
 }
 
-interface SelectOptionsForm {
+interface SelectOptionsForm extends FieldOptionsForm, GridItemOptionsForm {
   props: SelectOptions;
 }
 
