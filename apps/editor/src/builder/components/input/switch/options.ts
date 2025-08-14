@@ -1,34 +1,29 @@
 import type { MuiConfig } from "@/builder/builder";
 import type { GetInputsImpl } from "@mfb/core";
 
-import type { SwitchOptions, SwitchOptionsForm } from "./type";
+import type { SwitchOptionsForm } from "./type";
 
-const switchOptions: Record<
-  keyof SwitchOptions,
-  | Array<GetInputsImpl<MuiConfig, SwitchOptionsForm>>
-  | GetInputsImpl<MuiConfig, SwitchOptionsForm>
-> = {
-  formControlLabelProps: [
-    {
-      gridProps: { size: 12 },
-      name: "formControlLabelProps.disableRipple",
-      props: {
-        defaultValue: true,
-        label: "Disable Ripple",
-      },
-      type: "checkbox",
+const switchOptions: Array<GetInputsImpl<MuiConfig, SwitchOptionsForm>> = [
+  {
+    gridProps: { size: 12 },
+    name: "formControlLabelProps.disableRipple",
+    props: {
+      defaultValue: true,
+      label: "Disable Ripple",
     },
-    {
-      gridProps: { size: 12 },
-      name: "formControlLabelProps.labelPlacement",
-      props: {
-        defaultValue: "end",
-        options: ["bottom", "end", "start", "top"],
-      },
-      type: "radio",
+    type: "checkbox",
+  },
+  {
+    gridProps: { size: 12 },
+    name: "formControlLabelProps.labelPlacement",
+    props: {
+      defaultValue: "end",
+      options: ["bottom", "end", "start", "top"],
     },
-  ],
-  label: {
+    type: "radio",
+  },
+
+  {
     gridProps: {
       size: 12,
     },
@@ -40,44 +35,43 @@ const switchOptions: Record<
     },
     type: "text",
   },
-  switchProps: [
-    {
-      gridProps: { size: 12 },
-      name: "switchProps.color",
-      props: {
-        textFieldProps: {
-          fullWidth: true,
-          label: "Color",
-          placeholder: "Color",
-          size: "small",
-        },
+
+  {
+    gridProps: { size: 12 },
+    name: "switchProps.color",
+    props: {
+      textFieldProps: {
+        fullWidth: true,
+        label: "Color",
+        placeholder: "Color",
+        size: "small",
       },
-      type: "text",
     },
-    {
-      gridProps: { size: 12 },
-      name: "switchProps.disableRipple",
-      props: {
-        defaultValue: true,
-        label: "Disable Ripple",
+    type: "text",
+  },
+  {
+    gridProps: { size: 12 },
+    name: "switchProps.disableRipple",
+    props: {
+      defaultValue: true,
+      label: "Disable Ripple",
+    },
+    type: "checkbox",
+  },
+  {
+    gridProps: { size: 12 },
+    name: "switchProps.size",
+    props: {
+      defaultValue: "small",
+      textFieldProps: {
+        fullWidth: true,
+        label: "Size",
+        placeholder: "Size",
+        size: "small",
       },
-      type: "checkbox",
     },
-    {
-      gridProps: { size: 12 },
-      name: "switchProps.size",
-      props: {
-        defaultValue: "small",
-        textFieldProps: {
-          fullWidth: true,
-          label: "Size",
-          placeholder: "Size",
-          size: "small",
-        },
-      },
-      type: "text",
-    },
-  ],
-};
+    type: "text",
+  },
+];
 
 export { switchOptions };

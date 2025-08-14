@@ -1,3 +1,5 @@
+import { FieldOptionsForm, GridItemOptionsForm } from "../../layout";
+
 interface SwitchOptions {
   formControlLabelProps: {
     disableTypography: boolean;
@@ -12,7 +14,7 @@ interface SwitchOptions {
   };
 }
 
-interface SwitchOptionsForm {
+interface SwitchOptionsForm extends FieldOptionsForm, GridItemOptionsForm {
   props: SwitchOptions;
 }
 

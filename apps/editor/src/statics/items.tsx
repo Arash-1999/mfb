@@ -7,6 +7,7 @@ import { Input } from "@mui/icons-material";
 import { BuilderMode } from "@/types/builder";
 import { CheckboxForm } from "@/builder/components/input/checkbox";
 import { SelectForm } from "@/builder/components/input/select";
+import { SliderForm } from "@/builder/components/input/slider";
 
 type Category =
   | ""
@@ -52,7 +53,7 @@ const renderInputForm = (type: InputKey) => {
     case "select":
       return <SelectForm />;
     case "slider":
-      return <></>;
+      return <SliderForm />;
     case "switch":
       return <></>;
     case "text":
