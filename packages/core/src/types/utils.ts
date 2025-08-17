@@ -23,13 +23,16 @@ interface BaseComponentProps {
 
 type BaseInput = (
   // TODO: use unknown instead of any for 'name' and 'formMethods' type-safety
-  props: any & BaseInputProps,
+  props: any & BaseInputProps
 ) => JSX.Element;
 interface BaseInputProps extends BaseComponentProps {
   defaultValue?: never;
 }
 
-interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
+interface DefaultItem<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> extends Dependency<TFields, GetExtraConditionKey<TConfig>> {
   gridProps?: object;
   name?: string;
 }
@@ -37,6 +40,11 @@ interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
 interface DefineFnProps {
   deps: never;
 }
+
+type GetExtraConditionKey<TConfig extends FormBuilderConfig> =
+  TConfig["options"] extends { extraConditions: infer TExtra }
+    ? keyof TExtra
+    : never;
 
 type GetLayoutProps<
   TConfig extends FormBuilderConfig,
@@ -59,11 +67,18 @@ type ListInputArray<
 > = Array<ActionInput<TConfig, TFields> | GetInputs<TConfig, TFields>>;
 
 type RenderFn<
+  TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-  TItem extends DefaultItem<TFields>,
-> = (item: TItem, options: RenderFnOptions<TFields>) => JSX.Element | null;
-interface RenderFnOptions<TFields extends FieldValues> {
-  dependsOn: DependencyStructure<TFields>;
+  TItem extends DefaultItem<TConfig, TFields>,
+> = (
+  item: TItem,
+  options: RenderFnOptions<TConfig, TFields>
+) => JSX.Element | null;
+interface RenderFnOptions<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> {
+  dependsOn: DependencyStructure<TFields, GetExtraConditionKey<TConfig>>;
   formMethods: UseFormReturn<TFields>;
   index: number;
   name?: string;
@@ -76,6 +91,7 @@ export type {
   BaseInput,
   DefaultItem,
   DefineFnProps,
+  GetExtraConditionKey,
   GetLayoutProps,
   HasDependencyField,
   InputArray,

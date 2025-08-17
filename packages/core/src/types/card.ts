@@ -8,6 +8,7 @@ import type {
   AdvancedList,
   BaseComponentProps,
   DefineFnProps,
+  GetExtraConditionKey,
   GetLayoutProps,
 } from "./utils";
 
@@ -30,7 +31,7 @@ type NormalCardItem<
   TAdvanced extends boolean = false,
   TFunc extends boolean = false,
 > = NormalCardItemBase<TConfig, TFields, TAdvanced> &
-  Dependency<TFields, TFunc>;
+  Dependency<TFields, GetExtraConditionKey<TConfig>, TFunc>;
 
 type GetCardBase<
   TConfig extends FormBuilderConfig,
@@ -89,10 +90,10 @@ type GetGroupCard<
               >
           : never;
       } & (
-          | (Dependency<TFields, TFunc> &
+          | (Dependency<TFields, GetExtraConditionKey<TConfig>, TFunc> &
               GetCardBase<TConfig, TFields, TAdvanced, true> &
               GroupCardList<TConfig>)
-          | (Dependency<TFields, TFunc> &
+          | (Dependency<TFields, GetExtraConditionKey<TConfig>, TFunc> &
               GetCardBase<TConfig, TFields, TAdvanced> &
               GroupCardNormal<TConfig>)
         );
@@ -105,7 +106,7 @@ type GetSimpleCard<
   TAdvanced extends boolean = false,
   TInternal extends boolean = false,
   TFunc extends boolean = false,
-> = Dependency<TFields, TFunc> &
+> = Dependency<TFields, GetExtraConditionKey<TConfig>, TFunc> &
   GetCardBase<TConfig, TFields, TAdvanced, true> &
   {
     [TCard in keyof TConfig["card"]["simple"]]: {

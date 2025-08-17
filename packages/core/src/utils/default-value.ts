@@ -1,7 +1,9 @@
 import type {
+  Condition,
   DependsOnBase,
   FieldArrayValues,
   FormBuilderConfig,
+  GetExtraConditionKey,
   HideDependency,
   Item,
   ItemArray,
@@ -16,7 +18,6 @@ import type {
 
 import { set } from "react-hook-form";
 
-import { conditionArrayCalculator } from "./dependency-management";
 import { mergeName } from "./merge-names";
 
 class DefaultValue<
@@ -28,10 +29,22 @@ class DefaultValue<
 
   private _paths: Set<string>;
   private config: TConfig;
-  private dequeue: Array<Item<TFields>>;
+  private dequeue: Array<Item<TConfig, TFields>>;
   private falseSet: Set<string>;
+  private conditionArrayCalculator: (
+    list: Array<Condition<GetExtraConditionKey<TConfig>> & { current: unknown }>
+  ) => boolean;
 
-  constructor(config: TConfig, list: ItemArray<TFields>) {
+  constructor(
+    config: TConfig,
+    list: ItemArray<TConfig, TFields>,
+    conditionArrayCalculator: (
+      list: Array<
+        Condition<GetExtraConditionKey<TConfig>> & { current: unknown }
+      >
+    ) => boolean
+  ) {
+    this.conditionArrayCalculator = conditionArrayCalculator;
     this.config = config;
     this.dequeue = [];
     this.falseSet = new Set<string>();
@@ -42,14 +55,14 @@ class DefaultValue<
     this.resovle(list);
   }
   private parseItems = (
-    items: ItemArray<TFields>,
-    options: ParseItemsOptions<TFields> = {
+    items: ItemArray<TConfig, TFields>,
+    options: ParseItemsOptions<TConfig, TFields> = {
       dequeue: [],
       parentDeps: [],
       paths: new Set(),
       prefix: "",
       result: this.result,
-    },
+    }
   ) => {
     items.forEach((_item) => {
       const item = typeof _item === "function" ? _item() : _item;
@@ -77,7 +90,7 @@ class DefaultValue<
         }
       }
 
-      let currentItems: ItemArray<TFields> = [];
+      let currentItems: ItemArray<TConfig, TFields> = [];
       if (Array.isArray(item.inputs)) {
         currentItems = item.inputs;
       }
@@ -99,7 +112,7 @@ class DefaultValue<
       }
     });
   };
-  public resovle = (list: ItemArray<TFields>) => {
+  public resovle = (list: ItemArray<TConfig, TFields>) => {
     this.parseItems(list, {
       dequeue: this.dequeue,
       parentDeps: [],
@@ -122,7 +135,10 @@ class DefaultValue<
           .filter((dep) => dep && this._paths.has(dep.path))
           .reduce<
             Array<
-              DependsOnBase<TFields> & HideDependency & { current: unknown }
+              DependsOnBase<TFields> &
+                HideDependency<GetExtraConditionKey<TConfig>> & {
+                  current: unknown;
+                }
             >
           >((_deps, dep) => {
             if (dep && dep.type === "hide") {
@@ -152,7 +168,7 @@ class DefaultValue<
           continue;
         }
 
-        if (!isHidden && !conditionArrayCalculator(deps)) {
+        if (!isHidden && !this.conditionArrayCalculator(deps)) {
           let value: unknown;
           if (
             item.props &&
@@ -182,7 +198,7 @@ class DefaultValue<
   private isNullOrUndefined = (value: unknown): value is null | undefined =>
     value == null;
 
-  private parseFieldArray = (items: ItemArray<TFields>, path: string) => {
+  private parseFieldArray = (items: ItemArray<TConfig, TFields>, path: string) => {
     const fieldArrayItem: FieldValues = {};
 
     this.parseItems(items, {

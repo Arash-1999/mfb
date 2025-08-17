@@ -25,45 +25,9 @@ const convertDepsToObject = <TDep extends DefaultDep = DefaultDep>(
   );
 };
 
-const conditionCalculator = (
-  { condition, value }: Condition,
-  currentValue: unknown
-): boolean => {
-  // NOTE: in field array comparisions: value -> index, currentValue -> length
-  let result: boolean = false;
-
-  switch (condition) {
-    case "eq":
-      result = value === currentValue;
-      break;
-    case "is-first-index":
-      result = value === 0;
-      break;
-    case "is-last-index":
-      if (typeof currentValue === "number") result = value === currentValue - 1;
-      break;
-    case "not-eq":
-      result = value !== currentValue;
-      break;
-    case "not-first-index":
-      result = value !== 0;
-      break;
-    case "not-last-index":
-      if (typeof currentValue === "number") result = value !== currentValue - 1;
-      break;
-  }
-  return result;
-};
-
-const conditionArrayCalculator = (
-  list: Array<Condition & { current: unknown }>
-) => {
-  return list.every((dep) => conditionCalculator(dep, dep.current));
-};
-
-const pushDependency = <TFields extends FieldValues>(
-  target: DependencyDict<TFields>,
-  dependsOn: DependsOnSingle<TFields, false>,
+const pushDependency = <TFields extends FieldValues, TExtraKey extends string>(
+  target: DependencyDict<TFields, TExtraKey>,
+  dependsOn: DependsOnSingle<TFields, TExtraKey, false>,
   value: number | PathValue<TFields, Path<TFields>> | undefined
 ) => {
   switch (dependsOn.type) {
@@ -85,12 +49,15 @@ const pushDependency = <TFields extends FieldValues>(
     }
   }
 };
-const createDependencyDict = <TFields extends FieldValues>(
-  dependsOn: DependsOn<TFields>,
+const createDependencyDict = <
+  TFields extends FieldValues,
+  TExtraKey extends string,
+>(
+  dependsOn: DependsOn<TFields, TExtraKey>,
   value: readonly PathValue<TFields, Path<TFields>>[],
   fieldArrayContext: FieldArrayContextValue
 ) => {
-  const base: DependencyDict<TFields> = {
+  const base: DependencyDict<TFields, TExtraKey> = {
     "bind-value": [],
     "def-props": [],
     disable: [],
@@ -107,7 +74,7 @@ const createDependencyDict = <TFields extends FieldValues>(
         reFieldArrayValue.test(cur.value)
       ) {
         // NOTE: value -> index, currentValue -> length
-        pushDependency(
+        pushDependency<TFields, TExtraKey>(
           acc,
           {
             ...cur,
@@ -116,20 +83,15 @@ const createDependencyDict = <TFields extends FieldValues>(
           fieldArrayContext.index === null ? undefined : fieldArrayContext.index
         );
       } else {
-        pushDependency(acc, cur, value[valueIndex]);
+        pushDependency<TFields, TExtraKey>(acc, cur, value[valueIndex]);
         valueIndex += 1;
       }
       return acc;
     }, base);
   } else {
-    pushDependency(base, dependsOn, value[0]);
+    pushDependency<TFields, TExtraKey>(base, dependsOn, value[0]);
   }
   return base;
 };
 
-export {
-  conditionArrayCalculator,
-  conditionCalculator,
-  convertDepsToObject,
-  createDependencyDict,
-};
+export { convertDepsToObject, createDependencyDict };

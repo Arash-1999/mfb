@@ -1,14 +1,19 @@
 import type { MfbItemContextValue } from "@/context";
-import type { ChildrenPathResult, DefaultItem } from "@/types";
+import type {
+  ChildrenPathResult,
+  DefaultItem,
+  FormBuilderConfig,
+} from "@/types";
 import type { PropsWithChildren } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import { MfbItemContext, useMfbItemContext } from "@/context";
 import { useMemo } from "react";
 
-interface PathProviderProps<
+interface ItemProviderProps<
+  TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-  TItem extends DefaultItem<TFields>,
+  TItem extends DefaultItem<TConfig, TFields>,
 > {
   disable?: boolean;
   getItemInfo?: (item: TItem) => ChildrenPathResult;
@@ -17,15 +22,16 @@ interface PathProviderProps<
 }
 
 const MfbItemProvider = <
+  TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-  TItem extends DefaultItem<TFields>,
+  TItem extends DefaultItem<TConfig, TFields>,
 >({
   children,
   disable = false,
   getItemInfo,
   index,
   item,
-}: PropsWithChildren<PathProviderProps<TFields, TItem>>) => {
+}: PropsWithChildren<ItemProviderProps<TConfig, TFields, TItem>>) => {
   const parent = useMfbItemContext();
 
   const contextValue = useMemo<MfbItemContextValue | null>(() => {

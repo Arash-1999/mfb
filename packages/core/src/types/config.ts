@@ -32,11 +32,15 @@ interface FormBuilderContext<TFormId extends string = string> {
 
 interface FormBuilderOptions {
   dependencyShouldReset: boolean;
+  extraConditions: Record<
+    PropertyKey,
+    (target: unknown, current: unknown) => boolean
+  >;
 }
 
 interface FormBuilderOverrides {
   FieldArray: <TFields extends FieldValues, TFormId extends string>(
-    props: FieldArrayOverrideProps<TFields, TFormId>,
+    props: FieldArrayOverrideProps<TFields, TFormId>
   ) => ReactNode;
 }
 

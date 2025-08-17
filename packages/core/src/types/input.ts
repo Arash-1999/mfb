@@ -7,6 +7,7 @@ import type {
   BaseComponentProps,
   BaseInput,
   DefineFnProps,
+  GetExtraConditionKey,
   GetLayoutProps,
   HasDependencyField,
 } from "./utils";
@@ -24,7 +25,7 @@ type GetInputs<
 > =
   | ((props?: DefineFnProps) => ActionInput<TConfig, TFields> & TExtra)
   | ((
-      props?: DefineFnProps,
+      props?: DefineFnProps
     ) => GetInputsImpl<TConfig, TFields, TInternal, true> & TExtra)
   | (ActionInput<TConfig, TFields> & TExtra)
   | (GetInputsImpl<TConfig, TFields, TInternal> & TExtra);
@@ -35,10 +36,12 @@ type GetInputsImpl<
   TInternal extends boolean = false,
   TFunc extends boolean = false,
 > =
-  | (Dependency<TFields, TFunc> & ListInput<TConfig, TFields>)
+  | (Dependency<TFields, GetExtraConditionKey<TConfig>, TFunc> &
+      ListInput<TConfig, TFields>)
   | {
       [TInput in keyof TConfig["input"]["components"]]: Dependency<
         TFields,
+        GetExtraConditionKey<TConfig>,
         TFunc,
         HasDependencyField<TConfig["input"]["components"][TInput]>
       > & {

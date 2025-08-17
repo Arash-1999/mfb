@@ -16,6 +16,7 @@ import type { GetInputsImpl } from "./input";
 import type {
   AdvancedList,
   DefaultItem,
+  GetExtraConditionKey,
   GetLayoutProps,
   InputArray,
   ListInputArray,
@@ -120,14 +121,15 @@ interface BuilderProps<
 }
 
 interface DependencyManagerProps<
+  TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-  TItem extends DefaultItem<TFields>,
+  TItem extends DefaultItem<TConfig, TFields>,
 > {
   component: ((props?: { deps: never }) => TItem) | TItem;
   getItemInfo: (item: TItem) => ChildrenPathResult;
   index: number;
   name?: string;
-  render: RenderFn<TFields, TItem>;
+  render: RenderFn<TConfig, TFields, TItem>;
   withGrid?: boolean;
 }
 
@@ -146,8 +148,11 @@ interface FieldArrayProps<TFields extends FieldValues> {
   render: (fields: UseFieldArrayReturn<TFields>["fields"]) => ReactNode;
 }
 
-interface InputMapFnOptions<TFields extends FieldValues> {
-  deps?: DependsOn<TFields>;
+interface InputMapFnOptions<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> {
+  deps?: DependsOn<TFields, GetExtraConditionKey<TConfig>>;
   formMethods: UseFormReturn<TFields>;
   name?: string;
 }
@@ -156,7 +161,7 @@ interface InputMapperProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > {
-  deps?: DependsOn<TFields>;
+  deps?: DependsOn<TFields, GetExtraConditionKey<TConfig>>;
   inputs: ListInputArray<TConfig, TFields>;
   name?: string;
 }

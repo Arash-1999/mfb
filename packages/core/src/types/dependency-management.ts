@@ -4,14 +4,16 @@ type BindValueDependency = {
   type: "bind-value";
 };
 
-type Condition = {
-  condition:
-    | "eq"
-    | "is-first-index"
-    | "is-last-index"
-    | "not-eq"
-    | "not-first-index"
-    | "not-last-index";
+type ConditionKey =
+  | "eq"
+  | "is-first-index"
+  | "is-last-index"
+  | "not-eq"
+  | "not-first-index"
+  | "not-last-index";
+
+type Condition<TExtraKey extends string> = {
+  condition: ConditionKey | TExtraKey;
   value: boolean | null | number | string;
 };
 
@@ -20,16 +22,17 @@ type DefPropsDependency = {
 };
 type Dependency<
   TFields extends FieldValues,
+  TExtraKey extends string,
   TFunc extends boolean = false,
   TOnlyBoolean extends boolean = false,
 > = (TFunc extends true
-  ? Required<DependencyObject<TFields, TOnlyBoolean>>
-  : Partial<DependencyObject<TFields, TOnlyBoolean>>) & {
+  ? Required<DependencyObject<TFields, TExtraKey, TOnlyBoolean>>
+  : Partial<DependencyObject<TFields, TExtraKey, TOnlyBoolean>>) & {
   dependencyShouldReset?: boolean;
 };
 
-type DependencyDict<TFields extends FieldValues> = {
-  [TKey in DependsOnUnion<false> as TKey["type"]]: Array<
+type DependencyDict<TFields extends FieldValues, TExtraKey extends string> = {
+  [TKey in DependsOnUnion<TExtraKey, false> as TKey["type"]]: Array<
     DependsOnBase<TFields> &
       TKey & {
         current: unknown;
@@ -38,14 +41,18 @@ type DependencyDict<TFields extends FieldValues> = {
 };
 interface DependencyObject<
   TFields extends FieldValues,
+  TExtraKey extends string,
   TOnlyBoolean extends boolean = false,
 > {
-  dependsOn: DependsOn<TFields, TOnlyBoolean>;
+  dependsOn: DependsOn<TFields, TExtraKey, TOnlyBoolean>;
 }
 
-type DependencyStructure<TFields extends FieldValues> = Omit<
+type DependencyStructure<
+  TFields extends FieldValues,
+  TExtraKey extends string,
+> = Omit<
   {
-    [TKey in DependsOnUnion<false> as TKey["type"]]: Array<
+    [TKey in DependsOnUnion<TExtraKey, false> as TKey["type"]]: Array<
       DependsOnBase<TFields> &
         TKey & {
           current: unknown;
@@ -58,15 +65,18 @@ type DependencyStructure<TFields extends FieldValues> = Omit<
   hide: boolean;
 };
 
-type DependencyType =
-  DependsOnUnion<false> extends { type: infer TType } ? TType : never;
+type DependencyType<TExtraKey extends string> =
+  DependsOnUnion<TExtraKey, false> extends { type: infer TType }
+    ? TType
+    : never;
 
 type DependsOn<
   TFields extends FieldValues,
+  TExtraKey extends string,
   TOnlyBoolean extends boolean = false,
 > =
-  | Array<DependsOnSingle<TFields, TOnlyBoolean>>
-  | DependsOnSingle<TFields, TOnlyBoolean>;
+  | Array<DependsOnSingle<TFields, TExtraKey, TOnlyBoolean>>
+  | DependsOnSingle<TFields, TExtraKey, TOnlyBoolean>;
 
 type DependsOnBase<TFields extends FieldValues> = {
   id: string;
@@ -75,20 +85,24 @@ type DependsOnBase<TFields extends FieldValues> = {
 
 type DependsOnSingle<
   TFields extends FieldValues,
+  TExtraKey extends string,
   TOnlyBoolean extends boolean = false,
-> = DependsOnBase<TFields> & DependsOnUnion<TOnlyBoolean>;
+> = DependsOnBase<TFields> & DependsOnUnion<TExtraKey, TOnlyBoolean>;
 
-type DependsOnUnion<TOnlyBoolean extends boolean = false> =
+type DependsOnUnion<
+  TExtraKey extends string,
+  TOnlyBoolean extends boolean = false,
+> =
   | DefPropsDependency
-  | DisableDependency
+  | DisableDependency<TExtraKey>
   | (TOnlyBoolean extends false ? BindValueDependency : never)
-  | HideDependency;
+  | HideDependency<TExtraKey>;
 
-type DisableDependency = Condition & {
+type DisableDependency<TExtraKey extends string> = Condition<TExtraKey> & {
   type: "disable";
 };
 
-type HideDependency = Condition & {
+type HideDependency<TExtraKey extends string> = Condition<TExtraKey> & {
   type: "hide";
 };
 
