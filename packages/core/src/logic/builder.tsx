@@ -4,68 +4,45 @@ import type {
   AdvancedMapperProps,
   BasicBuilderProps,
   BuilderProps,
-  DefaultItem,
-  DependencyManagerProps,
-  FieldArrayOverrideProps,
   FieldArrayProps,
   FormBuilderConfig,
-  FormBuilderContext,
   FormBuilderOptions,
   FormBuilderOverrides,
   GetCardsImpl,
   GetInputsImpl,
   InputMapperProps,
-  MfbContextValue,
+  RenderCardItemProps,
   RenderFnOptions,
 } from "@/types";
-import type { Context, ReactNode } from "react";
 import type { FieldValues } from "react-hook-form";
 
-import { options as defaultOptions } from "@/constants";
-import {
-  DependencyContext,
-  FieldArrayContext,
-  useDependencyContext,
-  useFieldArrayContext,
-} from "@/context";
-import { useDefaultValue, useDependency, useDependsOnField } from "@/hooks";
+import { FieldArrayContext, useFieldArrayContext } from "@/context";
+import { useDefaultValue } from "@/hooks";
+import { MfbItemProvider } from "@/providers";
 import {
   convertDepsToObject,
+  dispatchFieldArray,
   listActionGuard,
   listInputGuard,
   mergeName,
 } from "@/utils";
-import { dispatchFieldArray } from "@/utils/events";
-import { createContext, createElement, useContext, useMemo } from "react";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { createElement, useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
+import { DependencyManagement } from "./dependency-management";
 import { MfbFieldArray } from "./field-array";
 
 // NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
   TConfig extends FormBuilderConfig,
   TFormId extends string = string,
-> {
-  private config: TConfig;
-  private Context: Context<FormBuilderContext<TFormId> | null>;
-  private FieldArrayOverride?: <
-    TFields extends FieldValues,
-    TFormId extends string,
-  >(
-    props: FieldArrayOverrideProps<TFields, TFormId>
-  ) => ReactNode;
-  private options: FormBuilderOptions;
-
+> extends DependencyManagement<TConfig, TFormId> {
   constructor(
     config: TConfig,
     options?: Partial<FormBuilderOptions>,
-    overrides?: FormBuilderOverrides
+    overrides?: FormBuilderOverrides,
   ) {
-    this.config = config;
-    this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
-    this.options = { ...defaultOptions, ...options };
-
-    if (overrides?.FieldArray) this.FieldArrayOverride = overrides.FieldArray;
+    super(config, options, overrides);
   }
 
   public AdvancedBuilder = <TFields extends FieldValues>({
@@ -105,9 +82,11 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <GridContainer {...gridContainerProps}>
-              <AdvancedMapper list={resolvedList} />
-            </GridContainer>
+            <MfbItemProvider>
+              <GridContainer {...gridContainerProps}>
+                <AdvancedMapper list={resolvedList} />
+              </GridContainer>
+            </MfbItemProvider>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
           </form>
@@ -150,9 +129,11 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <GridContainer {...gridContainerProps}>
-              <InputMapper inputs={resolvedInputs} />
-            </GridContainer>
+            <MfbItemProvider>
+              <GridContainer {...gridContainerProps}>
+                <InputMapper inputs={resolvedInputs} />
+              </GridContainer>
+            </MfbItemProvider>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
           </form>
@@ -199,41 +180,30 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <GridContainer {...(gridContainerProps || {})}>
-              {resolvedCards.map((card, index) => {
-                return (
-                  <DependencyManager<
-                    TFields,
-                    | GetCardsImpl<TConfig, TFields, false, true>
-                    | GetCardsImpl<TConfig, TFields, false>
-                  >
-                    component={card}
-                    index={index}
-                    key={`card-${index}`}
-                    render={renderCard}
-                    withContext
-                  />
-                );
-              })}
-            </GridContainer>
+            <MfbItemProvider>
+              <GridContainer {...(gridContainerProps || {})}>
+                {resolvedCards.map((card, index) => {
+                  return (
+                    <DependencyManager<
+                      TFields,
+                      | GetCardsImpl<TConfig, TFields, false, true>
+                      | GetCardsImpl<TConfig, TFields, false>
+                    >
+                      component={card}
+                      getItemInfo={this.childrenPath.card}
+                      index={index}
+                      key={`card-${index}`}
+                      render={renderCard}
+                    />
+                  );
+                })}
+              </GridContainer>
+            </MfbItemProvider>
             {/* TODO: remove this submit button as configurable option */}
             <button type="submit">SUBMIT</button>
           </form>
         </FormProvider>
       </Context.Provider>
-    );
-  };
-
-  private useMfbContext = <TFields extends FieldValues>() => {
-    const { Context } = this;
-
-    return (
-      (useContext(Context) as MfbContextValue<TFields, TFormId>) ||
-      ({
-        defaultValues: {},
-        fieldArray: {},
-        id: "",
-      } as MfbContextValue<TFields, TFormId>)
     );
   };
 
@@ -298,11 +268,11 @@ class FormBuilder<
             | GetCardsImpl<TConfig, TFields, true>
           >
             component={item}
+            getItemInfo={this.childrenPath.card}
             index={index}
             key={`card-${index}`}
             name={name}
             render={renderCard}
-            withContext
           />
         );
       }
@@ -311,24 +281,23 @@ class FormBuilder<
           return (
             <DependencyManager<TFields, ActionInput<TConfig, TFields>>
               component={item}
+              getItemInfo={this.childrenPath.action}
               index={index}
               key={`action-${index}`}
               name={name}
               render={renderAction}
-              withContext={false}
               withGrid
             />
           );
         }
-        const withContext = item.type === "list";
         return (
           <DependencyManager<TFields, GetInputsImpl<TConfig, TFields>>
             component={item}
+            getItemInfo={this.childrenPath.input}
             index={index}
             key={`input-${index}`}
             name={name}
             render={renderInput}
-            withContext={withContext}
             withGrid
           />
         );
@@ -339,73 +308,9 @@ class FormBuilder<
 
   private defineItem =
     <TItem,>() =>
-      <TDeps extends FieldValues>(func: (props?: { deps: TDeps }) => TItem) => {
-        return func;
-      };
-
-  private DependencyManager = <
-    TFields extends FieldValues,
-    TItem extends DefaultItem<TFields>,
-  >({
-    component,
-    index,
-    name,
-    render,
-    withContext,
-    withGrid,
-  }: DependencyManagerProps<TFields, TItem>) => {
-    const {
-      layout: { "grid-item": GridItem },
-    } = this.config;
-    const dependencyContext = useDependencyContext();
-    const formMethods = useFormContext<TFields>();
-    const dependency = useDependsOnField<TFields, TItem>({
-      component,
-    });
-
-    const [resolvedComponent, dependencies] = useDependency<TFields, TItem>(
-      {
-        component,
-        dependencyContext,
-        dependsOn: dependency,
-        name,
-      },
-      {
-        dependencyShouldReset: this.options.dependencyShouldReset,
-      }
-    );
-
-    if (resolvedComponent === null) return null;
-
-    const renderedComponent = render(resolvedComponent, {
-      dependsOn: dependencies,
-      formMethods,
-      index,
-      name,
-    });
-
-    const children =
-      withGrid || "gridProps" in resolvedComponent ? (
-        <GridItem {...resolvedComponent.gridProps}>
-          {renderedComponent}
-        </GridItem>
-      ) : (
-        renderedComponent
-      );
-
-    return withContext ? (
-      <DependencyContext.Provider
-        value={{
-          disable: dependencies.disable,
-        }}
-      >
-        {children}
-      </DependencyContext.Provider>
-    ) : (
-      children
-    );
-  };
-
+    <TDeps extends FieldValues>(func: (props?: { deps: TDeps }) => TItem) => {
+      return func;
+    };
   private FieldArray = <TFields extends FieldValues>({
     disabled,
     name,
@@ -440,25 +345,23 @@ class FormBuilder<
         return (
           <DependencyManager<TFields, ActionInput<TConfig, TFields>>
             component={input}
+            getItemInfo={this.childrenPath.action}
             index={i}
             key={`input-${i}`}
             name={name}
             render={renderAction}
-            withContext={false}
             withGrid
           />
         );
       }
-      const withContext =
-        (typeof input === "function" ? input().type : input.type) === "list";
       return (
         <DependencyManager<TFields, GetInputsImpl<TConfig, TFields>>
           component={input}
+          getItemInfo={this.childrenPath.input}
           index={i}
           key={`input-${i}`}
           name={name}
           render={renderInput}
-          withContext={withContext}
           withGrid
         />
       );
@@ -467,7 +370,7 @@ class FormBuilder<
 
   private renderAction = <TFields extends FieldValues>(
     action: ActionInput<TConfig, TFields>,
-    { dependsOn }: RenderFnOptions<TFields>
+    { dependsOn }: RenderFnOptions<TFields>,
   ) => {
     const { ActionButton } = this;
 
@@ -483,7 +386,7 @@ class FormBuilder<
     card:
       | GetCardsImpl<TConfig, TFields, TAdvanced, true>
       | GetCardsImpl<TConfig, TFields, TAdvanced>,
-    { dependsOn, index, name }: RenderFnOptions<TFields>
+    { dependsOn, index, name }: RenderFnOptions<TFields>,
   ) => {
     const resolvedName = mergeName(name || "", card.name || "");
     const { "grid-container": GridContainer, "grid-item": GridItem } =
@@ -545,6 +448,7 @@ class FormBuilder<
         );
       }
 
+      const { DependencyManager, renderCardItem } = this;
       /* Card Group Normal*/
       return createElement(RenderGroupCard, {
         addGrid: (node, index) => (
@@ -555,32 +459,36 @@ class FormBuilder<
         key: `card-${index}`,
         nodes:
           "list" in card
-            ? card.list.map(
-              ({ gridContainerProps, list, name: itemName, title }) => ({
+            ? card.list.map((component, cardIndex) => ({
                 children: (
-                  <GridContainer {...gridContainerProps}>
-                    <AdvancedMapper
-                      list={list}
-                      name={mergeName(resolvedName, itemName || "")}
-                    />
-                  </GridContainer>
+                  <DependencyManager<
+                    TFields,
+                    RenderCardItemProps<TConfig, TFields>
+                  >
+                    component={{ advanced: true, ...component }}
+                    getItemInfo={() => this.childrenPath.cardItem(true)}
+                    index={cardIndex}
+                    name={name}
+                    render={renderCardItem}
+                  />
                 ),
-                title,
-              })
-            )
-            : card.inputs.map(
-              ({ gridContainerProps, list, name: itemName, title }) => ({
+                title: component.title,
+              }))
+            : card.inputs.map((component, cardIndex) => ({
                 children: (
-                  <GridContainer {...gridContainerProps}>
-                    <InputMapper
-                      inputs={list}
-                      name={mergeName(resolvedName, itemName || "")}
-                    />
-                  </GridContainer>
+                  <DependencyManager<
+                    TFields,
+                    RenderCardItemProps<TConfig, TFields>
+                  >
+                    component={{ advanced: false, ...component }}
+                    getItemInfo={() => this.childrenPath.cardItem(true)}
+                    index={cardIndex}
+                    name={resolvedName}
+                    render={renderCardItem}
+                  />
                 ),
-                title,
-              })
-            ),
+                title: component.title,
+              })),
         ...card.props,
       });
     }
@@ -606,7 +514,7 @@ class FormBuilder<
               ) : (
                 <InputMapper inputs={card.inputs} name={resolvedName} />
               )}
-            </GridContainer>
+            </GridContainer>,
           )}
         </GridItem>
       );
@@ -614,9 +522,35 @@ class FormBuilder<
     return null;
   };
 
+  private renderCardItem = <TFields extends FieldValues>(
+    cardItem: RenderCardItemProps<TConfig, TFields>,
+    { name }: RenderFnOptions<TFields>,
+  ) => {
+    const {
+      layout: { "grid-container": GridContainer },
+    } = this.config;
+    const { AdvancedMapper, InputMapper } = this;
+
+    return (
+      <GridContainer {...cardItem.gridContainerProps}>
+        {cardItem.advanced ? (
+          <AdvancedMapper
+            list={cardItem.list}
+            name={mergeName(name || "", cardItem.name || "")}
+          />
+        ) : (
+          <InputMapper
+            inputs={cardItem.list}
+            name={mergeName(name || "", cardItem.name || "")}
+          />
+        )}
+      </GridContainer>
+    );
+  };
+
   private renderInput = <TFields extends FieldValues>(
     input: GetInputsImpl<TConfig, TFields, true>,
-    { dependsOn, formMethods, name }: RenderFnOptions<TFields>
+    { dependsOn, formMethods, name }: RenderFnOptions<TFields>,
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {

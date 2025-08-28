@@ -20,6 +20,7 @@
     "react-hook-form": "catalog:"
   },
   "devDependencies": {
+    "eslint": "catalog:",
     "@mfb/eslint-config": "workspace:*",
     "@mfb/typescript-config": "workspace:*",
     "@types/react": "^19.0.8",

@@ -11,30 +11,42 @@ import type {
   GetLayoutProps,
 } from "./utils";
 
+interface NormalCardItemBase<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TAdvanced extends boolean = false,
+> {
+  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+  list: TAdvanced extends false
+    ? Array<GetInputs<TConfig, TFields>>
+    : AdvancedList<TConfig, TFields>;
+  name?: string;
+  title: Header | string;
+}
+
+type NormalCardItem<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TAdvanced extends boolean = false,
+  TFunc extends boolean = false,
+> = NormalCardItemBase<TConfig, TFields, TAdvanced> &
+  Dependency<TFields, TFunc>;
+
 type GetCardBase<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TAdvanced extends boolean = false,
   TNormalGroup extends boolean = false,
+  TFunc extends boolean = false,
 > = TAdvanced extends false
   ? {
       inputs: TNormalGroup extends false
-        ? Array<{
-            gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-            list: Array<GetInputs<TConfig, TFields>>;
-            name?: string;
-            title: Header | string;
-          }>
+        ? Array<NormalCardItem<TConfig, TFields, TAdvanced, TFunc>>
         : Array<GetInputs<TConfig, TFields>>;
     }
   : {
       list: TNormalGroup extends false
-        ? Array<{
-            gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-            list: AdvancedList<TConfig, TFields>;
-            name?: string;
-            title: Header | string;
-          }>
+        ? Array<NormalCardItem<TConfig, TFields, TAdvanced, TFunc>>
         : AdvancedList<TConfig, TFields>;
     };
 
@@ -45,7 +57,7 @@ type GetCards<
   TExtra = unknown,
 > =
   | ((
-      props?: DefineFnProps,
+      props?: DefineFnProps
     ) => GetCardsImpl<TConfig, TFields, TAdvanced, true> & TExtra)
   | (GetCardsImpl<TConfig, TFields, TAdvanced> & TExtra);
 
@@ -169,6 +181,7 @@ export type {
   GroupCardComponent,
   GroupCardProps,
   Header,
+  NormalCardItem,
   SimpleCardBase,
   SimpleCardObject,
   SimpleCardProps,
