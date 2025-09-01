@@ -17,9 +17,11 @@
     "@mfb/plugin-mui": "workspace:*",
     "@mui/icons-material": "^6.4.5",
     "@mui/material": "^6.4.5",
+    "ajv": "^8.17.1",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-hook-form": "catalog:"
+    "react-hook-form": "catalog:",
+    "valibot": "^1.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
