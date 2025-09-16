@@ -1,0 +1,22 @@
+{
+  "name": "valibot",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && vite build"
+  },
+  "peerDependencies": {
+    "valibot": "^1.1.0",
+    "@mfb/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@mfb/eslint-config": "workspace:*",
+    "@mfb/typescript-config": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:vite7",
+    "vite-plugin-dts": "^4.5.0"
+  }
+}

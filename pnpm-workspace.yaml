@@ -6,6 +6,15 @@ catalog:
   "@eslint/js": ^9.19.0
   eslint: ^9.19.0
 
+catalogs:
+  vite6:
+    vite: "^6.1.0"
+    vite-plugin-dts: "^4.5.0"
+    "@vitejs/plugin-react-swc": "^3.5.0"
+  vite7:
+    vite: "^7.1.2"
+    vite-plugin-dts: "^4.5.0"
+
 packages:
   - "apps/editor"
   - "playground"
