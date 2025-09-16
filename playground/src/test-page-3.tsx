@@ -159,7 +159,7 @@ const TestPage3 = () => {
                       },
                     },
                     dependsOn: {
-                      type: "visibility",
+                      type: "hide",
                       path: "input-1",
                       condition: "eq",
                       value: "something",
