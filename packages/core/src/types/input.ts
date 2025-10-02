@@ -10,6 +10,7 @@ import type {
   GetLayoutProps,
   HasDependencyField,
 } from "./utils";
+import type { Validation } from "./validation";
 
 type GetInputParameter<
   TConfig extends FormBuilderConfig,
@@ -52,6 +53,7 @@ type GetInputsImpl<
               "deps" | "formMethods" | "name"
             >;
         type: TInput;
+        validation?: Validation;
       };
     }[keyof TConfig["input"]["components"]];
 

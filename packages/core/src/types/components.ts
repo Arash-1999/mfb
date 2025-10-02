@@ -3,6 +3,7 @@ import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
 import type { AdvancedList, GetLayoutProps, ListInputArray } from "./utils";
+import type { ArrayValidation } from "./validation";
 
 interface ActionInput<
   TConfig extends FormBuilderConfig,
@@ -39,6 +40,7 @@ interface ListInputBase<TConfig extends FormBuilderConfig> {
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   name: string;
   type: "list";
+  validation?: ArrayValidation;
 }
 
 export type { ActionInput, ButtonComponent, ButtonComponentProps, ListInput };
