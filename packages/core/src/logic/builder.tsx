@@ -104,7 +104,6 @@ class FormBuilder<
   }: BasicBuilderProps<TConfig, TFields, TFormId>) => {
     const { Context, InputMapper } = this;
     const { "grid-container": GridContainer } = this.config.layout;
-    const formMethods = useForm<TFields>(options);
 
     // TODO: move useMemo into a custom hook with generic type for TItem (and list/inputs)
     const resolvedInputs = useMemo(() => {
@@ -118,6 +117,11 @@ class FormBuilder<
     }, [inputs]);
 
     const defaultValues = useDefaultValue(this.config, resolvedInputs);
+    // TODO: if options.useDefaultValue use generated default value else undefined
+    const formMethods = useForm<TFields>({
+      defaultValues: defaultValues.defaultValues,
+      ...options,
+    });
 
     return (
       <Context.Provider
