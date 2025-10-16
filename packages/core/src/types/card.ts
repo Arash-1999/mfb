@@ -11,27 +11,6 @@ import type {
   GetLayoutProps,
 } from "./utils";
 
-interface NormalCardItemBase<
-  TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
-  TAdvanced extends boolean = false,
-> {
-  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-  list: TAdvanced extends false
-    ? Array<GetInputs<TConfig, TFields>>
-    : AdvancedList<TConfig, TFields>;
-  name?: string;
-  title: Header | string;
-}
-
-type NormalCardItem<
-  TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
-  TAdvanced extends boolean = false,
-  TFunc extends boolean = false,
-> = NormalCardItemBase<TConfig, TFields, TAdvanced> &
-  Dependency<TFields, TFunc>;
-
 type GetCardBase<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
@@ -57,7 +36,7 @@ type GetCards<
   TExtra = unknown,
 > =
   | ((
-      props?: DefineFnProps
+      props?: DefineFnProps,
     ) => GetCardsImpl<TConfig, TFields, TAdvanced, true> & TExtra)
   | (GetCardsImpl<TConfig, TFields, TAdvanced> & TExtra);
 
@@ -157,6 +136,27 @@ interface GroupCardPropsBase extends BaseComponentProps {
 }
 
 type Header = Record<"center" | "left" | "right", ReactNode>;
+
+type NormalCardItem<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TAdvanced extends boolean = false,
+  TFunc extends boolean = false,
+> = Dependency<TFields, TFunc> &
+  NormalCardItemBase<TConfig, TFields, TAdvanced>;
+
+interface NormalCardItemBase<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TAdvanced extends boolean = false,
+> {
+  gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+  list: TAdvanced extends false
+    ? Array<GetInputs<TConfig, TFields>>
+    : AdvancedList<TConfig, TFields>;
+  name?: string;
+  title: Header | string;
+}
 
 type SimpleCardBase = (props: SimpleCardPropsBase & unknown) => JSX.Element;
 

@@ -11,7 +11,7 @@ interface ChildrenPathItem {
 }
 
 type ChildrenPathResult =
-  | null
-  | (ChildrenPathBase & (ChildrenPathCard | ChildrenPathItem));
+  | (ChildrenPathBase & (ChildrenPathCard | ChildrenPathItem))
+  | null;
 
 export type { ChildrenPathResult };

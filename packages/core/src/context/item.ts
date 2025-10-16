@@ -2,14 +2,14 @@ import type { ChildrenPathResult } from "@/types";
 
 import { createContext, useContext } from "react";
 
-interface ParentDeps {
-  disable: boolean;
-}
 interface MfbItemContextValue {
   childrenPath: ChildrenPathResult;
+  deps: ParentDeps;
   mode: "advanced" | "normal";
   path: string;
-  deps: ParentDeps;
+}
+interface ParentDeps {
+  disable: boolean;
 }
 
 const MfbItemContext = createContext<MfbItemContextValue | null>(null);

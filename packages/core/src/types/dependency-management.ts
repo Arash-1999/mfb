@@ -81,8 +81,8 @@ type DependsOnSingle<
 type DependsOnUnion<TOnlyBoolean extends boolean = false> =
   | DefPropsDependency
   | DisableDependency
-  | (TOnlyBoolean extends false ? BindValueDependency : never)
-  | HideDependency;
+  | HideDependency
+  | (TOnlyBoolean extends false ? BindValueDependency : never);
 
 type DisableDependency = Condition & {
   type: "disable";

@@ -39,9 +39,9 @@ const MfbItemProvider = <
 
     return {
       childrenPath: getItemInfo && item ? getItemInfo(item) : null,
+      deps: { disable: Boolean(disable) },
       mode: "normal",
       path,
-      deps: { disable: Boolean(disable) },
     };
   }, [disable, getItemInfo, index, item, parent]);
 
