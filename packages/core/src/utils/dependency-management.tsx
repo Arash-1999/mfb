@@ -4,7 +4,7 @@ import type {
   DependencyDict,
   DependsOn,
   DependsOnSingle,
-} from "@/types/dependency-management";
+} from "@mfb/types";
 import type { FieldValues, Path, PathValue } from "react-hook-form";
 
 import { reFieldArrayValue } from "@/constants";
@@ -14,20 +14,20 @@ interface DefaultDep {
   id: string;
 }
 const convertDepsToObject = <TDep extends DefaultDep = DefaultDep>(
-  dependencies: Array<TDep>
+  dependencies: Array<TDep>,
 ): Record<string, unknown> => {
   return dependencies.reduce<Record<string, unknown>>(
     (acc, cur) => ({
       ...acc,
       [cur.id]: cur.current,
     }),
-    {}
+    {},
   );
 };
 
 const conditionCalculator = (
   { condition, value }: Condition,
-  currentValue: unknown
+  currentValue: unknown,
 ): boolean => {
   // NOTE: in field array comparisions: value -> index, currentValue -> length
   let result: boolean = false;
@@ -56,7 +56,7 @@ const conditionCalculator = (
 };
 
 const conditionArrayCalculator = (
-  list: Array<Condition & { current: unknown }>
+  list: Array<Condition & { current: unknown }>,
 ) => {
   return list.every((dep) => conditionCalculator(dep, dep.current));
 };
@@ -64,7 +64,7 @@ const conditionArrayCalculator = (
 const pushDependency = <TFields extends FieldValues>(
   target: DependencyDict<TFields>,
   dependsOn: DependsOnSingle<TFields, false>,
-  value: number | PathValue<TFields, Path<TFields>> | undefined
+  value: number | PathValue<TFields, Path<TFields>> | undefined,
 ) => {
   switch (dependsOn.type) {
     case "bind-value": {
@@ -88,7 +88,7 @@ const pushDependency = <TFields extends FieldValues>(
 const createDependencyDict = <TFields extends FieldValues>(
   dependsOn: DependsOn<TFields>,
   value: readonly PathValue<TFields, Path<TFields>>[],
-  fieldArrayContext: FieldArrayContextValue
+  fieldArrayContext: FieldArrayContextValue,
 ) => {
   const base: DependencyDict<TFields> = {
     "bind-value": [],
@@ -113,7 +113,9 @@ const createDependencyDict = <TFields extends FieldValues>(
             ...cur,
             value: fieldArrayContext.index,
           },
-          fieldArrayContext.index === null ? undefined : fieldArrayContext.index
+          fieldArrayContext.index === null
+            ? undefined
+            : fieldArrayContext.index,
         );
       } else {
         pushDependency(acc, cur, value[valueIndex]);

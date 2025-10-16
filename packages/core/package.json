@@ -15,6 +15,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@mfb/types": "workspace:*",
     "@mfb/utils": "workspace:*"
   },
   "peerDependencies": {

@@ -1,4 +1,4 @@
-import type { FormBuilderConfig, ItemArray } from "@/types";
+import type { FormBuilderConfig, ItemArray } from "@mfb/types";
 import type { FieldValues } from "react-hook-form";
 
 import { DefaultValue } from "@/utils";

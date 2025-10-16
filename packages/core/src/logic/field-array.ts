@@ -1,4 +1,4 @@
-import type { FieldArrayEvent, FieldArrayOverrideProps } from "@/types";
+import type { FieldArrayEvent, FieldArrayOverrideProps } from "@mfb/types";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import { eventNames } from "@/constants";

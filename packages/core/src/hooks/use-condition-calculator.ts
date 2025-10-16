@@ -1,4 +1,4 @@
-import type { Condition } from "@/types";
+import type { Condition } from "@mfb/types";
 
 import { conditionCalculator } from "@/utils";
 import { useCallback } from "react";

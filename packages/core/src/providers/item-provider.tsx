@@ -1,5 +1,5 @@
 import type { MfbItemContextValue } from "@/context";
-import type { ChildrenPathResult, DefaultItem } from "@/types";
+import type { ChildrenPathResult, DefaultItem } from "@mfb/types";
 import type { PropsWithChildren } from "react";
 import type { FieldValues } from "react-hook-form";
 

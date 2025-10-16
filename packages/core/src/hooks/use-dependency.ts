@@ -4,7 +4,7 @@ import type {
   DependencyStructure,
   DependencyType,
   DependsOn,
-} from "@/types";
+} from "@mfb/types";
 import type { FieldValues, Path } from "react-hook-form";
 
 import { reFieldArrayValue } from "@/constants";
@@ -43,7 +43,7 @@ const useDependency = <
     dependsOn,
     name = "",
   }: UseDependencyProps<TFields, TItem>,
-  options?: UseDependencyOptions
+  options?: UseDependencyOptions,
 ): UseDependencyReturn<TFields, TItem> => {
   const fieldArrayContext = useFieldArrayContext();
   const { reduceCalc } = useConditionCalculator();
@@ -64,7 +64,7 @@ const useDependency = <
           ? typeof dep.value === "string"
             ? !reFieldArrayValue.test(dep.value)
             : true
-          : true
+          : true,
       )
       .map((dep) => {
         return dep.path;

@@ -1,10 +1,9 @@
 import type {
-  // ActionInput,
   ChildrenPathResult,
   FormBuilderConfig,
   GetCardsImpl,
   GetInputsImpl,
-} from "@/types";
+} from "@mfb/types";
 import type { FieldValues } from "react-hook-form";
 
 class ItemInfo<TConfig extends FormBuilderConfig> {

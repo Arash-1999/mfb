@@ -114,6 +114,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@mfb/types':
+        specifier: workspace:*
+        version: link:../types
       '@mfb/utils':
         specifier: workspace:*
         version: link:../utils
@@ -190,6 +193,28 @@ importers:
       typescript-eslint:
         specifier: ^8.23.0
         version: 8.23.0(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3)
+
+  packages/types:
+    dependencies:
+      react-hook-form:
+        specifier: 'catalog:'
+        version: 7.54.2(react@19.0.0)
+    devDependencies:
+      '@mfb/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@mfb/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/react':
+        specifier: ^19.0.8
+        version: 19.1.6
+      eslint:
+        specifier: 'catalog:'
+        version: 9.19.0(jiti@2.4.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.7.3
 
   packages/typescript-config: {}
 

@@ -1,4 +1,4 @@
-import type { ChildrenPathResult } from "@/types";
+import type { ChildrenPathResult } from "@mfb/types";
 
 import { createContext, useContext } from "react";
 

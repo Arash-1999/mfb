@@ -6,7 +6,7 @@ import type {
   Item,
   ItemArray,
   ParseItemsOptions,
-} from "@/types";
+} from "@mfb/types";
 import type {
   ArrayPath,
   DefaultValues,
