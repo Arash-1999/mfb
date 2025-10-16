@@ -14,6 +14,7 @@ import type {
   FieldValues,
 } from "react-hook-form";
 
+import { compact, isKey, isNullOrUndefined } from "@mfb/utils";
 import { set } from "react-hook-form";
 
 import { conditionArrayCalculator } from "./dependency-management";
@@ -127,9 +128,9 @@ class DefaultValue<
           >((_deps, dep) => {
             if (dep && dep.type === "hide") {
               const currentValue = (
-                this.isKey(dep.path) ? [dep.path] : this.stringToPath(dep.path)
+                isKey(dep.path) ? [dep.path] : this.stringToPath(dep.path)
               ).reduce((acc, key) => {
-                if (this.isNullOrUndefined(acc)) return this.result;
+                if (isNullOrUndefined(acc)) return this.result;
 
                 // check dep is not calculated yet
                 if (!(key in acc) && !this.falseSet.has(dep.path)) {
@@ -174,14 +175,6 @@ class DefaultValue<
     }
   };
 
-  private compact = <TValue>(value: TValue[]) =>
-    Array.isArray(value) ? value.filter(Boolean) : [];
-
-  private isKey = (value: string) => /^\w*$/.test(value);
-
-  private isNullOrUndefined = (value: unknown): value is null | undefined =>
-    value == null;
-
   private parseFieldArray = (items: ItemArray<TFields>, path: string) => {
     const fieldArrayItem: FieldValues = {};
 
@@ -198,7 +191,7 @@ class DefaultValue<
   };
 
   private stringToPath = (input: string): string[] =>
-    this.compact(input.replace(/["|']|\]/g, "").split(/\.|\[/));
+    compact(input.replace(/["|']|\]/g, "").split(/\.|\[/));
 }
 
 export { DefaultValue };
