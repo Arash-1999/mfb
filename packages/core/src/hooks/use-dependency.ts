@@ -105,15 +105,14 @@ const useDependency = <
       const _hide = dependencies.hide;
       const _disable = dependencies.disable;
 
+      // TODO: save last bind-value and def-props state and compare if there is change reset
       if (
         (typeof ref.current.hide === "boolean" &&
           _hide &&
           _hide !== ref.current.hide) ||
         (typeof ref.current.disable === "boolean" &&
           _disable &&
-          _disable !== ref.current.disable) ||
-        dependencies["bind-value"].length > 0 ||
-        dependencies["def-props"].length > 0
+          _disable !== ref.current.disable)
       ) {
         formMethods.resetField(resolvedName as Path<TFields>);
       }
