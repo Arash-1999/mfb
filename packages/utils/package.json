@@ -16,8 +16,7 @@
     "lint": "eslint ."
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "keywords": [
     "mfb",
