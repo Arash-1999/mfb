@@ -1,5 +1,6 @@
 import type { FieldValues } from "react-hook-form";
 
+import { MfbValidator } from "@mfb/validation";
 import { FormBuilder, FormBuilderConfig, GetInputs } from "@mfb/core";
 import { MfbFieldArray } from "./field-array";
 import { MfbButton } from "./button";
@@ -20,6 +21,7 @@ const config = {
     defaultValues: { select: "fab67329-8854-4e22-a0e6-8207be509905", text: "" },
   },
   layout: getLayout(),
+  validator: new MfbValidator(),
 } satisfies FormBuilderConfig;
 
 type MfbInput<TFields extends FieldValues> = GetInputs<typeof config, TFields>;

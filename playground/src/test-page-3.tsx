@@ -137,35 +137,35 @@ const TestPage3 = () => {
                       options: [],
                     },
                   },
-                  {
-                    type: "text",
-                    name: "input-2",
-                    props: {
-                      textFieldProps: {
-                        size: "small",
-                        label: "Second Input",
-                        placeholder: "Second Input",
-                      },
-                    },
-                  },
-                  {
-                    type: "text",
-                    name: "input-3",
-                    props: {
-                      textFieldProps: {
-                        size: "small",
-                        label: "Third Input",
-                        placeholder: "Third Input",
-                      },
-                    },
-                    dependsOn: {
-                      type: "visibility",
-                      path: "input-1",
-                      condition: "eq",
-                      value: "something",
-                      id: "input-1",
-                    },
-                  },
+                  // {
+                  //   type: "text",
+                  //   name: "input-2",
+                  //   props: {
+                  //     textFieldProps: {
+                  //       size: "small",
+                  //       label: "Second Input",
+                  //       placeholder: "Second Input",
+                  //     },
+                  //   },
+                  // },
+                  // {
+                  //   type: "text",
+                  //   name: "input-3",
+                  //   props: {
+                  //     textFieldProps: {
+                  //       size: "small",
+                  //       label: "Third Input",
+                  //       placeholder: "Third Input",
+                  //     },
+                  //   },
+                  //   dependsOn: {
+                  //     type: "visibility",
+                  //     path: "input-1",
+                  //     condition: "eq",
+                  //     value: "something",
+                  //     id: "input-1",
+                  //   },
+                  // },
                 ],
                 title: "Group Item 1",
               },

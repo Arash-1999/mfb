@@ -11,6 +11,7 @@ import type {
   GetCardsImpl,
   GetInputsImpl,
   InputMapperProps,
+  ItemArray,
   RenderCardItemProps,
   RenderFnOptions,
 } from "@mfb/types";
@@ -26,6 +27,7 @@ import {
   listInputGuard,
   mergeName,
 } from "@/utils";
+import { isNullOrUndefined } from "@mfb/utils";
 import { createElement, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
@@ -142,6 +144,20 @@ class FormBuilder<
     );
   };
 
+  private useValidation = <TFields extends FieldValues>(
+    items: ItemArray<TFields>,
+  ) => {
+    const resolver = useMemo(() => {
+      if (isNullOrUndefined(this.config.validator)) {
+        return undefined;
+      }
+
+      return this.config.validator.resolve<TFields>(items);
+    }, [items]);
+
+    return resolver;
+  };
+
   public Builder = <TFields extends FieldValues>({
     cards,
     gridContainerProps,
@@ -149,7 +165,6 @@ class FormBuilder<
     onSubmit,
     options,
   }: BuilderProps<TConfig, TFields, TFormId>) => {
-    const formMethods = useForm<TFields>(options);
     const {
       layout: { "grid-container": GridContainer },
     } = this.config;
@@ -168,7 +183,10 @@ class FormBuilder<
       return cards;
     }, [cards]);
 
+    const resolver = this.useValidation<TFields>(resolvedCards);
     const defaultValues = useDefaultValue(this.config, resolvedCards);
+    const formMethods = useForm<TFields>(options);
+    console.log(resolver);
 
     return (
       <Context.Provider
@@ -206,7 +224,6 @@ class FormBuilder<
       </Context.Provider>
     );
   };
-
   private ActionButton = <TFields extends FieldValues>({
     action,
     disabled,
@@ -252,6 +269,7 @@ class FormBuilder<
       />
     );
   };
+
   private AdvancedMapper = <TFields extends FieldValues>({
     list,
     name,

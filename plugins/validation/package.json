@@ -1,0 +1,28 @@
+{
+  "name": "@mfb/validation",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "list": "eslint ."
+  },
+  "peerDependencies": {
+    "@mfb/types": "workspace:*",
+    "react-hook-form": "catalog:"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@mfb/eslint-config": "workspace:*",
+    "@mfb/typescript-config": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:vite7",
+    "vite-plugin-dts": "^4.5.0"
+  }
+}
