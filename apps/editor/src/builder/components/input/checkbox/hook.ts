@@ -23,7 +23,6 @@ const useCheckboxForm = (): UseTextFieldFormReturn => {
       return `${splitedPath.slice(0, -1).join(".")}.is_${splitedPath.at(-1)}_responsive` as never;
     },
   });
-
   return {
     fieldInputs,
     gridItemInputs,

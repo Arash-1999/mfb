@@ -11,14 +11,21 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 export default function Page() {
   const [formAtomValue, setFormAtom] = useAtom(formAtom);
   const setEditorLayoutAtom = useSetAtom(editorLayoutAtom);
+  const { currentPath } = useAtomValue(editorLayoutAtom);
   // const [width, setWidth] = useState<number>(breakpoints[0]);
-
   return (
     <main>
       <h1>Mfb Editor</h1>
       {formAtomValue === null ? (
         <>
           <p>choose your UI-Kit</p>
+          <button
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              console.log("Current path:", currentPath);
+            }}>
+            +
+          </button>
           <div className="flex gap-2">
             {(Object.values(BUILDER_MODE) as BuilderMode[]).map((mode) => (
               <button
@@ -29,8 +36,7 @@ export default function Page() {
                     type: mode,
                     list: [],
                   }));
-                }}
-              >
+                }}>
                 {mode}
               </button>
             ))}
@@ -42,11 +48,10 @@ export default function Page() {
           <button
             onClick={() => {
               setEditorLayoutAtom({
-                currentPath: "",
+                currentPath: "sss",
                 sidebarOpen: true,
               });
-            }}
-          >
+            }}>
             APPEND TO ROOT
           </button>
         </>

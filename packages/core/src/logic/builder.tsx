@@ -40,7 +40,7 @@ class FormBuilder<
   constructor(
     config: TConfig,
     options?: Partial<FormBuilderOptions>,
-    overrides?: FormBuilderOverrides,
+    overrides?: FormBuilderOverrides
   ) {
     super(config, options, overrides);
   }
@@ -78,8 +78,7 @@ class FormBuilder<
           defaultValues: defaultValues.defaultValues,
           fieldArray: defaultValues.fieldArray,
           id,
-        }}
-      >
+        }}>
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <MfbItemProvider>
@@ -125,8 +124,7 @@ class FormBuilder<
           defaultValues: defaultValues.defaultValues,
           fieldArray: defaultValues.fieldArray,
           id,
-        }}
-      >
+        }}>
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <MfbItemProvider>
@@ -176,8 +174,7 @@ class FormBuilder<
           defaultValues: defaultValues.defaultValues,
           fieldArray: defaultValues.fieldArray,
           id,
-        }}
-      >
+        }}>
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
             <MfbItemProvider>
@@ -370,7 +367,7 @@ class FormBuilder<
 
   private renderAction = <TFields extends FieldValues>(
     action: ActionInput<TConfig, TFields>,
-    { dependsOn }: RenderFnOptions<TFields>,
+    { dependsOn }: RenderFnOptions<TFields>
   ) => {
     const { ActionButton } = this;
 
@@ -386,7 +383,7 @@ class FormBuilder<
     card:
       | GetCardsImpl<TConfig, TFields, TAdvanced, true>
       | GetCardsImpl<TConfig, TFields, TAdvanced>,
-    { dependsOn, index, name }: RenderFnOptions<TFields>,
+    { dependsOn, index, name }: RenderFnOptions<TFields>
   ) => {
     const resolvedName = mergeName(name || "", card.name || "");
     const { "grid-container": GridContainer, "grid-item": GridItem } =
@@ -514,7 +511,7 @@ class FormBuilder<
               ) : (
                 <InputMapper inputs={card.inputs} name={resolvedName} />
               )}
-            </GridContainer>,
+            </GridContainer>
           )}
         </GridItem>
       );
@@ -524,7 +521,7 @@ class FormBuilder<
 
   private renderCardItem = <TFields extends FieldValues>(
     cardItem: RenderCardItemProps<TConfig, TFields>,
-    { name }: RenderFnOptions<TFields>,
+    { name }: RenderFnOptions<TFields>
   ) => {
     const {
       layout: { "grid-container": GridContainer },
@@ -550,7 +547,7 @@ class FormBuilder<
 
   private renderInput = <TFields extends FieldValues>(
     input: GetInputsImpl<TConfig, TFields, true>,
-    { dependsOn, formMethods, name }: RenderFnOptions<TFields>,
+    { dependsOn, formMethods, name }: RenderFnOptions<TFields>
   ) => {
     const resolvedName = mergeName(name || "", input.name);
     if (listInputGuard<TConfig, TFields>(input)) {
@@ -587,8 +584,7 @@ class FormBuilder<
                   return (
                     <FieldArrayContext.Provider
                       key={field.id}
-                      value={{ index: i, length }}
-                    >
+                      value={{ index: i, length }}>
                       {children}
                     </FieldArrayContext.Provider>
                   );

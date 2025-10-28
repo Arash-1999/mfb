@@ -14,6 +14,7 @@ const Sidebar = () => {
   const builderMode = useAtomValue(readonlyBuilderMode);
   const [tabKey, setTabKey] = useState<Category>("");
   const [formKey, setFormKey] = useState<string>("");
+  console.log(currentPath);
 
   const filteredCategories = getCategoriesByMode(
     builderMode,
@@ -40,16 +41,17 @@ const Sidebar = () => {
           <div className="flex flex-col gap-2">
             {(
               Object.keys(filteredCategories) as (keyof typeof categoryDict)[]
-            ).map((key) => (
-              <button
-                key={key}
-                onClick={() => {
-                  setTabKey(key);
-                }}
-              >
-                {key.replaceAll("-", " ")}
-              </button>
-            ))}
+            ).map((key) => {
+              return (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setTabKey(key);
+                  }}>
+                  {key.replaceAll("-", " ")}
+                </button>
+              );
+            })}
           </div>
         </>
       );
@@ -64,8 +66,7 @@ const Sidebar = () => {
                 className="cursor-pointer p-2 w-full h-full inline-block text-start"
                 onClick={() => {
                   setFormKey(item.name);
-                }}
-              >
+                }}>
                 {item.name.replaceAll("-", " ")}
               </button>
             </li>
