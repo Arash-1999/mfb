@@ -1,6 +1,11 @@
 import { FormBuilder } from "@mfb/core";
 
-import type { EditableMuiConfig, FormId, DraggableMuiConfig, MuiConfig } from "./config";
+import type {
+  EditableMuiConfig,
+  FormId,
+  DraggableMuiConfig,
+  MuiConfig,
+} from "./config";
 
 import { editableConfig, draggableConfig, muiConfig } from "./config";
 
@@ -16,9 +21,7 @@ const DraggableMuiFB = new FormBuilder<DraggableMuiConfig, FormId>(
   draggableConfig
 );
 
-const MuiFB = new FormBuilder<MuiConfig, FormId>(
-  muiConfig
-);
+const MuiFB = new FormBuilder<MuiConfig, FormId>(muiConfig);
 
 export { EditableMuiFB, DraggableMuiFB, MuiFB };
 export type { EditableMuiConfig, FormId, DraggableMuiConfig, MuiConfig };
