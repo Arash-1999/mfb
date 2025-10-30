@@ -24,5 +24,12 @@
     "typescript": "catalog:",
     "vite": "catalog:vite7",
     "vite-plugin-dts": "^4.5.0"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "catalog:",
+    "@mfb/utils": "workspace:*",
+    "ajv": "catalog:",
+    "ajv-errors": "catalog:",
+    "ajv-formats": "catalog:"
   }
 }
