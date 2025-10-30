@@ -6,6 +6,7 @@ import type { FormBuilderConfig } from "./config";
 import type { Dependency, DependsOn } from "./dependency-management";
 import type { BaseInput, GetInputs } from "./input";
 import type { ActionInput } from "./input/action";
+import type { Validation } from "./validation";
 
 type AdvancedList<
   TConfig extends FormBuilderConfig,
@@ -48,7 +49,9 @@ interface Item<TFields extends FieldValues> {
     | ItemArray<TFields>;
   name?: string;
   props?: unknown;
+  required?: boolean;
   type?: PropertyKey;
+  validation?: Validation;
   variant?: "list" | "normal";
 }
 
