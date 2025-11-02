@@ -1,7 +1,7 @@
 const BUILDER_MODE = {
-  ADVANCED: "Advanced",
-  BASIC: "Basic",
-  NORMAL: "Normal",
+  ADVANCED: "advanced",
+  BASIC: "basic",
+  NORMAL: "normal",
 } as const;
 
 type BuilderModeKeys = keyof typeof BUILDER_MODE;
