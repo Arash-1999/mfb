@@ -1,0 +1,33 @@
+{
+  "name": "@mfb/utils",
+  "description": "Mfb utilities",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "lint": "eslint ."
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "mfb",
+    "micro-kernel",
+    "form-builder"
+  ],
+  "devDependencies": {
+    "@mfb/eslint-config": "workspace:*",
+    "@mfb/typescript-config": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  },
+  "license": "ISC"
+}

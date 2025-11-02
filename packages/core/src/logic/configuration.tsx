@@ -5,7 +5,7 @@ import type {
   FormBuilderOptions,
   FormBuilderOverrides,
   MfbContextValue,
-} from "@/types";
+} from "@mfb/types";
 import type { Context, ReactNode } from "react";
 import type { FieldValues } from "react-hook-form";
 

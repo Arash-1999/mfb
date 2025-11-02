@@ -1,20 +1,15 @@
-import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 
-import type { ActionInput, ListInput } from "./components";
-import type { FormBuilderConfig } from "./config";
-import type { Dependency } from "./dependency-management";
+import type { DefineFnProps } from "../common";
+import type { FormBuilderConfig } from "../config";
+import type { Dependency } from "../dependency-management";
 import type {
-  BaseComponentProps,
-  BaseInput,
-  DefineFnProps,
+  GetInputParameter,
   GetLayoutProps,
   HasDependencyField,
-} from "./utils";
-
-type GetInputParameter<
-  TConfig extends FormBuilderConfig,
-  TInput extends PropertyKey,
-> = Parameters<TConfig["input"]["components"][TInput]>[0];
+} from "../utils";
+import type { ActionInput } from "./action";
+import type { ListInput } from "./list";
 
 type GetInputs<
   TConfig extends FormBuilderConfig,
@@ -55,13 +50,12 @@ type GetInputsImpl<
       };
     }[keyof TConfig["input"]["components"]];
 
-type InputObject = Record<PropertyKey, BaseInput>;
-
-// TODO: add required and other rules
-type InputProps<TFields extends FieldValues, TProps> = BaseComponentProps &
-  TProps & {
-    formMethods: UseFormReturn<TFields>;
-    name: Path<TFields>;
-  };
-
-export type { GetInputs, GetInputsImpl, InputObject, InputProps };
+export type { GetInputs, GetInputsImpl };
+export type { ActionInput } from "./action";
+export type {
+  BaseInput,
+  ButtonComponent,
+  ButtonComponentProps,
+  InputProps,
+} from "./component";
+export type { ListInput } from "./list";

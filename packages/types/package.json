@@ -1,0 +1,32 @@
+{
+  "name": "@mfb/types",
+  "description": "Mfb types",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "mfb",
+    "micro-kernel",
+    "form-builder",
+    "typescript"
+  ],
+  "devDependencies": {
+    "@mfb/eslint-config": "workspace:*",
+    "@mfb/typescript-config": "workspace:*",
+    "@types/react": "^19.0.8",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react-hook-form": "catalog:"
+  },
+  "license": "ISC"
+}

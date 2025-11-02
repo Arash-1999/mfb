@@ -13,7 +13,7 @@ import type {
   InputMapperProps,
   RenderCardItemProps,
   RenderFnOptions,
-} from "@/types";
+} from "@mfb/types";
 import type { FieldValues } from "react-hook-form";
 
 import { FieldArrayContext, useFieldArrayContext } from "@/context";
@@ -308,6 +308,7 @@ class FormBuilder<
     <TDeps extends FieldValues>(func: (props?: { deps: TDeps }) => TItem) => {
       return func;
     };
+
   private FieldArray = <TFields extends FieldValues>({
     disabled,
     name,

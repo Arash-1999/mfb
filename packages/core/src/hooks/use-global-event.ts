@@ -1,5 +1,5 @@
 import type { EventName } from "@/constants";
-import type { FieldArrayEvent } from "@/types";
+import type { FieldArrayEvent } from "@mfb/types";
 import type { FieldValues } from "react-hook-form";
 
 import { useEffect } from "react";

@@ -4,7 +4,7 @@ import type {
   DependencyStructure,
   DependencyType,
   DependsOn,
-} from "@/types";
+} from "@mfb/types";
 import type { FieldValues, Path } from "react-hook-form";
 
 import { reFieldArrayValue } from "@/constants";
@@ -43,7 +43,7 @@ const useDependency = <
     dependsOn,
     name = "",
   }: UseDependencyProps<TFields, TItem>,
-  options?: UseDependencyOptions
+  options?: UseDependencyOptions,
 ): UseDependencyReturn<TFields, TItem> => {
   const fieldArrayContext = useFieldArrayContext();
   const { reduceCalc } = useConditionCalculator();
@@ -64,7 +64,7 @@ const useDependency = <
           ? typeof dep.value === "string"
             ? !reFieldArrayValue.test(dep.value)
             : true
-          : true
+          : true,
       )
       .map((dep) => {
         return dep.path;
@@ -105,15 +105,14 @@ const useDependency = <
       const _hide = dependencies.hide;
       const _disable = dependencies.disable;
 
+      // TODO: save last bind-value and def-props state and compare if there is change reset
       if (
         (typeof ref.current.hide === "boolean" &&
           _hide &&
           _hide !== ref.current.hide) ||
         (typeof ref.current.disable === "boolean" &&
           _disable &&
-          _disable !== ref.current.disable) ||
-        dependencies["bind-value"].length > 0 ||
-        dependencies["def-props"].length > 0
+          _disable !== ref.current.disable)
       ) {
         formMethods.resetField(resolvedName as Path<TFields>);
       }

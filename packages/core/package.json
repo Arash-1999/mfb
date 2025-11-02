@@ -14,6 +14,10 @@
     "build:watch": "tsc -b && vite build --watch",
     "lint": "eslint ."
   },
+  "dependencies": {
+    "@mfb/types": "workspace:*",
+    "@mfb/utils": "workspace:*"
+  },
   "peerDependencies": {
     "react": "catalog:",
     "react-dom": "catalog:",

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@mfb/typescript-config/base.json",
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist"
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+  }
+}

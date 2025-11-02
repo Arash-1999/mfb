@@ -1,12 +1,11 @@
-import type { ReactNode } from "react";
+import type { JSX } from "react";
 import type { DeepPartial, FieldValues } from "react-hook-form";
 
-import type { FieldArrayOverrideProps } from "./builder-methods";
-import type { GroupCardComponent, SimpleCardObject } from "./card";
-import type { ButtonComponent } from "./components";
+import type { FieldArrayOverrideProps } from "./builder-methods/field-array";
+import type { GroupCardComponent, SimpleCardObject } from "./card/component";
+import type { BaseComponent, InputObject, LayoutKey } from "./common";
 import type { FieldArrayValues } from "./default-value";
-import type { InputObject } from "./input";
-import type { BaseComponent, LayoutKey } from "./utils";
+import type { ButtonComponent } from "./input";
 
 interface FormBuilderConfig {
   button: {
@@ -37,7 +36,7 @@ interface FormBuilderOptions {
 interface FormBuilderOverrides {
   FieldArray: <TFields extends FieldValues, TFormId extends string>(
     props: FieldArrayOverrideProps<TFields, TFormId>,
-  ) => ReactNode;
+  ) => JSX.Element;
 }
 
 interface MfbContextValue<

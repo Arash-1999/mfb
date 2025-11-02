@@ -1,23 +1,15 @@
 import type { FieldValues, Path } from "react-hook-form";
 
+import type { Condition } from "./condition";
+
 type BindValueDependency = {
   type: "bind-value";
-};
-
-type Condition = {
-  condition:
-    | "eq"
-    | "is-first-index"
-    | "is-last-index"
-    | "not-eq"
-    | "not-first-index"
-    | "not-last-index";
-  value: boolean | null | number | string;
 };
 
 type DefPropsDependency = {
   type: "def-props";
 };
+
 type Dependency<
   TFields extends FieldValues,
   TFunc extends boolean = false,
@@ -36,6 +28,7 @@ type DependencyDict<TFields extends FieldValues> = {
       }
   >;
 };
+
 interface DependencyObject<
   TFields extends FieldValues,
   TOnlyBoolean extends boolean = false,
@@ -81,8 +74,8 @@ type DependsOnSingle<
 type DependsOnUnion<TOnlyBoolean extends boolean = false> =
   | DefPropsDependency
   | DisableDependency
-  | (TOnlyBoolean extends false ? BindValueDependency : never)
-  | HideDependency;
+  | HideDependency
+  | (TOnlyBoolean extends false ? BindValueDependency : never);
 
 type DisableDependency = Condition & {
   type: "disable";
@@ -94,7 +87,6 @@ type HideDependency = Condition & {
 
 export type {
   BindValueDependency,
-  Condition,
   Dependency,
   DependencyDict,
   DependencyStructure,

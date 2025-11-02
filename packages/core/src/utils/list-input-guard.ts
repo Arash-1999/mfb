@@ -3,7 +3,7 @@ import type {
   DefineFnProps,
   FormBuilderConfig,
   ListInput,
-} from "@/types";
+} from "@mfb/types";
 import type { FieldValues } from "react-hook-form";
 
 const listActionGuard = <

@@ -1,4 +1,4 @@
-import type { Dependency, DependsOn } from "@/types";
+import type { Dependency, DependsOn } from "@mfb/types";
 import type { FieldValues } from "react-hook-form";
 
 import { useMemo } from "react";

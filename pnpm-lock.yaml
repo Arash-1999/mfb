@@ -117,6 +117,12 @@ importers:
 
   packages/core:
     dependencies:
+      '@mfb/types':
+        specifier: workspace:*
+        version: link:../types
+      '@mfb/utils':
+        specifier: workspace:*
+        version: link:../utils
       react:
         specifier: 'catalog:'
         version: 19.0.0
@@ -191,7 +197,44 @@ importers:
         specifier: ^8.23.0
         version: 8.23.0(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3)
 
+  packages/types:
+    dependencies:
+      react-hook-form:
+        specifier: 'catalog:'
+        version: 7.54.2(react@19.0.0)
+    devDependencies:
+      '@mfb/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@mfb/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/react':
+        specifier: ^19.0.8
+        version: 19.1.6
+      eslint:
+        specifier: 'catalog:'
+        version: 9.19.0(jiti@2.4.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.7.3
+
   packages/typescript-config: {}
+
+  packages/utils:
+    devDependencies:
+      '@mfb/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@mfb/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: 'catalog:'
+        version: 9.19.0(jiti@2.4.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.7.3
 
   playground:
     dependencies:
@@ -5883,7 +5926,7 @@ snapshots:
       '@humanfs/node': 0.16.6
       '@humanwhocodes/module-importer': 1.0.1
       '@humanwhocodes/retry': 0.4.1
-      '@types/estree': 1.0.6
+      '@types/estree': 1.0.7
       '@types/json-schema': 7.0.15
       ajv: 6.12.6
       chalk: 4.1.2

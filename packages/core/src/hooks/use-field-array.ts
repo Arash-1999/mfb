@@ -1,4 +1,4 @@
-import type { FieldArrayValues, FormAction } from "@/types";
+import type { FieldArrayValues, FormAction } from "@mfb/types";
 import type { ArrayPath, FieldValues } from "react-hook-form";
 
 import { useCallback } from "react";
