@@ -1,1 +1,1 @@
-export { EditorLayout } from './editor'
+export { EditorLayout } from "./editor";

@@ -1,4 +1,4 @@
-type FormId = `form-${number}`;
+type FormId = string;
 
 export { MfbSidebarStepper } from "./card";
 export { draggableConfig } from "./draggable";

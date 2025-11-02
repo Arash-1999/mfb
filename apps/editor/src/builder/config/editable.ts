@@ -1,6 +1,12 @@
 import type { FormBuilderConfig } from "@mfb/core";
 
-import { FormField, getInputComponents } from "@mfb/plugin-mui";
+import {
+  FormField,
+  getInputComponents,
+  getConfig,
+  getGroupCards,
+} from "@mfb/plugin-mui";
+import { getSimpleCards } from "@mfb/plugin-mui";
 import { createElement } from "react";
 
 import { MfbButton } from "./button";
@@ -13,9 +19,11 @@ const editableConfig = {
   },
   card: {
     group: {
-      "sidebar-stepper": MfbSidebarStepper,
+      ...getGroupCards(),
     },
-    simple: {},
+    simple: {
+      ...getSimpleCards(),
+    },
   },
   input: {
     components: {
@@ -26,6 +34,7 @@ const editableConfig = {
       checkbox: false,
       radio: "",
       text: "",
+      slider: "",
     },
   },
   layout: {
