@@ -1,10 +1,10 @@
 import { MuiFB } from "@/builder";
-
 import type { SelectOptionsForm } from "./type";
-
 import { useSelectForm } from "./hook";
+import { withSubmit } from "../../submit/submit";
+import { onSubmitFn } from "../../submit/type";
 
-const SelectForm = () => {
+const Select = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
   const { fieldInputs, gridItemInputs, propsInputs } = useSelectForm();
 
   return (
@@ -45,6 +45,11 @@ const SelectForm = () => {
       id="form-2"
       onSubmit={(data) => {
         console.log(data);
+        onSubmit({
+          type: "select",
+          name: "new-field",
+          ...data,
+        });
       }}
       options={{
         defaultValues: {
@@ -77,5 +82,6 @@ const SelectForm = () => {
     />
   );
 };
+const SelectForm = withSubmit(Select);
 
 export { SelectForm };

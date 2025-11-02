@@ -1,9 +1,10 @@
 import { MuiFB } from "@/builder";
-
 import type { RatingOptionsForm } from "./type";
 import { useRatingOptionsForm } from "./hook";
+import { withSubmit } from "../../submit/submit";
+import { onSubmitFn } from "../../submit/type";
 
-const RatingForm = () => {
+const Rating = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
   const { fieldInputs, gridItemInputs, propsInputs } = useRatingOptionsForm();
 
   return (
@@ -44,6 +45,11 @@ const RatingForm = () => {
       id="form-2"
       onSubmit={(data) => {
         console.log(data);
+        onSubmit({
+          type: "rating",
+          name: "new-field",
+          ...data,
+        });
       }}
       options={{
         defaultValues: {
@@ -65,5 +71,6 @@ const RatingForm = () => {
     />
   );
 };
+const RatingForm = withSubmit(Rating);
 
 export { RatingForm };

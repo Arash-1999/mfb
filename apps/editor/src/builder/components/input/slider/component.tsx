@@ -1,10 +1,10 @@
 import { MuiFB } from "@/builder";
-
 import type { SliderOptionsForm } from "./type";
-
 import { useSliderForm } from "./hook";
+import { withSubmit } from "../../submit/submit";
+import { onSubmitFn } from "../../submit/type";
 
-const SliderForm = () => {
+const Slider = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
   const { fieldInputs, gridItemInputs, propsInputs } = useSliderForm();
 
   return (
@@ -45,6 +45,11 @@ const SliderForm = () => {
       id="form-2"
       onSubmit={(data) => {
         console.log(data);
+        onSubmit({
+          type: "slider",
+          name: "new-field",
+          ...data,
+        });
       }}
       options={{
         defaultValues: {
@@ -68,5 +73,5 @@ const SliderForm = () => {
     />
   );
 };
-
+const SliderForm = withSubmit(Slider);
 export { SliderForm };

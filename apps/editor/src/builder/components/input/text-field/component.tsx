@@ -2,8 +2,10 @@ import { MuiFB } from "@/builder";
 
 import type { TextFieldForm } from "./type";
 import { useTextFieldForm } from "./hook";
+import { withSubmit } from "../../submit/submit";
+import { onSubmitFn } from "../../submit/type";
 
-const TextFieldsForm = () => {
+const TextFields = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
   const { fieldInputs, gridItemInputs, propsInputs } = useTextFieldForm();
 
   return (
@@ -44,6 +46,11 @@ const TextFieldsForm = () => {
       id="form-2"
       onSubmit={(data) => {
         console.log(data);
+        onSubmit({
+          type: "text",
+          name: "new-field",
+          ...data,
+        });
       }}
       options={{
         defaultValues: {
@@ -69,5 +76,6 @@ const TextFieldsForm = () => {
     />
   );
 };
+const TextFieldsForm = withSubmit(TextFields);
 
 export { TextFieldsForm };
