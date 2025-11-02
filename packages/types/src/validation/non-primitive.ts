@@ -1,4 +1,4 @@
-import { PrimitiveValiditon } from "./primitive";
+import type { PrimitiveValiditon } from "./primitive";
 
 interface ArrayBaseKeywords {
   maxItems?: number;

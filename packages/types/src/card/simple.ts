@@ -4,6 +4,7 @@ import type { BaseComponentProps } from "../common";
 import type { FormBuilderConfig } from "../config";
 import type { Dependency } from "../dependency-management";
 import type { GetLayoutProps } from "../utils";
+import type { ObjectValidation } from "../validation";
 import type { GetCardBase, Header } from "./common";
 
 type GetSimpleCard<
@@ -29,6 +30,7 @@ type GetSimpleCard<
             "children" | "header" | keyof BaseComponentProps
           >;
       type: TCard;
+      validation?: ObjectValidation;
     };
   }[keyof TConfig["card"]["simple"]];
 

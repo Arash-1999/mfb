@@ -20,14 +20,12 @@ type GetCardBase<
         ? Array<NormalCardItem<TConfig, TFields, TAdvanced, TFunc>>
         : Array<GetInputs<TConfig, TFields>>;
       required?: boolean;
-      validaiton?: ObjectValidation;
     }
   : {
       list: TNormalGroup extends false
         ? Array<NormalCardItem<TConfig, TFields, TAdvanced, TFunc>>
         : AdvancedList<TConfig, TFields>;
       required?: boolean;
-      validaiton?: ObjectValidation;
     };
 
 type Header = Record<"center" | "left" | "right", ReactNode>;
