@@ -1,5 +1,5 @@
 import { Button, Container } from "@mui/material";
-import { FB } from "./form-builder";
+//import { FB } from "./form-builder";
 import { dispatchFieldArray } from "@mfb/core";
 
 const TEST_PAGE_3_FORM_ID = "TEST_PAGE_FORM_ID";
@@ -32,8 +32,7 @@ const TestPage3 = () => {
               { shouldFocus: false },
             ],
           });
-        }}
-      >
+        }}>
         APPEND TO AKBAR
       </Button>
       <Button
@@ -44,12 +43,11 @@ const TestPage3 = () => {
             type: "remove",
             params: [-1],
           });
-        }}
-      >
+        }}>
         REMOVE FROM AKBAR
       </Button>
 
-      <FB.Builder<TestPageForm>
+      {/* <FB.Builder<TestPageForm>
         gridContainerProps={{
           spacing: 2,
         }}
@@ -258,7 +256,7 @@ const TestPage3 = () => {
             type: "tab-group",
           },
         ]}
-      />
+      /> */}
     </Container>
   );
 };

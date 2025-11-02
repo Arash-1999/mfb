@@ -33,10 +33,9 @@ const Page = () => {
                 },
                 { shouldFocus: false },
               ],
-            },
+            }
           );
-        }}
-      >
+        }}>
         APPEND TO FILTER ITEMS
       </Button>
       <FB.AdvancedBuilder<TestPageFields>
@@ -67,6 +66,7 @@ const Page = () => {
                     mode: "input",
                     type: "field-array-action",
                   },
+
                   {
                     mode: "input",
                     type: "text",
@@ -82,6 +82,22 @@ const Page = () => {
                       },
                     },
                   },
+                  {
+                    mode: "input",
+                    type: "text",
+                    name: "title",
+                    gridProps: {
+                      size: 11,
+                    },
+                    props: {
+                      textFieldProps: {
+                        size: "small",
+                        label: "Title",
+                        placeholder: "Title",
+                      },
+                    },
+                  },
+
                   {
                     dependsOn: {
                       type: "disable",
@@ -124,6 +140,7 @@ const Page = () => {
                           },
                         },
                       },
+
                       {
                         mode: "input",
                         type: "list",

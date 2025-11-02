@@ -29,8 +29,7 @@ const TestPage = () => {
               { shouldFocus: false },
             ],
           });
-        }}
-      >
+        }}>
         APPEND TO AKBAR
       </Button>
       <Button
@@ -41,8 +40,7 @@ const TestPage = () => {
             type: "remove",
             params: [-1],
           });
-        }}
-      >
+        }}>
         REMOVE FROM AKBAR
       </Button>
       <FB.BasicBuilder

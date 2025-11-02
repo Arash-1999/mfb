@@ -1,1 +1,1 @@
-export { MuiPage1 } from "./test-1";
+export {} from "./test-1";

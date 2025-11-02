@@ -40,71 +40,71 @@ const Page = () => {
               },
             },
           },
-          {
-            dependsOn: [
-              {
-                path: "is_multiple",
-                condition: "not-eq",
-                id: "is_multiple",
-                type: "visibility",
-                value: "yes",
-              },
-              {
-                path: "are_you_sure",
-                condition: "eq",
-                id: "sure",
-                type: "visibility",
-                value: "akbar",
-              },
-            ],
-            shouldReset: true,
-            type: "text",
-            name: "value",
-            props: {
-              textFieldProps: {
-                size: "small",
-                label: "value",
-                placeholder: "value",
-              },
-            },
-          },
-          {
-            dependsOn: {
-              path: "is_multiple",
-              condition: "eq",
-              id: "is_multiple",
-              type: "visibility",
-              value: "yes",
-            },
-            type: "text",
-            name: "value.xs",
-            props: {
-              textFieldProps: {
-                size: "small",
-                label: "value xs",
-                placeholder: "value xs",
-              },
-            },
-          },
+          // {
+          //   dependsOn: [
+          //     {
+          //       path: "is_multiple",
+          //       condition: "not-eq",
+          //       id: "is_multiple",
+          //       type: "visibility",
+          //       value: "yes",
+          //     },
+          //     {
+          //       path: "are_you_sure",
+          //       condition: "eq",
+          //       id: "sure",
+          //       type: "visibility",
+          //       value: "akbar",
+          //     },
+          //   ],
+          //   shouldReset: true,
+          //   type: "text",
+          //   name: "value",
+          //   props: {
+          //     textFieldProps: {
+          //       size: "small",
+          //       label: "value",
+          //       placeholder: "value",
+          //     },
+          //   },
+          // },
+          // {
+          //   dependsOn: {
+          //     path: "is_multiple",
+          //     condition: "eq",
+          //     id: "is_multiple",
+          //     type: "visibility",
+          //     value: "yes",
+          //   },
+          //   type: "text",
+          //   name: "value.xs",
+          //   props: {
+          //     textFieldProps: {
+          //       size: "small",
+          //       label: "value xs",
+          //       placeholder: "value xs",
+          //     },
+          //   },
+          // },
 
-          {
-            dependsOn: {
-              path: "is_multiple",
-              condition: "eq",
-              id: "is_multiple",
-              type: "visibility",
-              value: "yes",
-            },
-            type: "text",
-            name: "value.md",
-            props: {
-              textFieldProps: {
-                size: "small",
-                label: "value md",
-                placeholder: "value md",
-              },
-            },
-          },
+          // {
+          //   dependsOn: {
+          //     path: "is_multiple",
+          //     condition: "eq",
+          //     id: "is_multiple",
+          //     type: "visibility",
+          //     value: "yes",
+          //   },
+          //   type: "text",
+          //   name: "value.md",
+          //   props: {
+          //     textFieldProps: {
+          //       size: "small",
+          //       label: "value md",
+          //       placeholder: "value md",
+          //     },
+          //   },
+          // },
           //   api.define<{ is_multiple: string }>((props) => ({
           //     type: "text",
           //     name: "value",

@@ -20,10 +20,10 @@ const MuiPage1 = () => {
                 { label: "Male", value: "1" },
                 { label: "Female", value: "0" },
               ],
-              radioGroupProps: {
-                defaultValue: "1",
-                row: true,
-              },
+              // radioGroupProps: {
+              //   defaultValue: "1",
+              //   row: true,
+              // },
             },
             type: "radio",
           },

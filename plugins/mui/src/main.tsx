@@ -1,16 +1,19 @@
 import type { FormBuilderConfig } from "@mfb/core";
 
 import { MfbAccordion, MfbAccordionGroup, MfbPaper } from "./components/cards";
+import { MfbCheckbox } from "./components/inputs/checkbox";
+import { MfbRadioGroup } from "./components/inputs/radio";
+import { MfbRating } from "./components/inputs/rating";
+import { MfbSelect } from "./components/inputs/select";
+import { MfbSlider } from "./components/inputs/slider";
+import { MfbSwitch } from "./components/inputs/switch";
+import { MfbTextField } from "./components/inputs/text-field";
 import {
-  MfbCheckbox,
-  MfbRadioGroup,
-  MfbRating,
-  MfbSelect,
-  MfbSlider,
-  MfbSwitch,
-  MfbTextField,
-} from "./components/inputs";
-import { FormField, getLayoutConfig, GridContainer, GridItem } from "./components/layout";
+  FormField,
+  getLayoutConfig,
+  GridContainer,
+  GridItem,
+} from "./components/layout";
 
 const config = {
   button: {
