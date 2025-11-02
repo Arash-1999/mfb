@@ -7,13 +7,15 @@ import { atom } from "jotai";
 
 interface AdvancedForm {
   type: (typeof BUILDER_MODE)["ADVANCED"];
+  list: InputArray<MuiConfig, FieldValues>;
 }
 interface BasicForm {
-  list: InputArray<MuiConfig, FieldValues>;
+  inputs: InputArray<MuiConfig, FieldValues>;
   type: (typeof BUILDER_MODE)["BASIC"];
 }
 interface NormalForm {
   type: (typeof BUILDER_MODE)["NORMAL"];
+  cards: InputArray<MuiConfig, FieldValues>;
 }
 
 const formAtom = atom<AdvancedForm | BasicForm | NormalForm | null>(null);
@@ -23,3 +25,4 @@ const readonlyBuilderMode = atom<BuilderMode>((get) => {
 });
 
 export { formAtom, readonlyBuilderMode };
+export type { AdvancedForm, BasicForm, NormalForm };
