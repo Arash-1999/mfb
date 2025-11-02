@@ -10,10 +10,12 @@
   },
   "scripts": {
     "build": "tsc -b && vite build",
-    "list": "eslint ."
+    "build:watch": "tsc -b && vite build --watch",
+    "list": "eslint .",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "peerDependencies": {
-    "@mfb/types": "workspace:*",
     "react-hook-form": "catalog:"
   },
   "devDependencies": {
@@ -27,9 +29,11 @@
   },
   "dependencies": {
     "@hookform/resolvers": "catalog:",
+    "@mfb/types": "workspace:*",
     "@mfb/utils": "workspace:*",
     "ajv": "catalog:",
     "ajv-errors": "catalog:",
-    "ajv-formats": "catalog:"
+    "ajv-formats": "catalog:",
+    "vitest": "catalog:"
   }
 }

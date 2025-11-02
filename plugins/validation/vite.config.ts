@@ -1,5 +1,5 @@
-import { join, resolve } from "node:path";
 import { defineConfig } from "vite";
+import { join, resolve } from "node:path";
 import dts from "vite-plugin-dts";
 
 import { peerDependencies } from "./package.json";
@@ -13,10 +13,12 @@ export default defineConfig({
     },
     minify: false,
     rollupOptions: {
-      // external: [...Object.keys(peerDependencies)],
-      //   output: {
-      //     globals: { },
-      //   },
+      external: [...Object.keys(peerDependencies)],
+      output: {
+        globals: {
+          "react-hook-form": "RHF",
+        },
+      },
     },
     target: "esnext",
   },

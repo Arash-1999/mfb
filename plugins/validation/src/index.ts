@@ -1,7 +1,9 @@
 import type {
   ArrayValidation,
+  BooleanValidation,
   Item,
   ItemArray,
+  NumericValidation,
   ObjectValidation,
   Properties,
   StringValidation,
@@ -11,8 +13,12 @@ import type {
 import type { FieldValues } from "react-hook-form";
 
 import { ajvResolver } from "@hookform/resolvers/ajv";
-import { isFunction, isKey, isNullOrUndefined, stringToPath } from "@mfb/utils";
-import { get } from "react-hook-form";
+import {
+  deepMerge,
+  isFunction,
+  isNullOrUndefined,
+  stringToPath,
+} from "@mfb/utils";
 
 class MfbValidator implements Validator {
   private parseItem = <TFields extends FieldValues>(item: Item<TFields>) => {
@@ -29,9 +35,9 @@ class MfbValidator implements Validator {
     if (!isNullOrUndefined(schema)) {
       if (isListItem(item)) {
         if (item.validation && item.validation.type === "array") {
-          return this.parseArray(item.validation, schema);
+          return this.parseArray(item.validation, schema, required);
         } else {
-          return this.parseArray({ type: "array" }, schema);
+          return this.parseArray({ type: "array" }, schema, required);
         }
       } else {
         const validation = {
@@ -50,9 +56,13 @@ class MfbValidator implements Validator {
 
     switch (item.validation.type) {
       case "array":
-        return this.parseArray(item.validation, {});
+        return this.parseArray(item.validation, {}, []);
+      case "boolean":
+        return this.parseBoolean(item.validation);
+      case "number":
+        return this.parseNumeric(item.validation);
       case "object":
-        return this.parseObject(item.validation, {});
+        return this.parseObject({ ...item.validation, required }, {});
       case "string":
         return this.parseString(item.validation);
       default:
@@ -72,47 +82,33 @@ class MfbValidator implements Validator {
 
       if (isNullOrUndefined(item.name)) return;
 
-      if (isKey(item.name)) {
+      const path = stringToPath(item.name);
+      const lastKey = path[path.length - 1];
+      if (isNullOrUndefined(lastKey)) return;
+
+      if (path.length === 1) {
         if (!isNullOrUndefined(validation)) {
-          result[item.name] = validation;
+          result[lastKey] = validation;
         }
 
         if (item.required && !requiredList.includes(item.name))
-          requiredList.push(item.name);
+          requiredList.push(lastKey);
       } else {
-        const path = stringToPath(item.name);
-        const lastKey = path[path.length - 1];
-        if (isNullOrUndefined(lastKey)) return;
-        const currentObject = get(result, path.join(".properties.")) || {};
-        console.log(currentObject);
-
         // TODO: what happens to digit keys?
         if (isNullOrUndefined(validation)) {
           return;
         }
-        // const a = path
-        //   .slice(0, -1)
-        //   .reverse()
-        //   .reduce(
-        //     (acc, key, index) => {
-        //       const currentPath = path
-        //         .slice(0, -1 - index)
-        //         .join(".properties.");
-        //       const currentObject = get(result, currentPath, {});
-        //       return this.parseObject(
-        //         {
-        //           required: [...(currentObject.required || []), key],
-        //           type: "object",
-        //         },
-        //         { [key]: acc },
-        //       );
-        //     },
-        //     this.parseObject(
-        //       { required: [lastKey], type: "object" },
-        //       { [lastKey]: validation },
-        //     ),
-        //   );
-        // console.log("something", result, a.properties);
+
+        if (item.required && path[0]) requiredList.push(path[0]);
+
+        const _result = this.setToPath({
+          isRequired: Boolean(item.required),
+          path,
+          target: result,
+          validation,
+        });
+
+        deepMerge(result, _result);
       }
     });
 
@@ -125,7 +121,6 @@ class MfbValidator implements Validator {
       properties: schema,
     };
   };
-
   public getSchema = <TFields extends FieldValues>(
     items: ItemArray<TFields>,
   ) => {
@@ -140,11 +135,23 @@ class MfbValidator implements Validator {
     });
   };
 
-  private parseArray = (validation: ArrayValidation, schema: Properties) => {
+  private parseArray = (
+    validation: ArrayValidation,
+    schema: Properties,
+    required: Array<string>,
+  ) => {
     return {
       ...validation,
-      items: this.parseObject({ type: "object" }, schema),
+      items: this.parseObject({ required, type: "object" }, schema),
     };
+  };
+
+  private parseBoolean = (validation: BooleanValidation) => {
+    return { ...validation };
+  };
+
+  private parseNumeric = (validation: NumericValidation) => {
+    return { ...validation };
   };
 
   private parseString = (validation: StringValidation) => {
@@ -153,28 +160,46 @@ class MfbValidator implements Validator {
     };
   };
 
-  private setToPath = (
-    target: Properties,
-    path: string[],
-    validation: Validation,
-    isLast?: boolean,
-  ): Properties => {
+  private setToPath = ({
+    isLast,
+    isRequired,
+    path,
+    target,
+    validation,
+  }: {
+    isLast?: boolean;
+    isRequired: boolean;
+    path: string[];
+    target: Properties;
+    validation: Validation;
+  }): Properties => {
     if (path.length === 0) return target;
     const key = path.shift();
     if (!key) return target;
 
     const current = target[key];
+    const required =
+      current && "required" in current ? current.required || [] : [];
 
     target[key] = isLast
       ? validation
       : this.parseObject(
-          { type: "object" },
-          this.setToPath(
-            (current && "properties" in current && current.properties) || {},
+          {
+            required: [
+              ...new Set<string>(
+                required.concat(isRequired && path[0] ? [path[0]] : []),
+              ),
+            ],
+            type: "object",
+          },
+          this.setToPath({
+            isLast: path.length === 1,
+            isRequired,
             path,
+            target:
+              (current && "properties" in current && current.properties) || {},
             validation,
-            path.length === 1,
-          ),
+          }),
         );
 
     return target;
