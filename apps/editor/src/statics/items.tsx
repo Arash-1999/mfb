@@ -4,12 +4,15 @@ import { RadioForm } from "@/builder/components/input/radio";
 import { RatingForm } from "@/builder/components/input/rating";
 import { MuiConfig } from "@mfb/plugin-mui";
 import { Input } from "@mui/icons-material";
-import { BuilderMode } from "@/types/builder";
+import { BUILDER_MODE, BuilderMode } from "@/types/builder";
+//change it the @/builder/components
 import { CheckboxForm } from "@/builder/components/input/checkbox";
 import { SelectForm } from "@/builder/components/input/select";
 import { SliderForm } from "@/builder/components/input/slider";
 import { SwitchForm } from "@/builder/components/input/switch";
 import { TextFieldsForm } from "@/builder/components/input/text-field";
+import { PaperForm } from "@/builder/components/cards/simple/paper";
+import { AccordionForm } from "@/builder/components/cards/simple/accordion";
 
 type Category =
   | ""
@@ -25,9 +28,9 @@ interface CategoryChild<TKey extends string> {
 
 interface CategoryDict {
   input: CategoryChild<InputKey>;
-  "list-group-card": CategoryChild<string>;
-  "normal-group-card": CategoryChild<string>;
-  "simple-card": CategoryChild<string>;
+  "list-group-card": CategoryChild<ListGroupCardKey>;
+  "normal-group-card": CategoryChild<NormalGroupCardKey>;
+  "simple-card": CategoryChild<SimpleCardKey>;
 }
 
 interface CategoryItem {
@@ -36,7 +39,9 @@ interface CategoryItem {
 }
 
 type InputKey = keyof MuiConfig["input"]["components"];
-
+type ListGroupCardKey = keyof MuiConfig["card"]["group"];
+type NormalGroupCardKey = keyof MuiConfig["card"]["group"];
+type SimpleCardKey = keyof MuiConfig["card"]["simple"];
 const categories: Array<CategoryItem> = [
   { icon: <Input />, key: "input" },
   { icon: <Input />, key: "simple-card" },
@@ -63,6 +68,20 @@ const renderInputForm = (type: InputKey) => {
   }
 };
 
+const renderListGroupCardForm = (type: NormalGroupCardKey) => {
+  switch (type) {
+    case "accordion-group":
+      return <AccordionForm />;
+  }
+};
+const renderSimpleCardForm = (type: SimpleCardKey) => {
+  switch (type) {
+    case "accordion":
+      return <AccordionForm />;
+    case "paper":
+      return <PaperForm />;
+  }
+};
 const categoryDict: CategoryDict = {
   input: {
     options: [
@@ -77,16 +96,16 @@ const categoryDict: CategoryDict = {
     render: renderInputForm,
   },
   "list-group-card": {
-    options: [{ name: "accordion" }, { name: "paper" }],
-    render: () => <></>,
+    options: [{ name: "accordion-group" }],
+    render: renderListGroupCardForm,
   },
   "normal-group-card": {
-    options: [],
-    render: () => <></>,
+    options: [{ name: "accordion-group" }],
+    render: renderListGroupCardForm,
   },
   "simple-card": {
-    options: [],
-    render: () => <></>,
+    options: [{ name: "accordion" }, { name: "paper" }],
+    render: renderSimpleCardForm,
   },
 };
 
@@ -106,13 +125,13 @@ const getInputCategories = ({ input }: CategoryDict) => ({
 
 const getCategoriesByMode = (mode: BuilderMode, path: string) => {
   switch (mode) {
-    case "Advanced": {
+    case BUILDER_MODE.ADVANCED: {
       return categoryDict;
     }
-    case "Basic": {
+    case BUILDER_MODE.BASIC: {
       return getInputCategories(categoryDict);
     }
-    case "Normal": {
+    case BUILDER_MODE.NORMAL: {
       if (path === "") {
         return getCardCategories(categoryDict);
       } else {
@@ -122,6 +141,12 @@ const getCategoriesByMode = (mode: BuilderMode, path: string) => {
   }
 };
 
-export { categories, categoryDict, renderInputForm, getCategoriesByMode };
+export {
+  categories,
+  categoryDict,
+  renderInputForm,
+  getCategoriesByMode,
+  renderSimpleCardForm,
+};
 
 export type { Category, CategoryDict };

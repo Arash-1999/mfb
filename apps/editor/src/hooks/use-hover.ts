@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseHoverProps {
   enabled?: boolean;
@@ -9,44 +9,46 @@ interface UseHoverReturn<TElement extends HTMLElement> {
   ref: (node: null | TElement) => void;
 }
 
-const useHover = <TElement extends HTMLElement>(props: UseHoverProps = { enabled: true }): UseHoverReturn<TElement> => {
+const useHover = <TElement extends HTMLElement>(
+  props: UseHoverProps = { enabled: true }
+): UseHoverReturn<TElement> => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const ref = useRef<TElement>(null);
   const setRef = useCallback((element: null | TElement) => {
-    if(element !== null) {
+    if (element !== null) {
       ref.current = element;
     }
   }, []);
 
   const handleMouseOver = useCallback((event: MouseEvent) => {
-    event.stopPropagation()
-    setIsHovered(true)
+    event.stopPropagation();
+    setIsHovered(true);
   }, []);
   const handleMouseOut = useCallback((event: MouseEvent) => {
-    event.stopPropagation()
-    setIsHovered(false)
+    event.stopPropagation();
+    setIsHovered(false);
   }, []);
 
   useEffect(() => {
     let _ref = null;
     if (!props.enabled) return;
-
     if (ref.current !== null) {
-      _ref = ref.current
-      ref.current.addEventListener('mouseover', handleMouseOver)
-      ref.current.addEventListener('mouseout', handleMouseOut)
+      _ref = ref.current;
+      ref.current.addEventListener("mouseover", handleMouseOver);
+      ref.current.addEventListener("mouseout", handleMouseOut);
     }
 
     return () => {
       if (_ref !== null) {
-        _ref.removeEventListener('mouseover', handleMouseOver);
-        _ref.removeEventListener('mouseout', handleMouseOut);
+        _ref.removeEventListener("mouseover", handleMouseOver);
+        _ref.removeEventListener("mouseout", handleMouseOut);
       }
     };
-  }, [props.enabled, handleMouseOut, handleMouseOver]);
+  });
+  // }, [props.enabled, handleMouseOut, handleMouseOver]);
 
-  return { isHovered, ref: setRef, };
-}
+  return { isHovered, ref: setRef };
+};
 
 export { useHover };
 export type { UseHoverProps, UseHoverReturn };
