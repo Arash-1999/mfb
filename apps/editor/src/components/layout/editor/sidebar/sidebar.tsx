@@ -4,28 +4,35 @@ import type { Category } from "@/statics/items";
 import { categoryDict, getCategoriesByMode } from "@/statics/items";
 import { editorLayoutAtom } from "@/store/atoms";
 import { readonlyBuilderMode } from "@/store/atoms/form";
-// import { ChevronLeft } from "@mui/icons-material";
-// import { IconButton } from "@mui/material";
 import { useAtom, useAtomValue } from "jotai";
-import { useState } from "react";
+
+// Import the new atoms (adjust path as needed)
+import {
+  sidebarTabKeyAtom,
+  sidebarFormKeyAtom,
+  resetSidebarStateAtom,
+} from "@/store/atoms/sidebar";
 
 const Sidebar = () => {
   const [{ sidebarOpen, currentPath }, setAtom] = useAtom(editorLayoutAtom);
   const builderMode = useAtomValue(readonlyBuilderMode);
-  const [tabKey, setTabKey] = useState<Category>("");
-  const [formKey, setFormKey] = useState<string>("");
-  console.log(currentPath);
+
+  // Replace useState with useAtom
+  const [tabKey, setTabKey] = useAtom(sidebarTabKeyAtom);
+  const [formKey, setFormKey] = useAtom(sidebarFormKeyAtom);
+
+  // Optional: Get the reset function if needed
+  const [, resetSidebarState] = useAtom(resetSidebarStateAtom);
 
   const filteredCategories = getCategoriesByMode(
     builderMode,
-    currentPath || ""
+    currentPath?.path || ""
   );
 
   return (
     <>
       <nav className="sticky top-14 rounded bg-amber-300 w-12 h-[calc(100vh-60px)] shrink-0"></nav>
 
-      {/* <div className={tabKey !== "" ? "w-64" : "w-0"}> */}
       <div className="w-64">{renderStep()}</div>
     </>
   );

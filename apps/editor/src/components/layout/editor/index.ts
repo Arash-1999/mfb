@@ -1,1 +1,2 @@
-export { EditorLayout } from './layout';
+export { EditorLayout } from "./layout";
+export { Mode } from "./mode/mode";

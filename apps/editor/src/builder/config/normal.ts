@@ -13,6 +13,7 @@ const muiConfig = {
   card: {
     group: {
       "sidebar-stepper": MfbSidebarStepper,
+      // "tab-group"
     },
     simple: {},
   },
