@@ -1,25 +1,30 @@
-// import type { FormBuilderConfig, InputArray } from "@mfb/types";
-// import type { JSONSchemaType } from "ajv";
-// import type { FieldValues } from "react-hook-form";
+import type { FormBuilderConfig, InputArray } from "@mfb/types";
+import type { JSONSchemaType } from "ajv";
 
-import { MfbValidator } from "@/index";
-import { expect, test } from "vitest";
+import { describe } from "vitest";
 
-// interface Item {
-//   description: string;
-//   input: InputArray<FormBuilderConfig, FieldValues>;
-//   output: JSONSchemaType<FieldValues>;
-// }
+import { compareJsonSchema } from "./compare-json-schema-test";
+import { mfbTest } from "./setup.vitest";
 
-const tests = [
-  {
-    description: "Empty list",
-    input: [],
-    output: { properties: {}, required: [], type: "object" },
-  },
-  {
-    description: "names with isKey === true",
-    input: [
+describe("Basic Builder", () => {
+  mfbTest("Empty list", ({ validator }) => {
+    const schema = validator.getSchema([]);
+    const expected = {
+      properties: {},
+      required: [],
+      type: "object",
+    };
+
+    compareJsonSchema(expected, schema);
+  });
+
+  mfbTest("names with isKey === true", ({ validator }) => {
+    interface TestSchema {
+      "field-1": string;
+      "field-2": number;
+      "field-3": boolean;
+    }
+    const input: InputArray<FormBuilderConfig, TestSchema> = [
       {
         name: "field-1",
         props: {},
@@ -41,8 +46,11 @@ const tests = [
         type: "text",
         validation: { type: "boolean" },
       },
-    ],
-    output: {
+    ];
+
+    const schema = validator.getSchema<TestSchema>(input);
+
+    const expected: JSONSchemaType<TestSchema> = {
       properties: {
         "field-1": { maxLength: 16, minLength: 3, type: "string" },
         "field-2": { maximum: 16, minimum: 3, type: "number" },
@@ -50,11 +58,23 @@ const tests = [
       },
       required: ["field-1", "field-2", "field-3"],
       type: "object",
-    },
-  },
-  {
-    description: "names with isKey === false",
-    input: [
+    };
+
+    compareJsonSchema(expected, schema);
+  });
+
+  mfbTest("names with isKey === false", ({ validator }) => {
+    interface TestSchema {
+      "field-3": boolean;
+      "parent-1": {
+        "field-1": string;
+      };
+      "parent-2": {
+        "field-2": number;
+      };
+    }
+
+    const input: InputArray<FormBuilderConfig, TestSchema> = [
       {
         name: "parent-1.field-1",
         props: {},
@@ -76,8 +96,10 @@ const tests = [
         type: "text",
         validation: { type: "boolean" },
       },
-    ],
-    output: {
+    ];
+    const schema = validator.getSchema<TestSchema>(input);
+
+    const expected: JSONSchemaType<TestSchema> = {
       properties: {
         "field-3": { type: "boolean" },
         "parent-1": {
@@ -97,11 +119,21 @@ const tests = [
       },
       required: ["parent-1", "parent-2", "field-3"],
       type: "object",
-    },
-  },
-  {
-    description: "list with flat items",
-    input: [
+    };
+
+    compareJsonSchema(expected, schema);
+  });
+
+  mfbTest("list with flat items", ({ validator }) => {
+    interface TestSchema {
+      "list-1": Array<{
+        "item-1": string;
+        "item-2": number;
+        "item-3": boolean;
+      }>;
+    }
+
+    const input: InputArray<FormBuilderConfig, TestSchema> = [
       {
         inputs: [
           {
@@ -129,8 +161,10 @@ const tests = [
         name: "list-1",
         type: "list",
       },
-    ],
-    output: {
+    ];
+    const schema = validator.getSchema<TestSchema>(input);
+
+    const expected: JSONSchemaType<TestSchema> = {
       properties: {
         "list-1": {
           items: {
@@ -147,11 +181,25 @@ const tests = [
       },
       required: [],
       type: "object",
-    },
-  },
-  {
-    description: "list with nested items",
-    input: [
+    };
+
+    compareJsonSchema(expected, schema);
+  });
+
+  mfbTest("list with nested items", ({ validator }) => {
+    interface TestSchema {
+      "list-1": Array<{
+        "item-3": boolean;
+        "parent-1": {
+          "item-1": string;
+        };
+        "parent-2": {
+          "item-2": number;
+        };
+      }>;
+    }
+
+    const input: InputArray<FormBuilderConfig, TestSchema> = [
       {
         inputs: [
           {
@@ -179,8 +227,10 @@ const tests = [
         name: "list-1",
         type: "list",
       },
-    ],
-    output: {
+    ];
+    const schema = validator.getSchema<TestSchema>(input);
+
+    const expected: JSONSchemaType<TestSchema> = {
       properties: {
         "list-1": {
           items: {
@@ -209,11 +259,23 @@ const tests = [
       },
       required: [],
       type: "object",
-    },
-  },
-  {
-    description: "nested list with flat items",
-    input: [
+    };
+
+    compareJsonSchema(expected, schema);
+  });
+
+  mfbTest("nested list with flat items", ({ validator }) => {
+    interface TestSchema {
+      parent: {
+        "list-1": Array<{
+          "item-1": string;
+          "item-2": number;
+          "item-3": boolean;
+        }>;
+      };
+    }
+
+    const input: InputArray<FormBuilderConfig, TestSchema> = [
       {
         inputs: [
           {
@@ -241,8 +303,10 @@ const tests = [
         name: "parent.list-1",
         type: "list",
       },
-    ],
-    output: {
+    ];
+    const schema = validator.getSchema<TestSchema>(input);
+
+    const expected: JSONSchemaType<TestSchema> = {
       properties: {
         parent: {
           properties: {
@@ -265,11 +329,27 @@ const tests = [
       },
       required: [],
       type: "object",
-    },
-  },
-  {
-    description: "nested list with nested items",
-    input: [
+    };
+
+    compareJsonSchema(expected, schema);
+  });
+
+  mfbTest("nested list with nested items", ({ validator }) => {
+    interface TestSchema {
+      parent: {
+        "list-1": Array<{
+          "item-3": boolean;
+          "parent-1": {
+            "item-1": string;
+          };
+          "parent-2": {
+            "item-2": number;
+          };
+        }>;
+      };
+    }
+
+    const input: InputArray<FormBuilderConfig, TestSchema> = [
       {
         inputs: [
           {
@@ -297,8 +377,10 @@ const tests = [
         name: "parent.list-1",
         type: "list",
       },
-    ],
-    output: {
+    ];
+    const schema = validator.getSchema<TestSchema>(input);
+
+    const expected: JSONSchemaType<TestSchema> = {
       properties: {
         parent: {
           properties: {
@@ -308,7 +390,11 @@ const tests = [
                   "item-3": { type: "boolean" },
                   "parent-1": {
                     properties: {
-                      "item-1": { maxLength: 16, minLength: 4, type: "string" },
+                      "item-1": {
+                        maxLength: 16,
+                        minLength: 4,
+                        type: "string",
+                      },
                     },
                     required: ["item-1"],
                     type: "object",
@@ -333,94 +419,133 @@ const tests = [
       },
       required: [],
       type: "object",
-    },
-  },
-  {
-    description: "nested list with nested items",
-    input: [
-      {
-        inputs: [
-          {
-            name: "parent-1.item-1",
-            props: {},
-            required: true,
-            type: "text",
-            validation: { maxLength: 16, minLength: 4, type: "string" },
-          },
-          {
-            name: "parent-2.item-2",
-            props: {},
-            required: true,
-            type: "text",
-            validation: { maximum: 16, minimum: 4, type: "number" },
-          },
-          {
-            name: "item-3",
-            props: {},
-            required: true,
-            type: "text",
-            validation: { type: "boolean" },
-          },
-        ],
-        name: "parent.list-1",
-        required: true,
-        type: "list",
-        validation: { maxItems: 4, minItems: 1 },
-      },
-    ],
-    output: {
-      properties: {
-        parent: {
-          properties: {
-            "list-1": {
-              items: {
-                properties: {
-                  "item-3": { type: "boolean" },
-                  "parent-1": {
-                    properties: {
-                      "item-1": { maxLength: 16, minLength: 4, type: "string" },
-                    },
-                    required: ["item-1"],
-                    type: "object",
-                  },
-                  "parent-2": {
-                    properties: {
-                      "item-2": { maximum: 16, minimum: 4, type: "number" },
-                    },
-                    required: ["item-2"],
-                    type: "object",
-                  },
-                },
-                required: ["parent-1", "parent-2", "item-3"],
-                type: "object",
-              },
-              type: "array",
-            },
-          },
-          required: ["list-1"],
-          type: "object",
-        },
-      },
-      required: ["parent"],
-      type: "object",
-    },
-  },
-  // {
-  //   description: "",
-  //   input: [],
-  //   output: { type: "object" },
-  // },
-];
+    };
 
-tests.forEach((item) => {
-  test(item.description, () => {
-    console.log(item.description);
-    const validaiton = new MfbValidator();
-
-    // TODO: remove this comments
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    const result = validaiton.getSchema(item.input);
-    expect(result).toEqual(item.output);
+    compareJsonSchema(expected, schema);
   });
+
+  mfbTest(
+    "Nested List contains nested list with nested items",
+    ({ validator }) => {
+      interface TestSchema {
+        parent: {
+          "list-1": Array<{
+            "nested-parent": {
+              "nested-list-1": Array<{
+                "item-3": boolean;
+                "parent-1": {
+                  "item-1": string;
+                };
+                "parent-2": {
+                  "item-2": number;
+                };
+              }>;
+            };
+          }>;
+        };
+      }
+      const input: InputArray<FormBuilderConfig, TestSchema> = [
+        {
+          inputs: [
+            {
+              inputs: [
+                {
+                  name: "parent-1.item-1",
+                  props: {},
+                  required: true,
+                  type: "text",
+                  validation: { maxLength: 16, minLength: 4, type: "string" },
+                },
+                {
+                  name: "parent-2.item-2",
+                  props: {},
+                  required: true,
+                  type: "text",
+                  validation: { maximum: 16, minimum: 4, type: "number" },
+                },
+                {
+                  name: "item-3",
+                  props: {},
+                  required: true,
+                  type: "text",
+                  validation: { type: "boolean" },
+                },
+              ],
+              name: "nested-parent.nested-list-1",
+              required: true,
+              type: "list",
+              validation: { maxItems: 4, minItems: 1, type: "array" },
+            },
+          ],
+          name: "parent.list-1",
+          type: "list",
+        },
+      ];
+
+      const schema = validator.getSchema<TestSchema>(input);
+      const expected: JSONSchemaType<TestSchema> = {
+        properties: {
+          parent: {
+            properties: {
+              "list-1": {
+                items: {
+                  properties: {
+                    "nested-parent": {
+                      properties: {
+                        "nested-list-1": {
+                          items: {
+                            properties: {
+                              "item-3": { type: "boolean" },
+                              "parent-1": {
+                                properties: {
+                                  "item-1": {
+                                    maxLength: 16,
+                                    minLength: 4,
+                                    type: "string",
+                                  },
+                                },
+                                required: ["item-1"],
+                                type: "object",
+                              },
+                              "parent-2": {
+                                properties: {
+                                  "item-2": {
+                                    maximum: 16,
+                                    minimum: 4,
+                                    type: "number",
+                                  },
+                                },
+                                required: ["item-2"],
+                                type: "object",
+                              },
+                            },
+                            required: ["item-3", "parent-1", "parent-2"],
+                            type: "object",
+                          },
+                          maxItems: 4,
+                          minItems: 1,
+                          type: "array",
+                        },
+                      },
+                      required: ["nested-list-1"],
+                      type: "object",
+                    },
+                  },
+                  required: ["nested-parent"],
+                  type: "object",
+                },
+                type: "array",
+              },
+            },
+            required: [],
+            type: "object",
+          },
+        },
+        required: [],
+        type: "object",
+      };
+
+      compareJsonSchema(expected, schema);
+    },
+  );
 });
