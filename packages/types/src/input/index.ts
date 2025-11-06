@@ -8,6 +8,7 @@ import type {
   GetLayoutProps,
   HasDependencyField,
 } from "../utils";
+import type { Validation } from "../validation";
 import type { ActionInput } from "./action";
 import type { ListInput } from "./list";
 
@@ -46,7 +47,9 @@ type GetInputsImpl<
               GetInputParameter<TConfig, TInput>,
               "deps" | "formMethods" | "name"
             >;
+        required?: boolean;
         type: TInput;
+        validation?: Validation;
       };
     }[keyof TConfig["input"]["components"]];
 

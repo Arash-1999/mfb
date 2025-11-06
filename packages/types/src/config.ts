@@ -6,6 +6,7 @@ import type { GroupCardComponent, SimpleCardObject } from "./card/component";
 import type { BaseComponent, InputObject, LayoutKey } from "./common";
 import type { FieldArrayValues } from "./default-value";
 import type { ButtonComponent } from "./input";
+import type { Validator } from "./validation";
 
 interface FormBuilderConfig {
   button: {
@@ -21,6 +22,7 @@ interface FormBuilderConfig {
   };
   layout: Record<LayoutKey, BaseComponent>;
   options?: Partial<FormBuilderOptions>;
+  validator?: Validator;
 }
 
 interface FormBuilderContext<TFormId extends string = string> {

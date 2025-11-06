@@ -4,6 +4,7 @@ import type { BaseComponentProps } from "../common";
 import type { FormBuilderConfig } from "../config";
 import type { Dependency } from "../dependency-management";
 import type { GetLayoutProps } from "../utils";
+import type { ArrayValidation, ObjectValidation } from "../validation";
 import type { GetCardBase } from "./common";
 
 type GetGroupCard<
@@ -44,11 +45,13 @@ type GroupCardList<TConfig extends FormBuilderConfig> = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   name: string;
+  validation?: ArrayValidation;
   variant: "list";
 };
 
 type GroupCardNormal<TConfig extends FormBuilderConfig> = {
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
+  validation?: ObjectValidation;
   variant?: "normal";
 };
 

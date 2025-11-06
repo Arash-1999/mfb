@@ -6,6 +6,7 @@ import type { FormBuilderConfig } from "../config";
 import type { Dependency } from "../dependency-management";
 import type { GetInputs } from "../input";
 import type { GetLayoutProps } from "../utils";
+import type { ObjectValidation } from "../validation";
 
 type GetCardBase<
   TConfig extends FormBuilderConfig,
@@ -18,11 +19,13 @@ type GetCardBase<
       inputs: TNormalGroup extends false
         ? Array<NormalCardItem<TConfig, TFields, TAdvanced, TFunc>>
         : Array<GetInputs<TConfig, TFields>>;
+      required?: boolean;
     }
   : {
       list: TNormalGroup extends false
         ? Array<NormalCardItem<TConfig, TFields, TAdvanced, TFunc>>
         : AdvancedList<TConfig, TFields>;
+      required?: boolean;
     };
 
 type Header = Record<"center" | "left" | "right", ReactNode>;
@@ -45,7 +48,9 @@ interface NormalCardItemBase<
     ? Array<GetInputs<TConfig, TFields>>
     : AdvancedList<TConfig, TFields>;
   name?: string;
+  required?: boolean;
   title: Header | string;
+  validation?: ObjectValidation;
 }
 
 export type { GetCardBase, Header, NormalCardItem };
