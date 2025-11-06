@@ -33,6 +33,7 @@ interface FormBuilderContext<TFormId extends string = string> {
 
 interface FormBuilderOptions {
   dependencyShouldReset: boolean;
+  genDefaultValues: boolean;
 }
 
 interface FormBuilderOverrides {

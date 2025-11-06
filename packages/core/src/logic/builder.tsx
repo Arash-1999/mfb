@@ -88,6 +88,9 @@ class FormBuilder<
     const defaultValues = useDefaultValue(this.config, resolvedList);
     const resolver = this.useValidation<TFields>(resolvedList);
     const formMethods = useForm<TFields>({
+      defaultValues: this.options.genDefaultValues
+        ? defaultValues.defaultValues
+        : undefined,
       resolver,
       ...options,
     });
@@ -138,7 +141,13 @@ class FormBuilder<
 
     const defaultValues = useDefaultValue(this.config, resolvedInputs);
     const resolver = this.useValidation<TFields>(resolvedInputs);
-    const formMethods = useForm<TFields>({ resolver, ...options });
+    const formMethods = useForm<TFields>({
+      defaultValues: this.options.genDefaultValues
+        ? defaultValues.defaultValues
+        : undefined,
+      resolver,
+      ...options,
+    });
 
     return (
       <Context.Provider
@@ -190,7 +199,13 @@ class FormBuilder<
 
     const resolver = this.useValidation<TFields>(resolvedCards);
     const defaultValues = useDefaultValue(this.config, resolvedCards);
-    const formMethods = useForm<TFields>({ resolver, ...options });
+    const formMethods = useForm<TFields>({
+      defaultValues: this.options.genDefaultValues
+        ? defaultValues.defaultValues
+        : undefined,
+      resolver,
+      ...options,
+    });
 
     return (
       <Context.Provider
