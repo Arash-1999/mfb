@@ -47,6 +47,20 @@ class FormBuilder<
     super(config, options, overrides);
   }
 
+  private useValidation = <TFields extends FieldValues>(
+    items: ItemArray<TFields>,
+  ) => {
+    const resolver = useMemo(() => {
+      if (isNullOrUndefined(this.config.validator)) {
+        return undefined;
+      }
+
+      return this.config.validator.resolve<TFields>(items);
+    }, [items]);
+
+    return resolver;
+  };
+
   public AdvancedBuilder = <TFields extends FieldValues>({
     gridContainerProps,
     id,
@@ -56,7 +70,6 @@ class FormBuilder<
   }: AdvancedBuilderProps<TConfig, TFields, TFormId>) => {
     const { AdvancedMapper, Context } = this;
     const { "grid-container": GridContainer } = this.config.layout;
-    const formMethods = useForm<TFields>(options);
 
     const resolvedList = useMemo(() => {
       if (typeof list === "function") {
@@ -73,6 +86,11 @@ class FormBuilder<
     }, [list]);
 
     const defaultValues = useDefaultValue(this.config, resolvedList);
+    const resolver = this.useValidation<TFields>(resolvedList);
+    const formMethods = useForm<TFields>({
+      resolver,
+      ...options,
+    });
 
     return (
       <Context.Provider
@@ -106,7 +124,6 @@ class FormBuilder<
   }: BasicBuilderProps<TConfig, TFields, TFormId>) => {
     const { Context, InputMapper } = this;
     const { "grid-container": GridContainer } = this.config.layout;
-    const formMethods = useForm<TFields>(options);
 
     // TODO: move useMemo into a custom hook with generic type for TItem (and list/inputs)
     const resolvedInputs = useMemo(() => {
@@ -120,6 +137,8 @@ class FormBuilder<
     }, [inputs]);
 
     const defaultValues = useDefaultValue(this.config, resolvedInputs);
+    const resolver = this.useValidation<TFields>(resolvedInputs);
+    const formMethods = useForm<TFields>({ resolver, ...options });
 
     return (
       <Context.Provider
@@ -142,20 +161,6 @@ class FormBuilder<
         </FormProvider>
       </Context.Provider>
     );
-  };
-
-  private useValidation = <TFields extends FieldValues>(
-    items: ItemArray<TFields>,
-  ) => {
-    const resolver = useMemo(() => {
-      if (isNullOrUndefined(this.config.validator)) {
-        return undefined;
-      }
-
-      return this.config.validator.resolve<TFields>(items);
-    }, [items]);
-
-    return resolver;
   };
 
   public Builder = <TFields extends FieldValues>({
@@ -185,8 +190,7 @@ class FormBuilder<
 
     const resolver = this.useValidation<TFields>(resolvedCards);
     const defaultValues = useDefaultValue(this.config, resolvedCards);
-    const formMethods = useForm<TFields>(options);
-    console.log(resolver);
+    const formMethods = useForm<TFields>({ resolver, ...options });
 
     return (
       <Context.Provider
