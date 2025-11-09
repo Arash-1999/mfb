@@ -1,0 +1,40 @@
+{
+  "name": "@mfb/ajv-plugin",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "build:watch": "tsc -b && vite build --watch",
+    "list": "eslint .",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "react-hook-form": "catalog:"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@mfb/eslint-config": "workspace:*",
+    "@mfb/typescript-config": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:vite7",
+    "vite-plugin-dts": "^4.5.0"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "catalog:",
+    "@mfb/types": "workspace:*",
+    "@mfb/utils": "workspace:*",
+    "@mfb/validator": "workspace:*",
+    "ajv": "catalog:",
+    "ajv-errors": "catalog:",
+    "ajv-formats": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "name": "@mfb/validation",
+  "name": "@mfb/validator",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -28,12 +28,8 @@
     "vite-plugin-dts": "^4.5.0"
   },
   "dependencies": {
-    "@hookform/resolvers": "catalog:",
     "@mfb/types": "workspace:*",
     "@mfb/utils": "workspace:*",
-    "ajv": "catalog:",
-    "ajv-errors": "catalog:",
-    "ajv-formats": "catalog:",
     "vitest": "catalog:"
   }
 }

@@ -1,5 +1,4 @@
 import type { AdvancedList, FormBuilderConfig } from "@mfb/types";
-import type { JSONSchemaType } from "ajv";
 
 import { describe } from "vitest";
 
@@ -53,7 +52,7 @@ describe("Advanced Builder", () => {
 
     const schema = validator.getSchema<TestSchema>(input);
 
-    const expected: JSONSchemaType<TestSchema> = {
+    const expected = {
       properties: {
         "field-1": { maxLength: 16, minLength: 3, type: "string" },
         "field-2": { maximum: 16, minimum: 3, type: "number" },
@@ -105,7 +104,7 @@ describe("Advanced Builder", () => {
     ];
     const schema = validator.getSchema<TestSchema>(input);
 
-    const expected: JSONSchemaType<TestSchema> = {
+    const expected = {
       properties: {
         "field-3": { type: "boolean" },
         "parent-1": {
@@ -174,7 +173,7 @@ describe("Advanced Builder", () => {
     ];
     const schema = validator.getSchema<TestSchema>(input);
 
-    const expected: JSONSchemaType<TestSchema> = {
+    const expected = {
       properties: {
         "list-1": {
           items: {
@@ -244,7 +243,7 @@ describe("Advanced Builder", () => {
     ];
     const schema = validator.getSchema<TestSchema>(input);
 
-    const expected: JSONSchemaType<TestSchema> = {
+    const expected = {
       properties: {
         "list-1": {
           items: {
@@ -324,7 +323,7 @@ describe("Advanced Builder", () => {
     ];
     const schema = validator.getSchema<TestSchema>(input);
 
-    const expected: JSONSchemaType<TestSchema> = {
+    const expected = {
       properties: {
         parent: {
           properties: {
@@ -402,7 +401,7 @@ describe("Advanced Builder", () => {
     ];
     const schema = validator.getSchema<TestSchema>(input);
 
-    const expected: JSONSchemaType<TestSchema> = {
+    const expected = {
       properties: {
         parent: {
           properties: {
@@ -510,7 +509,7 @@ describe("Advanced Builder", () => {
       ];
 
       const schema = validator.getSchema<TestSchema>(input);
-      const expected: JSONSchemaType<TestSchema> = {
+      const expected = {
         properties: {
           parent: {
             properties: {

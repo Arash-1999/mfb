@@ -8,11 +8,9 @@ import type {
   Properties,
   StringValidation,
   Validation,
-  Validator,
 } from "@mfb/types";
 import type { FieldValues } from "react-hook-form";
 
-import { ajvResolver } from "@hookform/resolvers/ajv";
 import {
   deepMerge,
   isFunction,
@@ -20,7 +18,7 @@ import {
   stringToPath,
 } from "@mfb/utils";
 
-class MfbValidator implements Validator {
+class MfbValidator {
   private parseItem = <TFields extends FieldValues>(item: Item<TFields>) => {
     let schema: null | Properties = null;
     let required: Array<string> = [];
@@ -127,12 +125,6 @@ class MfbValidator implements Validator {
     const [schema, required] = this.parse(items);
 
     return this.parseObject({ required, type: "object" }, schema);
-  };
-
-  public resolve = <TFields extends FieldValues>(items: ItemArray<TFields>) => {
-    return ajvResolver<TFields>(this.getSchema<TFields>(items), {
-      $data: true,
-    });
   };
 
   private parseArray = (
