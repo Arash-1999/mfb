@@ -3,7 +3,7 @@ import type { FieldValues } from "react-hook-form";
 import type { BaseComponentProps } from "../common";
 import type { FormBuilderConfig } from "../config";
 import type { Dependency } from "../dependency-management";
-import type { GetLayoutProps } from "../utils";
+import type { GetFormats, GetLayoutProps } from "../utils";
 import type { ArrayValidation, ObjectValidation } from "../validation";
 import type { GetCardBase } from "./common";
 
@@ -45,13 +45,13 @@ type GroupCardList<TConfig extends FormBuilderConfig> = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   name: string;
-  validation?: ArrayValidation;
+  validation?: ArrayValidation<GetFormats<TConfig>>;
   variant: "list";
 };
 
 type GroupCardNormal<TConfig extends FormBuilderConfig> = {
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
-  validation?: ObjectValidation;
+  validation?: ObjectValidation<GetFormats<TConfig>>;
   variant?: "normal";
 };
 

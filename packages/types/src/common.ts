@@ -38,25 +38,29 @@ type InputArray<
 
 type InputObject = Record<PropertyKey, BaseInput>;
 
-interface Item<TFields extends FieldValues> {
+interface Item<TFields extends FieldValues, TFormat extends string = string> {
   dependsOn?: DependsOn<TFields>;
-  inputs?: ItemArray<TFields>;
+  inputs?: ItemArray<TFields, (string & {}) | TFormat>;
   list?:
     | Array<{
-        list: ItemArray<TFields>;
+        list: ItemArray<TFields, (string & {}) | TFormat>;
         name?: string;
       }>
-    | ItemArray<TFields>;
+    | ItemArray<TFields, (string & {}) | TFormat>;
   name?: string;
   props?: unknown;
   required?: boolean;
   type?: PropertyKey;
-  validation?: Validation;
+  validation?: Validation<(string & {}) | TFormat>;
   variant?: "list" | "normal";
 }
 
-type ItemArray<TFields extends FieldValues> = Array<
-  ((props?: DefineFnProps) => Item<TFields>) | Item<TFields>
+type ItemArray<
+  TFields extends FieldValues,
+  TFormat extends string = string,
+> = Array<
+  | ((props?: DefineFnProps) => Item<TFields, (string & {}) | TFormat>)
+  | Item<TFields, (string & {}) | TFormat>
 >;
 
 type LayoutKey = "field" | "grid-container" | "grid-item";

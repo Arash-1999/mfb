@@ -22,7 +22,7 @@ interface FormBuilderConfig {
   };
   layout: Record<LayoutKey, BaseComponent>;
   options?: Partial<FormBuilderOptions>;
-  validator?: Validator;
+  validator?: Validator<string>;
 }
 
 interface FormBuilderContext<TFormId extends string = string> {

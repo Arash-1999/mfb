@@ -2,7 +2,7 @@ import type { FieldValues } from "react-hook-form";
 
 import type { AdvancedList, ListInputArray } from "../common";
 import type { FormBuilderConfig } from "../config";
-import type { GetLayoutProps } from "../utils";
+import type { GetFormats, GetLayoutProps } from "../utils";
 import type { ArrayValidation } from "../validation";
 
 type ListInput<
@@ -24,7 +24,7 @@ interface ListInputBase<TConfig extends FormBuilderConfig> {
   name: string;
   required?: boolean;
   type: "list";
-  validation?: ArrayValidation;
+  validation?: ArrayValidation<GetFormats<TConfig>>;
 }
 
 export type { ListInput };

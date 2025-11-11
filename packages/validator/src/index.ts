@@ -18,9 +18,11 @@ import {
   stringToPath,
 } from "@mfb/utils";
 
-class MfbValidator {
-  private parseItem = <TFields extends FieldValues>(item: Item<TFields>) => {
-    let schema: null | Properties = null;
+class MfbValidator<TFormat extends string> {
+  private parseItem = <TFields extends FieldValues>(
+    item: Item<TFields, (string & {}) | TFormat>,
+  ) => {
+    let schema: null | Properties<(string & {}) | TFormat> = null;
     let required: Array<string> = [];
 
     if (!isNullOrUndefined(item.inputs)) {
@@ -68,9 +70,9 @@ class MfbValidator {
     }
   };
   private parse = <TFields extends FieldValues>(
-    items: ItemArray<TFields>,
-  ): [Properties, Array<string>] => {
-    const result: Properties = {};
+    items: ItemArray<TFields, (string & {}) | TFormat>,
+  ): [Properties<(string & {}) | TFormat>, Array<string>] => {
+    const result: Properties<(string & {}) | TFormat> = {};
     const requiredList: Array<string> = [];
 
     items.forEach((_item) => {
@@ -113,14 +115,17 @@ class MfbValidator {
     return [result, requiredList];
   };
 
-  private parseObject = (validation: ObjectValidation, schema: Properties) => {
+  private parseObject = (
+    validation: ObjectValidation<(string & {}) | TFormat>,
+    schema: Properties<(string & {}) | TFormat>,
+  ) => {
     return {
       ...validation,
       properties: schema,
     };
   };
   public getSchema = <TFields extends FieldValues>(
-    items: ItemArray<TFields>,
+    items: ItemArray<TFields, (string & {}) | TFormat>,
   ) => {
     const [schema, required] = this.parse(items);
 
@@ -128,8 +133,8 @@ class MfbValidator {
   };
 
   private parseArray = (
-    validation: ArrayValidation,
-    schema: Properties,
+    validation: ArrayValidation<(string & {}) | TFormat>,
+    schema: Properties<(string & {}) | TFormat>,
     required: Array<string>,
   ) => {
     return {
@@ -146,7 +151,9 @@ class MfbValidator {
     return { ...validation };
   };
 
-  private parseString = (validation: StringValidation) => {
+  private parseString = (
+    validation: StringValidation<(string & {}) | TFormat>,
+  ) => {
     return {
       ...validation,
     };
@@ -162,9 +169,9 @@ class MfbValidator {
     isLast?: boolean;
     isRequired: boolean;
     path: string[];
-    target: Properties;
-    validation: Validation;
-  }): Properties => {
+    target: Properties<(string & {}) | TFormat>;
+    validation: Validation<(string & {}) | TFormat>;
+  }): Properties<(string & {}) | TFormat> => {
     if (path.length === 0) return target;
     const key = path.shift();
     if (!key) return target;

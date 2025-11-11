@@ -1,6 +1,14 @@
 import type { LayoutKey } from "./common";
 import type { FormBuilderConfig } from "./config";
 import type { BaseInput } from "./input";
+import type { Validator } from "./validation";
+
+type GetFormats<TConfig extends FormBuilderConfig> =
+  TConfig["validator"] extends Validator<infer T>
+    ? T extends string
+      ? (string & {}) | T
+      : string
+    : string;
 
 type GetInputParameter<
   TConfig extends FormBuilderConfig,
@@ -15,4 +23,9 @@ type GetLayoutProps<
 type HasDependencyField<TInput extends BaseInput> =
   "deps" extends keyof Parameters<TInput>[0] ? false : true;
 
-export type { GetInputParameter, GetLayoutProps, HasDependencyField };
+export type {
+  GetFormats,
+  GetInputParameter,
+  GetLayoutProps,
+  HasDependencyField,
+};

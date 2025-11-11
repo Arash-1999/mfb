@@ -4,27 +4,36 @@ interface ArrayBaseKeywords {
   maxItems?: number;
   minItems?: number;
 }
-interface ArrayKeywords extends ArrayBaseKeywords {
-  items?: Validation;
-  prefixItems?: Array<Validation>;
+interface ArrayKeywords<TFormats extends string> extends ArrayBaseKeywords {
+  items?: Validation<TFormats>;
+  prefixItems?: Array<Validation<TFormats>>;
 }
 
-interface ArrayValidation extends ArrayKeywords {
+interface ArrayValidation<TFormats extends string>
+  extends ArrayKeywords<TFormats> {
   type: "array";
 }
 
-type NonPrimitiveValidation = ArrayValidation | ObjectValidation;
+type NonPrimitiveValidation<TFormats extends string> =
+  | ArrayValidation<TFormats>
+  | ObjectValidation<TFormats>;
 
-interface ObjectKeywords {
-  properties?: Properties;
+interface ObjectKeywords<TFormats extends string> {
+  properties?: Properties<TFormats>;
   required?: Array<string>;
 }
-interface ObjectValidation extends ObjectKeywords {
+interface ObjectValidation<TFormats extends string>
+  extends ObjectKeywords<TFormats> {
   type: "object";
 }
-type Properties = Record<PropertyKey, Validation>;
+type Properties<TFormats extends string> = Record<
+  PropertyKey,
+  Validation<TFormats>
+>;
 
-type Validation = NonPrimitiveValidation | PrimitiveValiditon;
+type Validation<TFormats extends string> =
+  | NonPrimitiveValidation<TFormats>
+  | PrimitiveValiditon<TFormats>;
 
 export type {
   ArrayBaseKeywords,

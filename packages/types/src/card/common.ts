@@ -5,7 +5,7 @@ import type { AdvancedList } from "../common";
 import type { FormBuilderConfig } from "../config";
 import type { Dependency } from "../dependency-management";
 import type { GetInputs } from "../input";
-import type { GetLayoutProps } from "../utils";
+import type { GetFormats, GetLayoutProps } from "../utils";
 import type { ObjectValidation } from "../validation";
 
 type GetCardBase<
@@ -50,7 +50,7 @@ interface NormalCardItemBase<
   name?: string;
   required?: boolean;
   title: Header | string;
-  validation?: ObjectValidation;
+  validation?: ObjectValidation<GetFormats<TConfig>>;
 }
 
 export type { GetCardBase, Header, NormalCardItem };

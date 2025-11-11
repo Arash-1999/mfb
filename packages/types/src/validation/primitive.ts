@@ -13,19 +13,20 @@ interface NumericValidation extends NumericKeywords {
   type: "integer" | "number";
 }
 
-type PrimitiveValiditon =
+type PrimitiveValiditon<TFormats extends string> =
   | BooleanValidation
   | NumericValidation
-  | StringValidation;
+  | StringValidation<TFormats>;
 
-interface StringKeywords {
-  format?: string;
+interface StringKeywords<TFormats extends string> {
+  format?: (string & {}) | TFormats;
   maxLength?: number;
   minLength?: number;
   pattern?: string;
 }
 
-interface StringValidation extends StringKeywords {
+interface StringValidation<TFormats extends string>
+  extends StringKeywords<TFormats> {
   type: "string";
 }
 

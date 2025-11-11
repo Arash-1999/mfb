@@ -4,6 +4,7 @@ import type { DefineFnProps } from "../common";
 import type { FormBuilderConfig } from "../config";
 import type { Dependency } from "../dependency-management";
 import type {
+  GetFormats,
   GetInputParameter,
   GetLayoutProps,
   HasDependencyField,
@@ -49,7 +50,7 @@ type GetInputsImpl<
             >;
         required?: boolean;
         type: TInput;
-        validation?: Validation;
+        validation?: Validation<GetFormats<TConfig>>;
       };
     }[keyof TConfig["input"]["components"]];
 

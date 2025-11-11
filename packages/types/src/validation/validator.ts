@@ -2,9 +2,9 @@ import type { FieldValues, Resolver } from "react-hook-form";
 
 import type { ItemArray } from "../common";
 
-interface Validator {
+interface Validator<TFormats extends string> {
   resolve: <TFields extends FieldValues>(
-    items: ItemArray<TFields>,
+    items: ItemArray<TFields, TFormats>,
   ) => Resolver<TFields>;
 }
 
