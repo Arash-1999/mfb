@@ -20,6 +20,10 @@ type PrimitiveValiditon<TFormats extends string> =
 
 interface StringKeywords<TFormats extends string> {
   format?: (string & {}) | TFormats;
+  formatExclusiveMaximum?: string;
+  formatExclusiveMinimum?: string;
+  formatMaximum?: string;
+  formatMinimum?: string;
   maxLength?: number;
   minLength?: number;
   pattern?: string;
