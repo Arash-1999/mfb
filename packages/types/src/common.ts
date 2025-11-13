@@ -20,6 +20,8 @@ type BaseComponent = (props: any) => JSX.Element;
 
 interface BaseComponentProps {
   disabled?: boolean;
+  required?: boolean;
+  validation?: Validation<string>;
 }
 
 interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
