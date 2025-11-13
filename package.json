@@ -4,7 +4,7 @@
   "scripts": {
     "dev:core": "turbo watch build:watch --filter=@mfb/core",
     "dev:plugin:mui": "turbo watch build:watch --filter=@mfb/plugin-mui",
-    "dev:plugin:validation": "turbo watch build:watch --filter=@mfb/validation",
+    "dev:plugin:ajv": "turbo watch build:watch --filter=@mfb/ajv-plugin",
     "dev:editor": "turbo dev --filter=@mfb/editor",
     "dev:pg": "turbo dev --filter=./playground",
     "lint": "turbo lint",

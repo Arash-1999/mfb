@@ -147,7 +147,9 @@ class MfbValidator<TFormat extends string> {
     return { ...validation };
   };
 
-  private parseNumeric = (validation: NumericValidation) => {
+  private parseNumeric = (
+    validation: NumericValidation<(string & {}) | TFormat>,
+  ) => {
     return { ...validation };
   };
 
