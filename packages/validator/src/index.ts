@@ -22,6 +22,7 @@ class MfbValidator<TFormat extends string> {
   private parseItem = <TFields extends FieldValues>(
     item: Item<TFields, (string & {}) | TFormat>,
   ) => {
+    console.log(item);
     let schema: null | Properties<(string & {}) | TFormat> = null;
     let required: Array<string> = [];
 
@@ -47,8 +48,10 @@ class MfbValidator<TFormat extends string> {
           required,
         };
 
+        // console.log(validation);
         if (validation.type === "object")
-          return this.parseObject(validation, schema);
+          return this.parseObject({ ...validation, required }, schema);
+        else return this.parseObject({ type: "object", required }, schema);
       }
     }
 
@@ -80,7 +83,17 @@ class MfbValidator<TFormat extends string> {
 
       const validation = this.parseItem(item);
 
-      if (isNullOrUndefined(item.name)) return;
+      if (isNullOrUndefined(validation)) return;
+
+      if (isNullOrUndefined(item.name)) {
+        if (validation.type === "object" && validation.properties) {
+          deepMerge(result, validation.properties);
+          validation.required?.forEach((key) => {
+            if (!requiredList.includes(key)) requiredList.push(key);
+          });
+        }
+        return;
+      }
 
       const path = stringToPath(item.name);
       const lastKey = path[path.length - 1];
@@ -95,10 +108,6 @@ class MfbValidator<TFormat extends string> {
           requiredList.push(lastKey);
       } else {
         // TODO: what happens to digit keys?
-        if (isNullOrUndefined(validation)) {
-          return;
-        }
-
         if (item.required && path[0]) requiredList.push(path[0]);
 
         const _result = this.setToPath({
