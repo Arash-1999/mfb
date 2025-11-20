@@ -7,7 +7,7 @@ import { describe } from "vitest";
 import { compareJsonSchema } from "./compare-json-schema-test";
 import { mfbTest } from "./setup.vitest";
 
-describe.skip("Normal Builder", () => {
+describe("Normal Builder", () => {
   mfbTest("Empty list", ({ validator }) => {
     const schema = validator.getSchema([]);
     const expected = {
@@ -195,4 +195,44 @@ describe.skip("Normal Builder", () => {
 
     compareJsonSchema(expected, schema);
   });
+
+  mfbTest("Single card with falt inputs", ({ validator }) => {
+    const input = [
+      {
+        inputs: [
+          {
+            list: [
+              {
+                name: "field-1",
+                props: {},
+                required: true,
+                type: "text",
+                validation: {
+                  format: "date",
+                  type: "string" as const,
+                },
+              },
+            ],
+          },
+        ],
+        isGroup: true,
+        type: "paper",
+        variant: "normal" as const,
+      },
+    ];
+    const schema = validator.getSchema(input);
+    const expected = {
+      properties: {
+        "field-1": {
+          format: "date",
+          type: "string",
+        },
+      },
+      required: ["field-1"],
+      type: "object",
+    };
+
+    compareJsonSchema(expected, schema);
+  });
+  // TODO: add group normal test
 });
