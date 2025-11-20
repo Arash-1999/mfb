@@ -1,4 +1,4 @@
-import { GroupCardComponentProps } from "@mfb/core";
+import { GroupCardProps } from "@mfb/core";
 import { ExpandMoreOutlined } from "@mui/icons-material";
 import {
   Accordion,
@@ -7,6 +7,7 @@ import {
   Paper,
   Tab,
   Tabs,
+  Typography,
 } from "@mui/material";
 import React, { Fragment, useState } from "react";
 import CardHeader from "./header";
@@ -17,7 +18,7 @@ function a11yProps(index: number) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const TabsGroup = ({ addGrid, nodes }: GroupCardComponentProps) => {
+const TabsGroup = ({ addGrid, nodes, required }: GroupCardProps<{}>) => {
   const [value, setValue] = useState<number>(0);
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -34,6 +35,7 @@ const TabsGroup = ({ addGrid, nodes }: GroupCardComponentProps) => {
     <>
       {addGrid(
         <>
+          {required ? <Typography>This field is required</Typography> : null}
           <Tabs
             value={value}
             onChange={handleChange}
@@ -53,17 +55,20 @@ const TabsGroup = ({ addGrid, nodes }: GroupCardComponentProps) => {
             })}
           </Tabs>
 
-          {Array.isArray(nodes) && nodes.length > 0 && value < nodes.length ? (
+          {Array.isArray(nodes) &&
+          nodes.length > 0 &&
+          value < nodes.length &&
+          nodes[value] ? (
             <Paper sx={{ p: 2, mt: 2 }}>{nodes[value]?.children}</Paper>
           ) : null}
         </>,
-        0
+        0,
       )}
     </>
   );
 };
 
-const AccordionGroup = ({ nodes, addGrid }: GroupCardComponentProps) => {
+const AccordionGroup = ({ nodes, addGrid }: GroupCardProps<{}>) => {
   const [active, setActive] = useState<number>(-1);
 
   const handleChange = (index: number) => () => {
@@ -91,4 +96,3 @@ const AccordionGroup = ({ nodes, addGrid }: GroupCardComponentProps) => {
 };
 
 export { AccordionGroup, TabsGroup };
-

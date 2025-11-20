@@ -15,7 +15,7 @@
     "@fontsource/roboto": "^5.1.1",
     "@mfb/core": "workspace:*",
     "@mfb/plugin-mui": "workspace:*",
-    "@mfb/validation": "workspace:*",
+    "@mfb/ajv-plugin": "workspace:*",
     "@mui/icons-material": "^6.4.5",
     "@mui/material": "^6.4.5",
     "react": "catalog:",

@@ -5,7 +5,9 @@ import { getConfig } from "@mfb/plugin-mui";
 
 import type { FormId } from "./id";
 
-const config = getConfig() satisfies FormBuilderConfig;
+const config = {
+  ...getConfig(),
+} satisfies FormBuilderConfig;
 
 type MuiConfig = typeof config;
 

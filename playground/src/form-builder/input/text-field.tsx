@@ -27,6 +27,7 @@ const MfbTextField = <TFields extends FieldValues = FieldValues>({
   defaultValue,
   disabled,
   name,
+  required,
   textFieldProps,
 }: MfbTextFieldProps<TFields>) => {
   const { control } = useFormContext();
@@ -36,17 +37,20 @@ const MfbTextField = <TFields extends FieldValues = FieldValues>({
       control={control}
       defaultValue={defaultValue as never}
       name={name}
-      render={({ field: { ref, value, ...field } }) => (
+      render={({ field: { ref, value, ...field }, fieldState: { error } }) => (
         <TextField
           disabled={disabled}
           inputRef={ref}
           type="text"
           value={value || ""}
+          required={required}
+          error={!!error}
+          helperText={error?.message}
           {...field}
           {...textFieldProps}
         />
       )}
-      rules={{ required: textFieldProps?.required }}
+      // rules={{ required: textFieldProps?.required }}
     />
   );
 };

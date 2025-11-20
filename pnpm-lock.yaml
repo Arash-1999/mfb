@@ -300,15 +300,15 @@ importers:
       '@fontsource/roboto':
         specifier: ^5.1.1
         version: 5.1.1
+      '@mfb/ajv-plugin':
+        specifier: workspace:*
+        version: link:../plugins/ajv
       '@mfb/core':
         specifier: workspace:*
         version: link:../packages/core
       '@mfb/plugin-mui':
         specifier: workspace:*
         version: link:../plugins/mui
-      '@mfb/validation':
-        specifier: workspace:*
-        version: link:../plugins/ajv
       '@mui/icons-material':
         specifier: ^6.4.5
         version: 6.4.5(@mui/material@6.4.5(@emotion/react@11.14.0(@types/react@19.0.8)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.8)(react@19.0.0))(@types/react@19.0.8)(react@19.0.0))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.8)(react@19.0.0)
