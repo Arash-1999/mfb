@@ -42,7 +42,13 @@ type InputObject = Record<PropertyKey, BaseInput>;
 
 interface Item<TFields extends FieldValues, TFormat extends string = string> {
   dependsOn?: DependsOn<TFields>;
-  inputs?: ItemArray<TFields, (string & {}) | TFormat>;
+  inputs?:
+    | Array<{
+        list: ItemArray<TFields, (string & {}) | TFormat>;
+        name?: string;
+      }>
+    | ItemArray<TFields, (string & {}) | TFormat>;
+  isGroup?: boolean;
   list?:
     | Array<{
         list: ItemArray<TFields, (string & {}) | TFormat>;

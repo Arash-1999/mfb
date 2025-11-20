@@ -141,6 +141,7 @@ class FormBuilder<
 
     const defaultValues = useDefaultValue(this.config, resolvedInputs);
     const resolver = this.useValidation<TFields>(resolvedInputs);
+    console.log("resolver", resolver);
     const formMethods = useForm<TFields>({
       defaultValues: this.options.genDefaultValues
         ? defaultValues.defaultValues
@@ -479,6 +480,8 @@ class FormBuilder<
                     title: `List Item ${i + 1}`,
                   };
                 }),
+                required: card.required,
+                validation: card.validation,
                 ...card.props,
               })
             }
@@ -525,8 +528,12 @@ class FormBuilder<
                     render={renderCardItem}
                   />
                 ),
+                required: component.required,
                 title: component.title,
+                validation: component.validation,
               })),
+        required: card.required,
+        validation: card.validation,
         ...card.props,
       });
     }
@@ -545,6 +552,8 @@ class FormBuilder<
             RenderSimpleCard,
             {
               header: card.header,
+              required: card.required,
+              validation: card.validation,
             },
             <GridContainer {...(card.gridContainerProps || {})}>
               {"list" in card ? (
@@ -648,6 +657,8 @@ class FormBuilder<
         <InputFn
           formMethods={formMethods}
           name={resolvedName}
+          required={input.required}
+          validation={input.validation}
           {...Object.assign({}, input.props, {
             deps: convertDepsToObject(dependsOn["bind-value"]),
             disabled: dependsOn.disable,
