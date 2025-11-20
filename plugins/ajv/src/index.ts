@@ -35,14 +35,6 @@ class MfbAjvPlugin<TFormat extends string>
     this.ajv = ajv;
   }
 
-  public resolve = <TFields extends FieldValues>(
-    items: ItemArray<TFields, TFormat>,
-  ) => {
-    const schema = this.getSchema<TFields>(items);
-
-    return this.resolver<TFields>(schema as JSONSchemaType<TFields>);
-  };
-
   private parseErrorSchema = (
     ajvErrors: AjvError[],
     validateAllFieldCriteria: boolean,
@@ -107,7 +99,8 @@ class MfbAjvPlugin<TFormat extends string>
 
       const valid = validate(values);
 
-      options.shouldUseNativeValidation && validateFieldsNatively({}, options);
+      if (options.shouldUseNativeValidation)
+        validateFieldsNatively({}, options);
 
       // TODO: add ajv-i18n
       return valid
@@ -124,6 +117,14 @@ class MfbAjvPlugin<TFormat extends string>
             values: {},
           };
     };
+  };
+
+  public resolve = <TFields extends FieldValues>(
+    items: ItemArray<TFields, TFormat>,
+  ) => {
+    const schema = this.getSchema<TFields>(items);
+
+    return this.resolver<TFields>(schema as JSONSchemaType<TFields>);
   };
 }
 
