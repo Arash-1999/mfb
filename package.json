@@ -7,6 +7,7 @@
     "dev:plugin:ajv": "turbo watch build:watch --filter=@mfb/ajv-plugin",
     "dev:editor": "turbo dev --filter=@mfb/editor",
     "dev:pg": "turbo dev --filter=./playground",
+    "doc:start": "turbo run start --filter=@mfb/docs",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
