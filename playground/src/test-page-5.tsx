@@ -33,7 +33,7 @@ const Page = () => {
                 },
                 { shouldFocus: false },
               ],
-            },
+            }
           );
         }}
       >
@@ -59,20 +59,11 @@ const Page = () => {
                 name: "filters",
                 list: [
                   {
-                    actionType: "append",
-                    gridProps: {
-                      size: "auto",
-                    },
-                    name: "filters.items",
-                    mode: "input",
-                    type: "field-array-action",
-                  },
-                  {
                     mode: "input",
                     type: "text",
                     name: "title",
                     gridProps: {
-                      size: 11,
+                      size: 12,
                     },
                     props: {
                       textFieldProps: {

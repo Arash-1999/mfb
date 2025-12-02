@@ -38,6 +38,3 @@ yarn-error.log*
 *.pem
 
 *.tsbuildinfo
-
-# React Router
-.react-router/

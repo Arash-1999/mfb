@@ -1,6 +1,6 @@
 import type { FormBuilderConfig } from "@mfb/core";
 
-import { MfbAccordion, MfbAccordionGroup, MfbPaper } from "./components/cards";
+// import { FormBuilder } from "@mfb/core";
 import {
   MfbCheckbox,
   MfbRadioGroup,
@@ -10,20 +10,12 @@ import {
   MfbSwitch,
   MfbTextField,
 } from "./components/inputs";
-import { FormField, getLayoutConfig, GridContainer, GridItem } from "./components/layout";
+import { getLayoutConfig } from "./components/layout";
 
 const config = {
-  button: {
-    // TODO: use button in playground
-    component: () => <></>,
-  },
   card: {
-    group: {
-      "accordion-group": MfbAccordionGroup,
-    },
     simple: {
-      accordion: MfbAccordion,
-      paper: MfbPaper,
+      paper: () => <></>,
     },
   },
   input: {
@@ -47,33 +39,5 @@ const getConfig = () => {
   return config;
 };
 
-const getGroupCards = () => ({
-  "accordion-group": MfbAccordionGroup,
-});
-
-const getInputComponents = () => ({
-  checkbox: MfbCheckbox,
-  radio: MfbRadioGroup,
-  rating: MfbRating,
-  select: MfbSelect,
-  slider: MfbSlider,
-  switch: MfbSwitch,
-  text: MfbTextField,
-});
-
-const getSimpleCards = () => ({
-  accordion: MfbAccordion,
-  paper: MfbPaper,
-});
-
-export {
-  FormField,
-  getConfig,
-  getGroupCards,
-  getInputComponents,
-  getLayoutConfig,
-  getSimpleCards,
-  GridContainer,
-  GridItem,
-};
+export { getConfig };
 export type { MuiConfig };

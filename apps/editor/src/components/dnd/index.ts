@@ -1,0 +1,1 @@
+export { Dnd } from './component';

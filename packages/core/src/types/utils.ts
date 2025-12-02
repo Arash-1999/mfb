@@ -11,8 +11,8 @@ type AdvancedList<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > = Array<
-  | GetCards<TConfig, TFields, true, { mode: "card" }>
-  | GetInputs<TConfig, TFields, false, { mode: "input" }>
+  | (GetCards<TConfig, TFields, true> & { mode: "card" })
+  | (GetInputs<TConfig, TFields> & { mode: "input" })
 >;
 
 type BaseComponent = (props: any) => JSX.Element;
@@ -23,11 +23,8 @@ interface BaseComponentProps {
 
 type BaseInput = (
   // TODO: use unknown instead of any for 'name' and 'formMethods' type-safety
-  props: any & BaseInputProps,
+  props: any & BaseComponentProps,
 ) => JSX.Element;
-interface BaseInputProps extends BaseComponentProps {
-  defaultValue?: never;
-}
 
 interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
   gridProps?: object;
@@ -56,7 +53,7 @@ type LayoutKey = "field" | "grid-container" | "grid-item";
 type ListInputArray<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = Array<ActionInput<TConfig, TFields> | GetInputs<TConfig, TFields>>;
+> = Array<ActionInput | GetInputs<TConfig, TFields>>;
 
 type RenderFn<
   TFields extends FieldValues,

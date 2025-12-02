@@ -1,31 +1,22 @@
-import type { DependencyContextValue } from "@/context";
 import type {
   DefaultItem,
+  DependencyContextValue,
   DependencyStructure,
-  DependencyType,
   DependsOn,
 } from "@/types";
-import type { FieldValues, Path } from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 
-import { reFieldArrayValue } from "@/constants";
-import { useFieldArrayContext } from "@/context";
-import { useConditionCalculator } from "@/hooks";
-import { convertDepsToObject, createDependencyDict, mergeName } from "@/utils";
-import { useEffect, useMemo, useRef } from "react";
+import { createDependencyStructure, handleRenderDep } from "@/utils";
+import { useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-
-interface UseDependencyOptions {
-  dependencyShouldReset?: boolean;
-}
 
 interface UseDependencyProps<
   TFields extends FieldValues,
   TItem extends DefaultItem<TFields>,
 > {
   component: ((props?: { deps: never }) => TItem) | TItem;
-  dependencyContext: DependencyContextValue;
   dependsOn: DependsOn<TFields>;
-  name: string | undefined;
+  dependencyContext: DependencyContextValue;
 }
 
 type UseDependencyReturn<
@@ -36,100 +27,56 @@ type UseDependencyReturn<
 const useDependency = <
   TFields extends FieldValues,
   TItem extends DefaultItem<TFields>,
->(
-  {
-    component,
-    dependencyContext,
-    dependsOn,
-    name = "",
-  }: UseDependencyProps<TFields, TItem>,
-  options?: UseDependencyOptions
-): UseDependencyReturn<TFields, TItem> => {
-  const fieldArrayContext = useFieldArrayContext();
-  const { reduceCalc } = useConditionCalculator();
+>({
+  component,
+  dependsOn,
+  dependencyContext,
+}: UseDependencyProps<TFields, TItem>): UseDependencyReturn<TFields, TItem> => {
   const formMethods = useFormContext<TFields>();
-  const ref = useRef<Record<DependencyType, boolean | null>>({
-    "bind-value": null,
-    "def-props": null,
-    disable: null,
-    hide: null,
-  });
 
-  // TODO: provide default value (it's will be undefined when defaultValue passed to Controller)
   const value = useWatch<TFields>({
     control: formMethods.control,
-    name: (Array.isArray(dependsOn) ? dependsOn : [dependsOn])
-      .filter((dep) =>
-        dep.type === "disable" || dep.type === "hide"
-          ? typeof dep.value === "string"
-            ? !reFieldArrayValue.test(dep.value)
-            : true
-          : true
-      )
-      .map((dep) => {
-        return dep.path;
-      }),
+    name: Array.isArray(dependsOn)
+      ? dependsOn.map((dep) => dep.path)
+      : [dependsOn.path],
   });
 
-  const dependencies = useMemo<DependencyStructure<TFields>>(() => {
-    const {
-      disable: disableDict,
-      hide: hideDict,
-      ...dependencyDict
-    } = createDependencyDict<TFields>(dependsOn, value, fieldArrayContext);
-
-    return {
-      ...dependencyDict,
-      disable: dependencyContext.disable || reduceCalc(disableDict),
-      hide: reduceCalc(hideDict),
-    };
-  }, [fieldArrayContext, reduceCalc, value, dependsOn, dependencyContext]);
+  const dependencies = useMemo(() => {
+    const dependencyStructure = createDependencyStructure<TFields>(
+      dependsOn,
+      value,
+    );
+    dependencyStructure.disable.push(...dependencyContext.disable);
+    if (component.name === "card-1.akbar") {
+      console.log("watch, ", "card-1.akbar", value);
+    }
+    return dependencyStructure;
+  }, [value, dependsOn, dependencyContext]);
 
   const resolvedComponent = useMemo(() => {
     if (typeof component === "function") {
-      const resolvedDeps = convertDepsToObject(dependencies["def-props"]);
+      // TODO: move this function to dependency manager file as a helper function
+      const resolvedDeps = dependencies["def-props"].reduce<
+        Record<string, unknown>
+      >(
+        (acc, cur) => ({
+          ...acc,
+          [cur.id]: cur.current,
+        }),
+        {},
+      );
       return component({ deps: resolvedDeps as never });
     }
     return component;
   }, [component, dependencies]);
 
-  useEffect(() => {
-    // NOTE: detect conditon diff between rerenders to reset field
-    if (
-      typeof resolvedComponent.dependencyShouldReset === "undefined"
-        ? options?.dependencyShouldReset
-        : resolvedComponent.dependencyShouldReset
-    ) {
-      const resolvedName = mergeName(name, resolvedComponent.name || "");
-
-      const _hide = dependencies.hide;
-      const _disable = dependencies.disable;
-
-      if (
-        (typeof ref.current.hide === "boolean" &&
-          _hide &&
-          _hide !== ref.current.hide) ||
-        (typeof ref.current.disable === "boolean" &&
-          _disable &&
-          _disable !== ref.current.disable) ||
-        dependencies["bind-value"].length > 0 ||
-        dependencies["def-props"].length > 0
-      ) {
-        formMethods.resetField(resolvedName as Path<TFields>);
-      }
-      ref.current.hide = _hide;
-      ref.current.disable = _disable;
-    }
-  }, [
+  return [
+    handleRenderDep({
+      children: resolvedComponent,
+      dependency: dependencies["visibility"],
+    }),
     dependencies,
-    formMethods,
-    name,
-    options?.dependencyShouldReset,
-    resolvedComponent,
-    value,
-  ]);
-
-  return [dependencies.hide ? null : resolvedComponent, dependencies];
+  ];
 };
 
 export { useDependency };

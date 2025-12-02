@@ -9,7 +9,6 @@ import type {
 
 import type { GetCards, GetCardsImpl } from "./card";
 import type { FormBuilderConfig } from "./config";
-import type { FieldArrayValues } from "./default-value";
 import type { DependsOn } from "./dependency-management";
 import type { GetInputsImpl } from "./input";
 import type {
@@ -17,7 +16,6 @@ import type {
   DefaultItem,
   GetLayoutProps,
   InputArray,
-  ListInputArray,
   RenderFn,
 } from "./utils";
 
@@ -130,19 +128,15 @@ interface DependencyManagerProps<
   withGrid?: boolean;
 }
 
-interface FieldArrayOverrideProps<
-  TFields extends FieldValues,
-  TFormId extends string = string,
-> extends FieldArrayProps<TFields> {
-  id: TFormId;
-}
-
 interface FieldArrayProps<TFields extends FieldValues> {
   disabled: boolean | undefined;
-  fieldArray: FieldArrayValues<TFields>;
   // TODO: use ArrayPath generic type instead of string
   name: string;
   render: (fields: UseFieldArrayReturn<TFields>["fields"]) => ReactNode;
+}
+
+interface FormBuilderProps<TConfig extends FormBuilderConfig> {
+  config: TConfig;
 }
 
 interface InputMapFnOptions<TFields extends FieldValues> {
@@ -156,7 +150,7 @@ interface InputMapperProps<
   TFields extends FieldValues,
 > {
   deps?: DependsOn<TFields>;
-  inputs: ListInputArray<TConfig, TFields>;
+  inputs: InputArray<TConfig, TFields>;
   name?: string;
 }
 
@@ -193,9 +187,9 @@ export type {
   BasicBuilderProps,
   BuilderProps,
   DependencyManagerProps,
-  FieldArrayOverrideProps,
   FieldArrayProps,
   FormBuilderConfig,
+  FormBuilderProps,
   InputMapFnOptions,
   InputMapperProps,
   RenderCardProps,

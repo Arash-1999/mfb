@@ -1,0 +1,15 @@
+{
+  "extends": "@mfb/typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src"
+  ]
+}

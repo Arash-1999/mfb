@@ -4,17 +4,16 @@
   "scripts": {
     "dev:core": "turbo watch build:watch --filter=@mfb/core",
     "dev:plugin:mui": "turbo watch build:watch --filter=@mfb/plugin-mui",
-    "dev:editor": "turbo dev --filter=@mfb/editor",
     "dev:pg": "turbo dev --filter=./playground",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "prettier": "^3.5.3",
-    "turbo": "^2.5.4",
+    "prettier": "^3.4.2",
+    "turbo": "^2.4.0",
     "typescript": "~5.7.3"
   },
-  "packageManager": "pnpm@10.12.1",
+  "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=18"
   }

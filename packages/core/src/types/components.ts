@@ -1,44 +1,49 @@
-import type { ComponentProps, JSX } from "react";
-import type { ArrayPath, FieldValues } from "react-hook-form";
+import type { JSX } from "react";
+import type { FieldValues } from "react-hook-form";
 
 import type { FormBuilderConfig } from "./config";
-import type { AdvancedList, GetLayoutProps, ListInputArray } from "./utils";
+import type { FieldArrayActions } from "./event";
+import type { GetInputs } from "./input";
+import type { AdvancedList, GetLayoutProps } from "./utils";
 
-interface ActionInput<
-  TConfig extends FormBuilderConfig,
-  TFields extends FieldValues,
-> {
-  actionType: "append" | "prepend" | "remove";
-  gridProps?: GetLayoutProps<TConfig, "grid-item">;
-  name: ArrayPath<TFields>;
-  props?: Parameters<TConfig["button"]["component"]>[0];
+type ActionInput = {
+  render: <TFields extends FieldValues>(
+    props: ActionRenderProps<TFields>
+  ) => JSX.Element;
   type: "field-array-action";
-}
+};
+type ActionRenderProps<TFields extends FieldValues> = {
+  methods: FieldArrayActions<TFields>;
+};
 
-type ButtonComponent = (props: ButtonComponentProps & unknown) => JSX.Element;
-type ButtonComponentProps = Pick<
-  ComponentProps<"button">,
-  "disabled" | "onClick" | "type"
->;
+// type AdvancedFieldArrayList<
+//   TConfig extends FormBuilderConfig,
+//   // TFields extends FieldValues,
+// > = {
+//   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
+//   gridProps?: GetLayoutProps<TConfig, "grid-item">;
+//   // TODO: change unknown type
+//   list?: Array<unknown>;
+//   name: string;
+//   type: 'advanced-list';
+// }
 
+// TODO: add ActionInput type to ListInput inputs
 type ListInput<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = ListInputBase<TConfig> &
-  (
-    | {
-        inputs: ListInputArray<TConfig, TFields>;
-      }
-    | {
-        list: AdvancedList<TConfig, TFields>;
-      }
-  );
-
-interface ListInputBase<TConfig extends FormBuilderConfig> {
+> = {
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   name: string;
   type: "list";
-}
+} & (
+  | {
+      inputs: Array<GetInputs<TConfig, TFields>>;
+    }
+  | {
+      list: AdvancedList<TConfig, TFields>;
+    }
+);
 
-export type { ActionInput, ButtonComponent, ButtonComponentProps, ListInput };
+export type { ActionInput, ListInput };

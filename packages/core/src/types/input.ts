@@ -1,6 +1,6 @@
 import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
-import type { ActionInput, ListInput } from "./components";
+import type { ListInput } from "./components";
 import type { FormBuilderConfig } from "./config";
 import type { Dependency } from "./dependency-management";
 import type {
@@ -20,14 +20,11 @@ type GetInputs<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TInternal extends boolean = false,
-  TExtra = unknown,
 > =
-  | ((props?: DefineFnProps) => ActionInput<TConfig, TFields> & TExtra)
   | ((
       props?: DefineFnProps,
-    ) => GetInputsImpl<TConfig, TFields, TInternal, true> & TExtra)
-  | (ActionInput<TConfig, TFields> & TExtra)
-  | (GetInputsImpl<TConfig, TFields, TInternal> & TExtra);
+    ) => GetInputsImpl<TConfig, TFields, TInternal, true>)
+  | GetInputsImpl<TConfig, TFields, TInternal>;
 
 type GetInputsImpl<
   TConfig extends FormBuilderConfig,

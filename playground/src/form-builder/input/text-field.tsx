@@ -1,54 +1,43 @@
 import type { FieldValues } from "react-hook-form";
-
-import { TextField } from "@mui/material";
-import { Controller, useFormContext } from "react-hook-form";
-
 import type { InputProps } from "@mfb/core";
-import type { TextFieldProps } from "@mui/material";
 
-type MfbTextFieldProps<TFields extends FieldValues> = InputProps<
-  TFields,
-  {
-    defaultValue?: string;
-    textFieldProps?: Omit<
-      TextFieldProps,
-      | "defaultChecked"
-      | "defaultValue"
-      | "disabled"
-      | "name"
-      | "onBlur"
-      | "onChange"
-      | "value"
-    >;
-  }
->;
+import { Controller, useFormContext } from "react-hook-form";
+import TextField, { type TextFieldProps } from "@mui/material/TextField";
 
-const MfbTextField = <TFields extends FieldValues = FieldValues>({
-  defaultValue,
+const TextFieldInput = <TFields extends FieldValues>({
   disabled,
   name,
   textFieldProps,
-}: MfbTextFieldProps<TFields>) => {
+}: InputProps<
+  TFields,
+  {
+    textFieldProps?: Omit<
+      TextFieldProps,
+      "onChange" | "onBlur" | "disabled" | "value"
+    >;
+  }
+>) => {
   const { control } = useFormContext();
 
   return (
     <Controller
       control={control}
-      defaultValue={defaultValue as never}
       name={name}
-      render={({ field: { ref, value, ...field } }) => (
-        <TextField
-          disabled={disabled}
-          inputRef={ref}
-          type="text"
-          value={value || ""}
-          {...field}
-          {...textFieldProps}
-        />
-      )}
-      rules={{ required: textFieldProps?.required }}
+      render={({ field: { ref, value, ...field } }) => {
+        return (
+          <TextField
+            fullWidth
+            inputRef={ref}
+            value={value || ""}
+            autoComplete="off"
+            disabled={disabled}
+            {...textFieldProps}
+            {...field}
+          />
+        );
+      }}
     />
   );
 };
 
-export default MfbTextField;
+export default TextFieldInput;

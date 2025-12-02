@@ -5,14 +5,8 @@ type BindValueDependency = {
 };
 
 type Condition = {
-  condition:
-    | "eq"
-    | "is-first-index"
-    | "is-last-index"
-    | "not-eq"
-    | "not-first-index"
-    | "not-last-index";
-  value: boolean | null | number | string;
+  condition: "eq" | "not-eq";
+  value: number | string;
 };
 
 type DefPropsDependency = {
@@ -22,20 +16,17 @@ type Dependency<
   TFields extends FieldValues,
   TFunc extends boolean = false,
   TOnlyBoolean extends boolean = false,
-> = (TFunc extends true
+> = TFunc extends true
   ? Required<DependencyObject<TFields, TOnlyBoolean>>
-  : Partial<DependencyObject<TFields, TOnlyBoolean>>) & {
-  dependencyShouldReset?: boolean;
-};
+  : Partial<DependencyObject<TFields, TOnlyBoolean>>;
 
-type DependencyDict<TFields extends FieldValues> = {
-  [TKey in DependsOnUnion<false> as TKey["type"]]: Array<
-    DependsOnBase<TFields> &
-      TKey & {
-        current: unknown;
-      }
-  >;
-};
+interface DependencyContextDisable extends Condition {
+  current: unknown;
+}
+interface DependencyContextValue {
+  disable: Array<DependencyContextDisable>;
+}
+
 interface DependencyObject<
   TFields extends FieldValues,
   TOnlyBoolean extends boolean = false,
@@ -52,14 +43,10 @@ type DependencyStructure<TFields extends FieldValues> = Omit<
         }
     >;
   },
-  "disable" | "hide"
+  "disable"
 > & {
-  disable: boolean;
-  hide: boolean;
+  disable: Array<DependencyContextDisable>;
 };
-
-type DependencyType =
-  DependsOnUnion<false> extends { type: infer TType } ? TType : never;
 
 type DependsOn<
   TFields extends FieldValues,
@@ -82,26 +69,25 @@ type DependsOnUnion<TOnlyBoolean extends boolean = false> =
   | DefPropsDependency
   | DisableDependency
   | (TOnlyBoolean extends false ? BindValueDependency : never)
-  | HideDependency;
+  | VisibilityDependency;
 
 type DisableDependency = Condition & {
   type: "disable";
 };
 
-type HideDependency = Condition & {
-  type: "hide";
+type VisibilityDependency = Condition & {
+  type: "visibility";
 };
 
 export type {
   BindValueDependency,
   Condition,
   Dependency,
-  DependencyDict,
+  DependencyContextValue,
   DependencyStructure,
-  DependencyType,
   DependsOn,
   DependsOnBase,
   DependsOnSingle,
   DisableDependency,
-  HideDependency,
+  VisibilityDependency,
 };

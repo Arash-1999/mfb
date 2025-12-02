@@ -44,8 +44,6 @@ const Counter = () => {
 };
 
 const TestPage = () => {
-  const context = useContext(TestContext);
-  console.log(context);
   return (
     <>
       <ComponentA />
