@@ -1,3 +1,7 @@
+---
+description: watch other input values
+---
+
 # Dependency
 
 You can add dynamic, condition-based rendering and behavior control to any form item(input, card).

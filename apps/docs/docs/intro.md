@@ -1,3 +1,8 @@
+---
+id: introduction
+sidebar_position: 0
+---
+
 # Introduction
 
 Mfb is a declarative framewrok for efficiently building forms.
