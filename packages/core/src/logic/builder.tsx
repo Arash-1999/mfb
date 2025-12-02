@@ -262,8 +262,6 @@ class FormBuilder<
         case "append":
         case "prepend":
           dispatchFieldArray<TFields>(id, action.name, {
-            // TODO: use config.input.defaultValues to create correct deafultValue
-            params: [{} as never, {}],
             type: "append",
           });
           break;
