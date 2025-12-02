@@ -22,6 +22,7 @@ type GetCardBase<
         ? Array<{
             gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
             list: Array<GetInputs<TConfig, TFields>>;
+            name?: string;
             title: Header | string;
           }>
         : Array<GetInputs<TConfig, TFields>>;
@@ -41,9 +42,12 @@ type GetCards<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TAdvanced extends boolean = false,
+  TExtra = unknown,
 > =
-  | ((props?: DefineFnProps) => GetCardsImpl<TConfig, TFields, TAdvanced, true>)
-  | GetCardsImpl<TConfig, TFields, TAdvanced>;
+  | ((
+      props?: DefineFnProps,
+    ) => GetCardsImpl<TConfig, TFields, TAdvanced, true> & TExtra)
+  | (GetCardsImpl<TConfig, TFields, TAdvanced> & TExtra);
 
 type GetCardsImpl<
   TConfig extends FormBuilderConfig,
@@ -146,10 +150,12 @@ type SimpleCardBase = (props: SimpleCardPropsBase & unknown) => JSX.Element;
 
 type SimpleCardObject = Record<PropertyKey, SimpleCardBase>;
 
-type SimpleCardProps<TProps> = BaseComponentProps &
-  TProps & {
-    header: Header | string;
-  };
+type SimpleCardProps<TProps> = PropsWithChildren<
+  BaseComponentProps &
+    TProps & {
+      header: Header | string;
+    }
+>;
 
 interface SimpleCardPropsBase
   extends BaseComponentProps,

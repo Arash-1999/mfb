@@ -1,5 +1,28 @@
-import type { FormBuilderConfig, ListInput } from "@/types";
+import type {
+  ActionInput,
+  DefineFnProps,
+  FormBuilderConfig,
+  ListInput,
+} from "@/types";
 import type { FieldValues } from "react-hook-form";
+
+const listActionGuard = <
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+>(
+  obj: unknown,
+): obj is
+  | ((props?: DefineFnProps) => ActionInput<TConfig, TFields>)
+  | ActionInput<TConfig, TFields> => {
+  if (!obj) return false;
+  const parsedObj = typeof obj === "function" ? obj() : obj;
+  return (
+    !!parsedObj &&
+    typeof parsedObj === "object" &&
+    "actionType" in parsedObj &&
+    typeof parsedObj.actionType === "string"
+  );
+};
 
 const listInputGuard = <
   TConfig extends FormBuilderConfig,
@@ -14,5 +37,4 @@ const listInputGuard = <
     input.type === "list"
   );
 };
-
-export { listInputGuard };
+export { listActionGuard, listInputGuard };

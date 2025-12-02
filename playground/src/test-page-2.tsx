@@ -39,7 +39,7 @@ const TestPage2 = () => {
                 },
                 { shouldFocus: false },
               ],
-            }
+            },
           );
         }}
       >
@@ -57,7 +57,7 @@ const TestPage2 = () => {
             {
               type: "remove",
               params: [-1],
-            }
+            },
           );
         }}
       >
@@ -74,7 +74,21 @@ const TestPage2 = () => {
             header: "First Card (akbar)",
             name: "card-1",
             type: "paper",
+            gridContainerProps: {
+              spacing: 2,
+            },
             inputs: [
+              {
+                actionType: "append",
+                gridProps: {
+                  size: "auto",
+                },
+                name: "card-1.akbar",
+                props: {
+                  icon: "append",
+                },
+                type: "field-array-action",
+              },
               {
                 type: "text",
                 name: "list-dep",
@@ -92,6 +106,7 @@ const TestPage2 = () => {
                 },
                 gridContainerProps: {
                   spacing: 1,
+                  justifyContent: "space-between",
                 },
                 type: "list",
                 name: "akbar",
@@ -104,13 +119,21 @@ const TestPage2 = () => {
                 },
                 inputs: [
                   {
+                    dependsOn: {
+                      type: "disable",
+                      condition: "is-first-index",
+                      id: "is-frist",
+                      path: "card-1.akbar",
+                      value: "{{index}}",
+                    },
                     type: "text",
                     gridProps: {
-                      size: 12,
+                      size: 11 / 3,
                     },
                     name: "input-1",
                     props: {
                       textFieldProps: {
+                        fullWidth: true,
                         placeholder: "First Input",
                         size: "small",
                       },
@@ -119,11 +142,12 @@ const TestPage2 = () => {
                   {
                     type: "text",
                     gridProps: {
-                      size: 12,
+                      size: 11 / 3,
                     },
                     name: "input-2",
                     props: {
                       textFieldProps: {
+                        fullWidth: true,
                         placeholder: "Second Input",
                         size: "small",
                       },
@@ -132,15 +156,27 @@ const TestPage2 = () => {
                   {
                     type: "text",
                     gridProps: {
-                      size: 12,
+                      size: 11 / 3,
                     },
                     name: "input-3",
                     props: {
                       textFieldProps: {
+                        fullWidth: true,
                         placeholder: "Third Input",
                         size: "small",
                       },
                     },
+                  },
+                  {
+                    actionType: "remove",
+                    gridProps: {
+                      size: "auto",
+                    },
+                    name: "card-1.akbar",
+                    props: {
+                      icon: "remove",
+                    },
+                    type: "field-array-action",
                   },
                 ],
               },

@@ -11,7 +11,6 @@ const MfbRadioGroup = <TFields extends FieldValues = FieldValues>({
   formControlLabelProps,
   name,
   options,
-  radioGroupProps,
   radioProps,
 }: MfbRadioGroupProps<TFields>) => {
   const { control } = useFormContext();
@@ -22,13 +21,7 @@ const MfbRadioGroup = <TFields extends FieldValues = FieldValues>({
       defaultValue={defaultValue as never}
       name={name}
       render={({ field: { ref, value, ...field } }) => (
-        <RadioGroup
-          disabled={disabled}
-          ref={ref}
-          value={value}
-          {...field}
-          {...radioGroupProps}
-        >
+        <RadioGroup disabled={disabled} ref={ref} value={value} {...field}>
           {options.map((option) => {
             const [key, label] =
               typeof option === "string" || typeof option === "number"
