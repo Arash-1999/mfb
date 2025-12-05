@@ -12,8 +12,11 @@ interface AdvancedMapperProps<
   name?: string;
 }
 
-interface InputMapFnOptions<TFields extends FieldValues> {
-  deps?: DependsOn<TFields>;
+interface InputMapFnOptions<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> {
+  deps?: DependsOn<TConfig, TFields>;
   formMethods: UseFormReturn<TFields>;
   name?: string;
 }
@@ -22,7 +25,7 @@ interface InputMapperProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > {
-  deps?: DependsOn<TFields>;
+  deps?: DependsOn<TConfig, TFields>;
   inputs: ListInputArray<TConfig, TFields>;
   name?: string;
 }

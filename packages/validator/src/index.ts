@@ -1,6 +1,7 @@
 import type {
   ArrayValidation,
   BooleanValidation,
+  FormBuilderConfig,
   Item,
   ItemArray,
   NumericValidation,
@@ -20,7 +21,7 @@ import {
 
 class MfbValidator<TFormat extends string> {
   private parseItem = <TFields extends FieldValues>(
-    item: Item<TFields, (string & {}) | TFormat>,
+    item: Item<FormBuilderConfig, TFields, (string & {}) | TFormat>,
   ) => {
     console.log(item);
     let schema: null | Properties<(string & {}) | TFormat> = null;
@@ -51,7 +52,7 @@ class MfbValidator<TFormat extends string> {
         // console.log(validation);
         if (validation.type === "object")
           return this.parseObject({ ...validation, required }, schema);
-        else return this.parseObject({ type: "object", required }, schema);
+        else return this.parseObject({ required, type: "object" }, schema);
       }
     }
 
@@ -73,7 +74,7 @@ class MfbValidator<TFormat extends string> {
     }
   };
   private parse = <TFields extends FieldValues>(
-    items: ItemArray<TFields, (string & {}) | TFormat>,
+    items: ItemArray<FormBuilderConfig, TFields, (string & {}) | TFormat>,
   ): [Properties<(string & {}) | TFormat>, Array<string>] => {
     const result: Properties<(string & {}) | TFormat> = {};
     const requiredList: Array<string> = [];
@@ -134,7 +135,7 @@ class MfbValidator<TFormat extends string> {
     };
   };
   public getSchema = <TFields extends FieldValues>(
-    items: ItemArray<TFields, (string & {}) | TFormat>,
+    items: ItemArray<FormBuilderConfig, TFields, (string & {}) | TFormat>,
   ) => {
     const [schema, required] = this.parse(items);
 
@@ -216,7 +217,9 @@ class MfbValidator<TFormat extends string> {
   };
 }
 
-function isListItem<TFields extends FieldValues>(item: Item<TFields>) {
+function isListItem<TFields extends FieldValues>(
+  item: Item<FormBuilderConfig, TFields>,
+) {
   return item.type === "list" || item.variant === "list";
 }
 

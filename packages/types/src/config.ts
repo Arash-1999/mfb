@@ -7,6 +7,7 @@ import type { BaseComponent, InputObject, LayoutKey } from "./common";
 import type { FieldArrayValues } from "./default-value";
 import type { ButtonComponent } from "./input";
 import type { Validator } from "./validation";
+import type { ConditionsMap } from "./dependency-management";
 
 interface FormBuilderConfig {
   button: {
@@ -33,6 +34,7 @@ interface FormBuilderContext<TFormId extends string = string> {
 
 interface FormBuilderOptions {
   dependencyShouldReset: boolean;
+  extraConditions: ConditionsMap;
   genDefaultValues: boolean;
 }
 

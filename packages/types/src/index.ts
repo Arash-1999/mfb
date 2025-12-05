@@ -4,6 +4,7 @@ export type * from "./children-path";
 export type * from "./common";
 export type * from "./condition";
 export type * from "./config";
+export type * from "./context";
 export type * from "./default-value";
 export type * from "./dependency-management";
 export type * from "./event";

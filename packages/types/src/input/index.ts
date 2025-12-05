@@ -32,9 +32,10 @@ type GetInputsImpl<
   TInternal extends boolean = false,
   TFunc extends boolean = false,
 > =
-  | (Dependency<TFields, TFunc> & ListInput<TConfig, TFields>)
+  | (Dependency<TConfig, TFields, TFunc> & ListInput<TConfig, TFields>)
   | {
       [TInput in keyof TConfig["input"]["components"]]: Dependency<
+        TConfig,
         TFields,
         TFunc,
         HasDependencyField<TConfig["input"]["components"][TInput]>

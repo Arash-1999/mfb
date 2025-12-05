@@ -35,7 +35,7 @@ type NormalCardItem<
   TFields extends FieldValues,
   TAdvanced extends boolean = false,
   TFunc extends boolean = false,
-> = Dependency<TFields, TFunc> &
+> = Dependency<TConfig, TFields, TFunc> &
   NormalCardItemBase<TConfig, TFields, TAdvanced>;
 
 interface NormalCardItemBase<

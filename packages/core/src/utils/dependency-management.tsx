@@ -1,9 +1,9 @@
-import type { FieldArrayContextValue } from "@/context";
 import type {
-  Condition,
   DependencyDict,
   DependsOn,
   DependsOnSingle,
+  FieldArrayContextValue,
+  FormBuilderConfig,
 } from "@mfb/types";
 import type { FieldValues, Path, PathValue } from "react-hook-form";
 
@@ -25,45 +25,12 @@ const convertDepsToObject = <TDep extends DefaultDep = DefaultDep>(
   );
 };
 
-const conditionCalculator = (
-  { condition, value }: Condition,
-  currentValue: unknown,
-): boolean => {
-  // NOTE: in field array comparisions: value -> index, currentValue -> length
-  let result: boolean = false;
-
-  switch (condition) {
-    case "eq":
-      result = value === currentValue;
-      break;
-    case "is-first-index":
-      result = value === 0;
-      break;
-    case "is-last-index":
-      if (typeof currentValue === "number") result = value === currentValue - 1;
-      break;
-    case "not-eq":
-      result = value !== currentValue;
-      break;
-    case "not-first-index":
-      result = value !== 0;
-      break;
-    case "not-last-index":
-      if (typeof currentValue === "number") result = value !== currentValue - 1;
-      break;
-  }
-  return result;
-};
-
-const conditionArrayCalculator = (
-  list: Array<Condition & { current: unknown }>,
-) => {
-  return list.every((dep) => conditionCalculator(dep, dep.current));
-};
-
-const pushDependency = <TFields extends FieldValues>(
-  target: DependencyDict<TFields>,
-  dependsOn: DependsOnSingle<TFields, false>,
+const pushDependency = <
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+>(
+  target: DependencyDict<TConfig, TFields>,
+  dependsOn: DependsOnSingle<TConfig, TFields, false>,
   value: number | PathValue<TFields, Path<TFields>> | undefined,
 ) => {
   switch (dependsOn.type) {
@@ -85,12 +52,15 @@ const pushDependency = <TFields extends FieldValues>(
     }
   }
 };
-const createDependencyDict = <TFields extends FieldValues>(
-  dependsOn: DependsOn<TFields>,
+const createDependencyDict = <
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+>(
+  dependsOn: DependsOn<TConfig, TFields>,
   value: readonly PathValue<TFields, Path<TFields>>[],
   fieldArrayContext: FieldArrayContextValue,
 ) => {
-  const base: DependencyDict<TFields> = {
+  const base: DependencyDict<TConfig, TFields> = {
     "bind-value": [],
     "def-props": [],
     disable: [],
@@ -129,9 +99,4 @@ const createDependencyDict = <TFields extends FieldValues>(
   return base;
 };
 
-export {
-  conditionArrayCalculator,
-  conditionCalculator,
-  convertDepsToObject,
-  createDependencyDict,
-};
+export { convertDepsToObject, createDependencyDict };

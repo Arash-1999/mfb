@@ -13,7 +13,7 @@ type GetSimpleCard<
   TAdvanced extends boolean = false,
   TInternal extends boolean = false,
   TFunc extends boolean = false,
-> = Dependency<TFields, TFunc> &
+> = Dependency<TConfig, TFields, TFunc> &
   GetCardBase<TConfig, TFields, TAdvanced, true> &
   {
     [TCard in keyof TConfig["card"]["simple"]]: {

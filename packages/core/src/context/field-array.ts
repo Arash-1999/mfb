@@ -1,9 +1,6 @@
-import { createContext, useContext } from "react";
+import type { FieldArrayContextValue } from "@mfb/types";
 
-interface FieldArrayContextValue {
-  index: null | number;
-  length: null | number;
-}
+import { createContext, useContext } from "react";
 
 const FieldArrayContext = createContext<FieldArrayContextValue | null>(null);
 
@@ -12,4 +9,3 @@ const useFieldArrayContext = () => {
 };
 
 export { FieldArrayContext, useFieldArrayContext };
-export type { FieldArrayContextValue };

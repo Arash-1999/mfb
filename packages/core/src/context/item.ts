@@ -1,16 +1,6 @@
-import type { ChildrenPathResult } from "@mfb/types";
+import type { MfbItemContextValue } from "@mfb/types";
 
 import { createContext, useContext } from "react";
-
-interface MfbItemContextValue {
-  childrenPath: ChildrenPathResult;
-  deps: ParentDeps;
-  mode: "advanced" | "normal";
-  path: string;
-}
-interface ParentDeps {
-  disable: boolean;
-}
 
 const MfbItemContext = createContext<MfbItemContextValue | null>(null);
 
@@ -27,4 +17,3 @@ const useMfbItemContext = () => {
 };
 
 export { MfbItemContext, useMfbItemContext };
-export type { MfbItemContextValue, ParentDeps };

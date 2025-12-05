@@ -24,7 +24,10 @@ interface BaseComponentProps {
   validation?: Validation<string>;
 }
 
-interface DefaultItem<TFields extends FieldValues> extends Dependency<TFields> {
+interface DefaultItem<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> extends Dependency<TConfig, TFields> {
   gridProps?: object;
   name?: string;
 }
@@ -40,21 +43,25 @@ type InputArray<
 
 type InputObject = Record<PropertyKey, BaseInput>;
 
-interface Item<TFields extends FieldValues, TFormat extends string = string> {
-  dependsOn?: DependsOn<TFields>;
+interface Item<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+  TFormat extends string = string,
+> {
+  dependsOn?: DependsOn<TConfig, TFields>;
   inputs?:
     | Array<{
-        list: ItemArray<TFields, (string & {}) | TFormat>;
+        list: ItemArray<TConfig, TFields, (string & {}) | TFormat>;
         name?: string;
       }>
-    | ItemArray<TFields, (string & {}) | TFormat>;
+    | ItemArray<TConfig, TFields, (string & {}) | TFormat>;
   isGroup?: boolean;
   list?:
     | Array<{
-        list: ItemArray<TFields, (string & {}) | TFormat>;
+        list: ItemArray<TConfig, TFields, (string & {}) | TFormat>;
         name?: string;
       }>
-    | ItemArray<TFields, (string & {}) | TFormat>;
+    | ItemArray<TConfig, TFields, (string & {}) | TFormat>;
   name?: string;
   props?: unknown;
   required?: boolean;
@@ -64,11 +71,12 @@ interface Item<TFields extends FieldValues, TFormat extends string = string> {
 }
 
 type ItemArray<
+  TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormat extends string = string,
 > = Array<
-  | ((props?: DefineFnProps) => Item<TFields, (string & {}) | TFormat>)
-  | Item<TFields, (string & {}) | TFormat>
+  | ((props?: DefineFnProps) => Item<TConfig, TFields, (string & {}) | TFormat>)
+  | Item<TConfig, TFields, (string & {}) | TFormat>
 >;
 
 type LayoutKey = "field" | "grid-container" | "grid-item";

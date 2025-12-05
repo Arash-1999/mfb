@@ -1,16 +1,27 @@
 import type {
+  CalcItem,
+  Condition,
   DefaultItem,
   DependencyManagerProps,
+  DependencyStructure,
+  DependencyType,
   FormBuilderConfig,
-  FormBuilderOptions,
   FormBuilderOverrides,
+  GetExtraConditions,
+  UseDependencyProps,
+  UseDependencyReturn,
+  UseDependsOnFieldProps,
 } from "@mfb/types";
-import type { FieldValues } from "react-hook-form";
+import type { FieldValues, Path } from "react-hook-form";
 
-import { useMfbItemContext } from "@/context";
-import { useDependency, useDependsOnField } from "@/hooks";
+import { reFieldArrayValue } from "@/constants";
+import { defaultConditions } from "@/constants/conditions";
+import { useFieldArrayContext, useMfbItemContext } from "@/context";
 import { MfbItemProvider } from "@/providers";
-import { useFormContext } from "react-hook-form";
+import { convertDepsToObject, createDependencyDict, mergeName } from "@/utils";
+import { isNullOrUndefined } from "@mfb/utils";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { Configuration } from "./configuration";
 
@@ -18,17 +29,176 @@ class DependencyManagement<
   TConfig extends FormBuilderConfig,
   TFormId extends string,
 > extends Configuration<TConfig, TFormId> {
-  constructor(
-    config: TConfig,
-    options?: Partial<FormBuilderOptions>,
-    overrides?: FormBuilderOverrides,
-  ) {
-    super(config, options, overrides);
+  constructor(config: TConfig, overrides?: FormBuilderOverrides) {
+    super(config, overrides);
   }
+
+  protected conditionCalculator = (
+    { condition, value }: Condition<GetExtraConditions<TConfig>>,
+    currentValue: unknown,
+  ): boolean => {
+    // NOTE: in field array comparisions: value -> index, currentValue -> length
+    let result: boolean = false;
+
+    if (!isNullOrUndefined(this.options.extraConditions[condition])) {
+      result = this.options.extraConditions[condition](value, currentValue);
+    } else if (!isNullOrUndefined(defaultConditions[condition])) {
+      result = defaultConditions[condition](value, currentValue);
+    }
+
+    return result;
+  };
+
+  protected useConditionCalculator = () => {
+    const calc = useCallback((item: CalcItem<TConfig>) => {
+      return this.conditionCalculator(item, item.current);
+    }, []);
+
+    const reduceCalc = useCallback(
+      (list: Array<CalcItem<TConfig>>) => {
+        return list.reduce<boolean>((acc, cur) => {
+          return acc || calc(cur);
+        }, false);
+      },
+      [calc],
+    );
+
+    return {
+      calc,
+      reduceCalc,
+    };
+  };
+
+  protected useDependency = <
+    TFields extends FieldValues,
+    TItem extends DefaultItem<TConfig, TFields>,
+  >({
+    component,
+    dependencyContext,
+    dependsOn,
+    name = "",
+  }: UseDependencyProps<TConfig, TFields, TItem>): UseDependencyReturn<
+    TConfig,
+    TFields,
+    TItem
+  > => {
+    const { options } = this;
+    const fieldArrayContext = useFieldArrayContext();
+    const { reduceCalc } = this.useConditionCalculator();
+    const formMethods = useFormContext<TFields>();
+    const ref = useRef<Record<DependencyType, boolean | null>>({
+      "bind-value": null,
+      "def-props": null,
+      disable: null,
+      hide: null,
+    });
+
+    // TODO: provide default value (it's will be undefined when defaultValue passed to Controller)
+    const value = useWatch<TFields>({
+      control: formMethods.control,
+      name: (Array.isArray(dependsOn) ? dependsOn : [dependsOn])
+        .filter((dep) =>
+          dep.type === "disable" || dep.type === "hide"
+            ? typeof dep.value === "string"
+              ? !reFieldArrayValue.test(dep.value)
+              : true
+            : true,
+        )
+        .map((dep) => {
+          return dep.path;
+        }),
+    });
+
+    console.log("value: ", value);
+
+    const dependencies = useMemo<DependencyStructure<TConfig, TFields>>(() => {
+      const {
+        disable: disableDict,
+        hide: hideDict,
+        ...dependencyDict
+      } = createDependencyDict<TConfig, TFields>(
+        dependsOn,
+        value,
+        fieldArrayContext,
+      );
+
+      return {
+        ...dependencyDict,
+        disable: dependencyContext.disable || reduceCalc(disableDict),
+        hide: reduceCalc(hideDict),
+      };
+    }, [fieldArrayContext, reduceCalc, value, dependsOn, dependencyContext]);
+
+    const resolvedComponent = useMemo(() => {
+      if (typeof component === "function") {
+        const resolvedDeps = convertDepsToObject(dependencies["def-props"]);
+        return component({ deps: resolvedDeps as never });
+      }
+      return component;
+    }, [component, dependencies]);
+
+    useEffect(() => {
+      // NOTE: detect conditon diff between rerenders to reset field
+      if (
+        typeof resolvedComponent.dependencyShouldReset === "undefined"
+          ? this.options?.dependencyShouldReset
+          : resolvedComponent.dependencyShouldReset
+      ) {
+        const resolvedName = mergeName(name, resolvedComponent.name || "");
+
+        const _hide = dependencies.hide;
+        const _disable = dependencies.disable;
+
+        // TODO: save last bind-value and def-props state and compare if there is change reset
+        if (
+          (typeof ref.current.hide === "boolean" &&
+            _hide &&
+            _hide !== ref.current.hide) ||
+          (typeof ref.current.disable === "boolean" &&
+            _disable &&
+            _disable !== ref.current.disable)
+        ) {
+          formMethods.resetField(resolvedName as Path<TFields>);
+        }
+        ref.current.hide = _hide;
+        ref.current.disable = _disable;
+      }
+    }, [
+      dependencies,
+      formMethods,
+      name,
+      options?.dependencyShouldReset,
+      resolvedComponent,
+      value,
+    ]);
+
+    return [dependencies.hide ? null : resolvedComponent, dependencies];
+  };
+
+  protected useDependsOnField = <
+    TFields extends FieldValues,
+    TItem extends DefaultItem<TConfig, TFields>,
+  >({
+    component,
+    deps,
+  }: UseDependsOnFieldProps<TConfig, TFields, TItem>) => {
+    return useMemo(() => {
+      let { dependsOn } =
+        typeof component === "function" ? component() : component;
+      dependsOn = dependsOn
+        ? Array.isArray(dependsOn)
+          ? dependsOn
+          : [dependsOn]
+        : [];
+      const resolvedDeps = deps ? (Array.isArray(deps) ? deps : [deps]) : [];
+
+      return [...resolvedDeps, ...dependsOn];
+    }, [component, deps]);
+  };
 
   protected DependencyManager = <
     TFields extends FieldValues,
-    TItem extends DefaultItem<TFields>,
+    TItem extends DefaultItem<TConfig, TFields>,
   >({
     component,
     getItemInfo,
@@ -36,27 +206,25 @@ class DependencyManagement<
     name,
     render,
     withGrid,
-  }: DependencyManagerProps<TFields, TItem>) => {
+  }: DependencyManagerProps<TConfig, TFields, TItem>) => {
     const {
       layout: { "grid-item": GridItem },
     } = this.config;
     const { deps: parentDeps } = useMfbItemContext();
     const formMethods = useFormContext<TFields>();
-    const dependency = useDependsOnField<TFields, TItem>({
+    const dependency = this.useDependsOnField<TFields, TItem>({
       component,
     });
 
-    const [resolvedComponent, dependencies] = useDependency<TFields, TItem>(
-      {
-        component,
-        dependencyContext: parentDeps,
-        dependsOn: dependency,
-        name,
-      },
-      {
-        dependencyShouldReset: this.options.dependencyShouldReset,
-      },
-    );
+    const [resolvedComponent, dependencies] = this.useDependency<
+      TFields,
+      TItem
+    >({
+      component,
+      dependencyContext: parentDeps,
+      dependsOn: dependency,
+      name,
+    });
 
     if (resolvedComponent === null) return null;
 
@@ -77,7 +245,7 @@ class DependencyManagement<
       );
 
     return (
-      <MfbItemProvider<TFields, TItem>
+      <MfbItemProvider<TConfig, TFields, TItem>
         disable={dependencies.disable}
         getItemInfo={getItemInfo}
         index={index}

@@ -3,6 +3,11 @@ import type { FormBuilderConfig } from "./config";
 import type { BaseInput } from "./input";
 import type { Validator } from "./validation";
 
+type GetExtraConditions<TConfig extends FormBuilderConfig> =
+  TConfig["options"] extends { extraConditions: infer TExtraConditions }
+    ? keyof TExtraConditions
+    : never;
+
 type GetFormats<TConfig extends FormBuilderConfig> =
   TConfig["validator"] extends Validator<infer T>
     ? T extends string
@@ -24,6 +29,7 @@ type HasDependencyField<TInput extends BaseInput> =
   "deps" extends keyof Parameters<TInput>[0] ? false : true;
 
 export type {
+  GetExtraConditions,
   GetFormats,
   GetInputParameter,
   GetLayoutProps,

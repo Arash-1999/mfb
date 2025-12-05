@@ -27,13 +27,13 @@ class Configuration<TConfig extends FormBuilderConfig, TFormId extends string> {
 
   constructor(
     config: TConfig,
-    options?: Partial<FormBuilderOptions>,
+    // options?: Partial<FormBuilderOptions>,
     overrides?: FormBuilderOverrides,
   ) {
     this.childrenPath = new ItemInfo<TConfig>();
     this.config = config;
     this.Context = createContext<FormBuilderContext<TFormId> | null>(null);
-    this.options = { ...defaultOptions, ...options };
+    this.options = { ...defaultOptions, ...config.options };
 
     if (overrides?.FieldArray) this.FieldArrayOverride = overrides.FieldArray;
   }

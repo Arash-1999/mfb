@@ -25,10 +25,10 @@ type GetGroupCard<
               >
           : never;
       } & (
-          | (Dependency<TFields, TFunc> &
+          | (Dependency<TConfig, TFields, TFunc> &
               GetCardBase<TConfig, TFields, TAdvanced, true> &
               GroupCardList<TConfig>)
-          | (Dependency<TFields, TFunc> &
+          | (Dependency<TConfig, TFields, TFunc> &
               GetCardBase<TConfig, TFields, TAdvanced> &
               GroupCardNormal<TConfig>)
         );
