@@ -23,6 +23,15 @@ const config = {
   },
   layout: getLayout(),
   validator: new MfbAjvPlugin<FormatName>(),
+  options: {
+    extraConditions: {
+      lt: (target, value) => {
+        const [a, b] = [Number(value), Number(target)];
+        if (!isNaN(a) && !isNaN(b)) return a < b;
+        else return false;
+      },
+    },
+  },
 } satisfies FormBuilderConfig;
 
 type MfbInput<TFields extends FieldValues> = GetInputs<typeof config, TFields>;
@@ -34,11 +43,9 @@ type FormId =
   | "ADVANCED_FORM_TEST_ID"
   | "TEST_PAGE_2_FORM_ID";
 
-const FB = new FormBuilder<Config, FormId>(
-  config,
-  {},
-  { FieldArray: MfbFieldArray },
-);
+const FB = new FormBuilder<Config, FormId>(config, {
+  FieldArray: MfbFieldArray,
+});
 
 export { config, FB };
 export type { Config, MfbInput };

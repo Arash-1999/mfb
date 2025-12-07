@@ -3,6 +3,8 @@ import { FB } from "./form-builder";
 
 interface Schema {
   akbar: string;
+  "test-1": string;
+  "test-2": string;
 }
 
 const Page = () => {
@@ -36,6 +38,33 @@ const Page = () => {
                       format: "email",
                       type: "string",
                       minLength: 1,
+                    },
+                  },
+                  {
+                    type: "text",
+                    props: {
+                      textFieldProps: {
+                        label: "test 1",
+                        placeholder: "test 1",
+                      },
+                    },
+                    name: "test-1",
+                  },
+                  {
+                    type: "text",
+                    props: {
+                      textFieldProps: {
+                        label: "test 2",
+                        placeholder: "test 2",
+                      },
+                    },
+                    name: "test-2",
+                    dependsOn: {
+                      type: "disable",
+                      condition: "lt",
+                      id: "lt-test-2",
+                      path: "test-1",
+                      value: 10,
                     },
                   },
                 ],
