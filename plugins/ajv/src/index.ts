@@ -1,5 +1,5 @@
 import type { AjvError } from "@hookform/resolvers/ajv";
-import type { ItemArray, Validator } from "@mfb/types";
+import type { FormBuilderConfig, ItemArray, Validator } from "@mfb/types";
 import type { DefinedError, JSONSchemaType, Options } from "ajv";
 import type { FormatName } from "ajv-formats";
 import type { Resolver } from "react-hook-form";
@@ -119,8 +119,11 @@ class MfbAjvPlugin<TFormat extends string>
     };
   };
 
-  public resolve = <TFields extends FieldValues>(
-    items: ItemArray<TFields, TFormat>,
+  public resolve = <
+    TConfig extends FormBuilderConfig,
+    TFields extends FieldValues,
+  >(
+    items: ItemArray<TConfig, TFields, TFormat>,
   ) => {
     const schema = this.getSchema<TFields>(items);
 
