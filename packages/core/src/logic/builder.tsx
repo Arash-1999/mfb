@@ -7,6 +7,7 @@ import type {
   FieldArrayProps,
   FormBuilderConfig,
   FormBuilderOverrides,
+  FormLayoutProps,
   GetCardsImpl,
   GetInputsImpl,
   InputMapperProps,
@@ -14,6 +15,7 @@ import type {
   RenderCardItemProps,
   RenderFnOptions,
 } from "@mfb/types";
+import type { PropsWithChildren } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import { FieldArrayContext, useFieldArrayContext } from "@/context";
@@ -28,12 +30,11 @@ import {
 } from "@/utils";
 import { isNullOrUndefined } from "@mfb/utils";
 import { createElement, useMemo } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { DependencyManagement } from "./dependency-management";
 import { MfbFieldArray } from "./field-array";
 
-// NOTE: move logic to separate functions in a better folder structure
 class FormBuilder<
   TConfig extends FormBuilderConfig,
   TFormId extends string = string,
@@ -77,13 +78,15 @@ class FormBuilder<
   };
 
   public AdvancedBuilder = <TFields extends FieldValues>({
+    footer,
     gridContainerProps,
+    header,
     id,
     list,
     onSubmit,
     options,
   }: AdvancedBuilderProps<TConfig, TFields, TFormId>) => {
-    const { AdvancedMapper, Context } = this;
+    const { AdvancedMapper, Context, FormLayout } = this;
     const { "grid-container": GridContainer } = this.config.layout;
 
     const resolvedList = useMemo(() => {
@@ -120,13 +123,13 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <MfbItemProvider>
-              <GridContainer {...gridContainerProps}>
-                <AdvancedMapper list={resolvedList} />
-              </GridContainer>
-            </MfbItemProvider>
-            {/* TODO: remove this submit button as configurable option */}
-            <button type="submit">SUBMIT</button>
+            <FormLayout footer={footer} header={header}>
+              <MfbItemProvider>
+                <GridContainer {...gridContainerProps}>
+                  <AdvancedMapper list={resolvedList} />
+                </GridContainer>
+              </MfbItemProvider>
+            </FormLayout>
           </form>
         </FormProvider>
       </Context.Provider>
@@ -134,13 +137,15 @@ class FormBuilder<
   };
 
   public BasicBuilder = <TFields extends FieldValues>({
+    footer,
     gridContainerProps,
+    header,
     id,
     inputs,
     onSubmit,
     options,
   }: BasicBuilderProps<TConfig, TFields, TFormId>) => {
-    const { Context, InputMapper } = this;
+    const { Context, FormLayout, InputMapper } = this;
     const { "grid-container": GridContainer } = this.config.layout;
 
     // TODO: move useMemo into a custom hook with generic type for TItem (and list/inputs)
@@ -156,7 +161,6 @@ class FormBuilder<
 
     const defaultValues = this.useDefaultValue(this.config, resolvedInputs);
     const resolver = this.useValidation<TFields>(resolvedInputs);
-    console.log("resolver", resolver);
     const formMethods = useForm<TFields>({
       defaultValues: this.options.genDefaultValues
         ? defaultValues.defaultValues
@@ -175,21 +179,24 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <MfbItemProvider>
-              <GridContainer {...gridContainerProps}>
-                <InputMapper inputs={resolvedInputs} />
-              </GridContainer>
-            </MfbItemProvider>
-            {/* TODO: remove this submit button as configurable option */}
-            <button type="submit">SUBMIT</button>
+            <FormLayout footer={footer} header={header}>
+              <MfbItemProvider>
+                <GridContainer {...gridContainerProps}>
+                  <InputMapper inputs={resolvedInputs} />
+                </GridContainer>
+              </MfbItemProvider>
+            </FormLayout>
           </form>
         </FormProvider>
       </Context.Provider>
     );
   };
+
   public Builder = <TFields extends FieldValues>({
     cards,
+    footer,
     gridContainerProps,
+    header,
     id,
     onSubmit,
     options,
@@ -197,7 +204,7 @@ class FormBuilder<
     const {
       layout: { "grid-container": GridContainer },
     } = this.config;
-    const { Context, DependencyManager, renderCard } = this;
+    const { Context, DependencyManager, FormLayout, renderCard } = this;
 
     // TODO: move useMemo into a custom hook with generic type for TItem (and list/inputs)
     const resolvedCards = useMemo(() => {
@@ -232,27 +239,27 @@ class FormBuilder<
       >
         <FormProvider {...formMethods}>
           <form id={id} onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <MfbItemProvider>
-              <GridContainer {...(gridContainerProps || {})}>
-                {resolvedCards.map((card, index) => {
-                  return (
-                    <DependencyManager<
-                      TFields,
-                      | GetCardsImpl<TConfig, TFields, false, true>
-                      | GetCardsImpl<TConfig, TFields, false>
-                    >
-                      component={card}
-                      getItemInfo={this.childrenPath.card}
-                      index={index}
-                      key={`card-${index}`}
-                      render={renderCard}
-                    />
-                  );
-                })}
-              </GridContainer>
-            </MfbItemProvider>
-            {/* TODO: remove this submit button as configurable option */}
-            <button type="submit">SUBMIT</button>
+            <FormLayout footer={footer} header={header}>
+              <MfbItemProvider>
+                <GridContainer {...(gridContainerProps || {})}>
+                  {resolvedCards.map((card, index) => {
+                    return (
+                      <DependencyManager<
+                        TFields,
+                        | GetCardsImpl<TConfig, TFields, false, true>
+                        | GetCardsImpl<TConfig, TFields, false>
+                      >
+                        component={card}
+                        getItemInfo={this.childrenPath.card}
+                        index={index}
+                        key={`card-${index}`}
+                        render={renderCard}
+                      />
+                    );
+                  })}
+                </GridContainer>
+              </MfbItemProvider>
+            </FormLayout>
           </form>
         </FormProvider>
       </Context.Provider>
@@ -686,6 +693,28 @@ class FormBuilder<
     }
 
     return null;
+  };
+
+  private FormLayout = <TFields extends FieldValues>({
+    children,
+    footer,
+    header,
+  }: PropsWithChildren<FormLayoutProps<TFields>>) => {
+    const formMethods = useFormContext<TFields>();
+
+    return (
+      <>
+        {!isNullOrUndefined(header)
+          ? createElement(header, { formMethods })
+          : null}
+
+        {children}
+
+        {!isNullOrUndefined(footer)
+          ? createElement(footer, { formMethods })
+          : null}
+      </>
+    );
   };
 }
 

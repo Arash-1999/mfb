@@ -1,6 +1,6 @@
 export type { AdvancedBuilderProps } from "./advanced";
 export type { BasicBuilderProps } from "./basic";
-export type { BuilderBaseProps } from "./common";
+export type { BuilderBaseProps, FormLayoutProps } from "./common";
 export type {
   DependencyManagerProps,
   RenderCardItemProps,
