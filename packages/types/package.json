@@ -20,7 +20,7 @@
   "devDependencies": {
     "@mfb/eslint-config": "workspace:*",
     "@mfb/typescript-config": "workspace:*",
-    "@types/react": "^19.0.8",
+    "@types/react": "catalog:",
     "eslint": "catalog:",
     "typescript": "catalog:"
   },
