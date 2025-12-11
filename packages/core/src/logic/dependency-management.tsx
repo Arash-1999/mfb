@@ -19,7 +19,7 @@ import { defaultConditions } from "@/constants/conditions";
 import { useFieldArrayContext, useMfbItemContext } from "@/context";
 import { MfbItemProvider } from "@/providers";
 import { convertDepsToObject, createDependencyDict, mergeName } from "@/utils";
-import { isNullOrUndefined } from "@mfb/utils";
+import { deepEqual, isNullOrUndefined, isObject } from "@mfb/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
@@ -86,7 +86,7 @@ class DependencyManagement<
     const fieldArrayContext = useFieldArrayContext();
     const { reduceCalc } = this.useConditionCalculator();
     const formMethods = useFormContext<TFields>();
-    const ref = useRef<Record<DependencyType, boolean | null>>({
+    const ref = useRef<Record<DependencyType, boolean | null | FieldValues>>({
       "bind-value": null,
       "def-props": null,
       disable: null,
@@ -108,8 +108,6 @@ class DependencyManagement<
           return dep.path;
         }),
     });
-
-    console.log("value: ", value);
 
     const dependencies = useMemo<DependencyStructure<TConfig, TFields>>(() => {
       const {
@@ -138,30 +136,42 @@ class DependencyManagement<
     }, [component, dependencies]);
 
     useEffect(() => {
+      const resolvedName = mergeName(name, resolvedComponent.name || "");
       // NOTE: detect conditon diff between rerenders to reset field
       if (
-        typeof resolvedComponent.dependencyShouldReset === "undefined"
+        (isNullOrUndefined(resolvedComponent.dependencyShouldReset)
           ? this.options?.dependencyShouldReset
-          : resolvedComponent.dependencyShouldReset
+          : resolvedComponent.dependencyShouldReset) &&
+        resolvedName &&
+        formMethods.getFieldState(resolvedName as Path<TFields>)?.isDirty &&
+        !isNullOrUndefined(resolvedComponent.dependsOn)
       ) {
-        const resolvedName = mergeName(name, resolvedComponent.name || "");
-
         const _hide = dependencies.hide;
         const _disable = dependencies.disable;
 
-        // TODO: save last bind-value and def-props state and compare if there is change reset
         if (
           (typeof ref.current.hide === "boolean" &&
             _hide &&
             _hide !== ref.current.hide) ||
           (typeof ref.current.disable === "boolean" &&
             _disable &&
-            _disable !== ref.current.disable)
+            _disable !== ref.current.disable) ||
+          ((isObject(ref.current["bind-value"]) ||
+            Array.isArray(ref.current["bind-value"])) &&
+            !deepEqual(
+              dependencies["bind-value"],
+              ref.current["bind-value"],
+            )) ||
+          ((isObject(ref.current["def-props"]) ||
+            Array.isArray(ref.current["def-props"])) &&
+            !deepEqual(dependencies["def-props"], ref.current["def-props"]))
         ) {
           formMethods.resetField(resolvedName as Path<TFields>);
         }
         ref.current.hide = _hide;
         ref.current.disable = _disable;
+        ref.current["bind-value"] = dependencies["bind-value"];
+        ref.current["def-props"] = dependencies["def-props"];
       }
     }, [
       dependencies,

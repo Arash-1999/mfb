@@ -205,6 +205,7 @@ class FormBuilder<
       layout: { "grid-container": GridContainer },
     } = this.config;
     const { Context, DependencyManager, FormLayout, renderCard } = this;
+    console.log("builder render");
 
     // TODO: move useMemo into a custom hook with generic type for TItem (and list/inputs)
     const resolvedCards = useMemo(() => {
