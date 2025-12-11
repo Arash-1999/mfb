@@ -1,5 +1,5 @@
 packages:
-  - apps/editor
+  - apps/*
   - playground
   - plugins/*
   - packages/*
@@ -18,6 +18,8 @@ catalog:
   vitest: ^3.2.4
   "@types/react": ^19.0.8
   "@types/react-dom": ^19.0.3
+  eslint-config-next: 16.0.8
+  next: 16.0.8
 
 catalogs:
   vite6:
