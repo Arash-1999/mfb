@@ -394,6 +394,22 @@ class FormBuilder<
     }
   };
 
+  private FormLayout = ({
+    children,
+    footer,
+    header,
+  }: PropsWithChildren<FormLayoutProps>) => {
+    return (
+      <>
+        {!isNullOrUndefined(header) ? createElement(header) : null}
+
+        {children}
+
+        {!isNullOrUndefined(footer) ? createElement(footer) : null}
+      </>
+    );
+  };
+
   private InputMapper = <TFields extends FieldValues>({
     inputs,
     name, // should passed in list input. optional in card or flat mode inputs.
@@ -694,28 +710,6 @@ class FormBuilder<
     }
 
     return null;
-  };
-
-  private FormLayout = <TFields extends FieldValues>({
-    children,
-    footer,
-    header,
-  }: PropsWithChildren<FormLayoutProps<TFields>>) => {
-    const formMethods = useFormContext<TFields>();
-
-    return (
-      <>
-        {!isNullOrUndefined(header)
-          ? createElement(header, { formMethods })
-          : null}
-
-        {children}
-
-        {!isNullOrUndefined(footer)
-          ? createElement(footer, { formMethods })
-          : null}
-      </>
-    );
   };
 }
 
