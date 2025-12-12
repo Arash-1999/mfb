@@ -51,9 +51,9 @@ class DefaultValue<
     this._paths = new Set<string>();
     this.result = {} as DefaultValues<TFields>;
     this.fieldArray = {} as FieldArrayValues<TFields>;
+    this.conditionCalculator = conditionCalculator;
 
     this.resovle(list);
-    this.conditionCalculator = conditionCalculator;
   }
 
   conditionArrayCalculator = (
