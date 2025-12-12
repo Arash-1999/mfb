@@ -1,13 +1,20 @@
 import type { JSX } from "react";
-import type { DeepPartial, FieldValues } from "react-hook-form";
+import type { DeepPartial, Field, FieldValues } from "react-hook-form";
 
 import type { FieldArrayOverrideProps } from "./builder-methods/field-array";
 import type { GroupCardComponent, SimpleCardObject } from "./card/component";
 import type { BaseComponent, InputObject, LayoutKey } from "./common";
 import type { FieldArrayValues } from "./default-value";
+import type { ConditionsMap } from "./dependency-management";
 import type { ButtonComponent } from "./input";
 import type { Validator } from "./validation";
-import type { ConditionsMap } from "./dependency-management";
+
+type FieldArrayOverrideFn = <
+  TFields extends FieldValues,
+  TFormId extends string,
+>(
+  props: FieldArrayOverrideProps<TFields, TFormId>,
+) => JSX.Element;
 
 interface FormBuilderConfig {
   button: {
@@ -37,11 +44,8 @@ interface FormBuilderOptions {
   extraConditions: ConditionsMap;
   genDefaultValues: boolean;
 }
-
 interface FormBuilderOverrides {
-  FieldArray: <TFields extends FieldValues, TFormId extends string>(
-    props: FieldArrayOverrideProps<TFields, TFormId>,
-  ) => JSX.Element;
+  FieldArray: FieldArrayOverrideFn;
 }
 
 interface MfbContextValue<
@@ -54,6 +58,7 @@ interface MfbContextValue<
 }
 
 export type {
+  FieldArrayOverrideFn,
   FormBuilderConfig,
   FormBuilderContext,
   FormBuilderOptions,

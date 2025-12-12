@@ -1,7 +1,7 @@
 import type { FieldValues } from "react-hook-form";
 
 import type { BaseComponentProps } from "../common";
-import type { FormBuilderConfig } from "../config";
+import type { FieldArrayOverrideFn, FormBuilderConfig } from "../config";
 import type { Dependency } from "../dependency-management";
 import type { GetFormats, GetLayoutProps } from "../utils";
 import type { ArrayValidation, ObjectValidation } from "../validation";
@@ -42,6 +42,7 @@ type GroupCardBase<TKey extends PropertyKey> = {
 };
 
 type GroupCardList<TConfig extends FormBuilderConfig> = {
+  element?: FieldArrayOverrideFn;
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   name: string;

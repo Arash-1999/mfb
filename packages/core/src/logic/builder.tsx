@@ -4,6 +4,7 @@ import type {
   AdvancedMapperProps,
   BasicBuilderProps,
   BuilderProps,
+  FieldArrayOverrideProps,
   FieldArrayProps,
   FormBuilderConfig,
   FormBuilderOverrides,
@@ -30,7 +31,7 @@ import {
 } from "@/utils";
 import { isNullOrUndefined } from "@mfb/utils";
 import { createElement, useMemo } from "react";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
 import { DependencyManagement } from "./dependency-management";
 import { MfbFieldArray } from "./field-array";
@@ -372,6 +373,7 @@ class FormBuilder<
     };
 
   private FieldArray = <TFields extends FieldValues>({
+    component,
     disabled,
     name,
     render,
@@ -380,13 +382,18 @@ class FormBuilder<
     const { FieldArrayOverride } = this;
     const { fieldArray, id } = this.useMfbContext<TFields>();
 
-    const props = {
+    const props: FieldArrayOverrideProps<TFields, TFormId> = {
       disabled,
       fieldArray,
       id,
       name,
       render,
     };
+
+    if (component) {
+      return createElement(component<TFields, TFormId>, props);
+    }
+
     if (FieldArrayOverride) {
       return <FieldArrayOverride<TFields, TFormId> {...props} />;
     } else {
@@ -482,6 +489,7 @@ class FormBuilder<
       if (card.variant === "list") {
         return (
           <FieldArray<TFields>
+            component={card.element}
             disabled={dependsOn.disable}
             key={`card-${index}`}
             name={resolvedName}
@@ -645,6 +653,7 @@ class FormBuilder<
 
       return (
         <FieldArray<TFields>
+          component={input.element}
           disabled={dependsOn.disable}
           name={resolvedName}
           render={(fields) => (

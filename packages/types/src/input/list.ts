@@ -1,7 +1,7 @@
 import type { FieldValues } from "react-hook-form";
 
 import type { AdvancedList, ListInputArray } from "../common";
-import type { FormBuilderConfig } from "../config";
+import type { FieldArrayOverrideFn, FormBuilderConfig } from "../config";
 import type { GetFormats, GetLayoutProps } from "../utils";
 import type { ArrayValidation } from "../validation";
 
@@ -19,6 +19,7 @@ type ListInput<
   );
 
 interface ListInputBase<TConfig extends FormBuilderConfig> {
+  element?: FieldArrayOverrideFn;
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
   gridProps?: GetLayoutProps<TConfig, "grid-item">;
   name: string;
