@@ -6,7 +6,7 @@ import type { Header } from "./common";
 
 type GroupCardComponent = (props: GroupCardPropsBase & unknown) => JSX.Element;
 
-type GroupCardProps<TProps> = BaseComponentProps &
+type GroupCardProps<TProps = unknown> = BaseComponentProps &
   TProps & {
     addGrid: (node: ReactNode, index: number) => ReactNode;
     nodes: Array<NodeItem>;
@@ -28,7 +28,7 @@ type SimpleCardBase = (props: SimpleCardPropsBase & unknown) => JSX.Element;
 
 type SimpleCardObject = Record<PropertyKey, SimpleCardBase>;
 
-type SimpleCardProps<TProps> = PropsWithChildren<
+type SimpleCardProps<TProps = unknown> = PropsWithChildren<
   BaseComponentProps &
     TProps & {
       header: Header | string;

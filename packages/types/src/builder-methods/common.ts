@@ -14,9 +14,9 @@ interface BuilderBaseProps<
   TFields extends FieldValues,
   TFormId extends string = string,
 > {
-  footer?: (props: BuilderLayoutComponentProps<TFields>) => JSX.Element;
+  footer?: () => JSX.Element;
   gridContainerProps?: GetLayoutProps<TConfig, "grid-container">;
-  header?: (props: BuilderLayoutComponentProps<TFields>) => JSX.Element;
+  header?: () => JSX.Element;
   id: TFormId;
   onSubmit: SubmitHandler<TFields>;
   options?: UseFormProps<TFields>;
@@ -26,13 +26,9 @@ interface BuilderLayoutComponentProps<TFields extends FieldValues> {
   formMethods: UseFormReturn<TFields>;
 }
 
-interface FormLayoutProps<TFields extends FieldValues> {
-  footer:
-    | ((props: BuilderLayoutComponentProps<TFields>) => JSX.Element)
-    | undefined;
-  header:
-    | ((props: BuilderLayoutComponentProps<TFields>) => JSX.Element)
-    | undefined;
+interface FormLayoutProps {
+  footer: (() => JSX.Element) | undefined;
+  header: (() => JSX.Element) | undefined;
 }
 
 export type { BuilderBaseProps, BuilderLayoutComponentProps, FormLayoutProps };

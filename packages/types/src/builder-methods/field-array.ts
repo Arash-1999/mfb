@@ -1,6 +1,7 @@
 import type { JSX } from "react";
 import type { FieldValues, UseFieldArrayReturn } from "react-hook-form";
 
+import type { FieldArrayOverrideFn } from "../config";
 import type { FieldArrayValues } from "../default-value";
 
 interface FieldArrayOverrideProps<
@@ -11,6 +12,7 @@ interface FieldArrayOverrideProps<
 }
 
 interface FieldArrayProps<TFields extends FieldValues> {
+  component?: FieldArrayOverrideFn;
   disabled: boolean | undefined;
   fieldArray: FieldArrayValues<TFields>;
   // TODO: use ArrayPath generic type instead of string
