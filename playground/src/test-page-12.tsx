@@ -1,4 +1,4 @@
-import { CustomElementInputProps } from "@mfb/core";
+import { CustomElementProps } from "@mfb/core";
 import { FB } from "./form-builder";
 import { MfbFieldArray } from "./form-builder/field-array";
 import { FieldValues, Path } from "react-hook-form";
@@ -19,9 +19,9 @@ const TestCustomElement = <TFields extends FieldValues>({
   disabled,
   formMethods,
   name,
-}: CustomElementInputProps<TFields>) => {
+}: CustomElementProps<TFields>) => {
   return (
-    <>
+    <div>
       <h6>Test Custom Element</h6>
 
       <input
@@ -29,7 +29,7 @@ const TestCustomElement = <TFields extends FieldValues>({
         type="text"
         {...formMethods.register(name as Path<TFields>)}
       />
-    </>
+    </div>
   );
 };
 
@@ -149,6 +149,48 @@ const Page = () => {
             name: "list",
             gridProps: { size: "auto" },
             props: { icon: "append" },
+          },
+        ]}
+        onSubmit={console.log}
+      />
+
+      <FB.Builder
+        id="TEST_PAGE_2_FORM_ID"
+        cards={[
+          {
+            type: "custom-element",
+            element: TestCustomElement,
+            name: "custom",
+            dependsOn: [
+              {
+                type: "disable",
+                condition: "eq",
+                id: "test-dep",
+                path: "test",
+                value: "fuck",
+              },
+            ],
+          },
+        ]}
+        onSubmit={console.log}
+      />
+
+      <FB.AdvancedBuilder
+        id="TEST_PAGE_2_FORM_ID"
+        list={[
+          {
+            type: "custom-element",
+            element: TestCustomElement,
+            name: "custom",
+            dependsOn: [
+              {
+                type: "disable",
+                condition: "eq",
+                id: "test-dep",
+                path: "test",
+                value: "fuck",
+              },
+            ],
           },
         ]}
         onSubmit={console.log}
