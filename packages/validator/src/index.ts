@@ -23,7 +23,6 @@ class MfbValidator<TFormat extends string> {
   private parseItem = <TFields extends FieldValues>(
     item: Item<FormBuilderConfig, TFields, (string & {}) | TFormat>,
   ) => {
-    console.log(item);
     let schema: null | Properties<(string & {}) | TFormat> = null;
     let required: Array<string> = [];
 
@@ -49,7 +48,6 @@ class MfbValidator<TFormat extends string> {
           required,
         };
 
-        // console.log(validation);
         if (validation.type === "object")
           return this.parseObject({ ...validation, required }, schema);
         else return this.parseObject({ required, type: "object" }, schema);
