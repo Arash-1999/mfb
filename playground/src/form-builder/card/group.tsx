@@ -18,7 +18,7 @@ function a11yProps(index: number) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const TabsGroup = ({ addGrid, nodes, required }: GroupCardProps<{}>) => {
+const TabsGroup = ({ addGrid, nodes, required }: GroupCardProps) => {
   const [value, setValue] = useState<number>(0);
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -68,7 +68,7 @@ const TabsGroup = ({ addGrid, nodes, required }: GroupCardProps<{}>) => {
   );
 };
 
-const AccordionGroup = ({ nodes, addGrid }: GroupCardProps<{}>) => {
+const AccordionGroup = ({ nodes, addGrid }: GroupCardProps) => {
   const [active, setActive] = useState<number>(-1);
 
   const handleChange = (index: number) => () => {

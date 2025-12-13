@@ -10,7 +10,7 @@ import {
 import CardHeader from "./header";
 import { ExpandMoreOutlined } from "@mui/icons-material";
 
-const AccordionCard = ({ children, header }: SimpleCardProps<any>) => {
+const AccordionCard = ({ children, header }: SimpleCardProps) => {
   return (
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
@@ -21,14 +21,7 @@ const AccordionCard = ({ children, header }: SimpleCardProps<any>) => {
   );
 };
 
-const PaperCard = ({
-  children,
-  header,
-  required,
-  validation,
-}: SimpleCardProps<any>) => {
-  console.log(validation);
-
+const PaperCard = ({ children, header, required }: SimpleCardProps) => {
   return (
     <Paper>
       <Box sx={{ p: 2 }}>

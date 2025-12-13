@@ -3,7 +3,7 @@ import type { FormatName } from "@mfb/ajv-plugin";
 
 import { MfbAjvPlugin } from "@mfb/ajv-plugin";
 import { FormBuilder, FormBuilderConfig, GetInputs } from "@mfb/core";
-import { MfbFieldArray } from "./field-array";
+// import { MfbFieldArray } from "./field-array";
 import { MfbButton } from "./button";
 import { getInput } from "./input";
 import { getLayout } from "./layout";
@@ -43,9 +43,10 @@ type FormId =
   | "ADVANCED_FORM_TEST_ID"
   | "TEST_PAGE_2_FORM_ID";
 
-const FB = new FormBuilder<Config, FormId>(config, {
-  FieldArray: MfbFieldArray,
-});
+const FB = new FormBuilder<Config, FormId>(
+  config,
+  // { FieldArray: MfbFieldArray, }
+);
 
 export { config, FB };
 export type { Config, MfbInput };

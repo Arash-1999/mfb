@@ -9,6 +9,7 @@ import {
 const MfbFieldArray = <TFields extends FieldValues>({
   // disabled,
   // id,
+  fieldArray,
   name,
   render,
 }: FieldArrayOverrideProps<TFields>) => {
@@ -17,8 +18,8 @@ const MfbFieldArray = <TFields extends FieldValues>({
   });
 
   useEffect(() => {
-    replace([{}]);
-  }, [replace]);
+    replace([fieldArray[name as ArrayPath<TFields>]]);
+  }, [replace, fieldArray, name]);
 
   // const handler = useCallback(
   //   (event: CustomEventInit<FieldArrayEvent<TFields, TFormId>>) => {
