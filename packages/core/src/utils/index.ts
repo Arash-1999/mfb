@@ -1,3 +1,4 @@
+export { customElementGuard } from "./custom-element-guard";
 export { DefaultValue } from "./default-value";
 export * from "./dependency-management";
 export { dispatchFieldArray } from "./events";

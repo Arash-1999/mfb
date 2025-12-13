@@ -3,6 +3,7 @@ import type { FieldValues } from "react-hook-form";
 
 import type { GetCards } from "./card";
 import type { FormBuilderConfig } from "./config";
+import type { CustomElement } from "./custom-element";
 import type { Dependency, DependsOn } from "./dependency-management";
 import type { BaseInput, GetInputs } from "./input";
 import type { ActionInput } from "./input/action";
@@ -12,6 +13,7 @@ type AdvancedList<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
 > = Array<
+  | CustomElement<TConfig, TFields>
   | GetCards<TConfig, TFields, true, { mode: "card" }>
   | GetInputs<TConfig, TFields, false, { mode: "input" }>
 >;
@@ -39,7 +41,7 @@ interface DefineFnProps {
 type InputArray<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = Array<GetInputs<TConfig, TFields>>;
+> = Array<CustomElement<TConfig, TFields> | GetInputs<TConfig, TFields>>;
 
 type InputObject = Record<PropertyKey, BaseInput>;
 
@@ -84,7 +86,11 @@ type LayoutKey = "field" | "grid-container" | "grid-item";
 type ListInputArray<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
-> = Array<ActionInput<TConfig, TFields> | GetInputs<TConfig, TFields>>;
+> = Array<
+  | ActionInput<TConfig, TFields>
+  | CustomElement<TConfig, TFields>
+  | GetInputs<TConfig, TFields>
+>;
 
 export type {
   AdvancedList,

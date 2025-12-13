@@ -2,6 +2,7 @@ import type { FieldValues } from "react-hook-form";
 
 import type { GetCards, GetCardsImpl } from "../card";
 import type { FormBuilderConfig } from "../config";
+import type { CustomElement } from "../custom-element";
 import type { GetInputsImpl } from "../input";
 import type { BuilderBaseProps } from "./common";
 
@@ -22,14 +23,19 @@ type BuilderCardsFn<
   ) => (props?: {
     deps: TDeps;
   }) => GetInputsImpl<TConfig, TFields, false, true>;
-}) => Array<GetCards<TConfig, TFields>>;
+}) => ItemsList<TConfig, TFields>;
 
 interface BuilderProps<
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,
   TFormId extends string = string,
 > extends BuilderBaseProps<TConfig, TFields, TFormId> {
-  cards: Array<GetCards<TConfig, TFields>> | BuilderCardsFn<TConfig, TFields>;
+  cards: BuilderCardsFn<TConfig, TFields> | ItemsList<TConfig, TFields>;
 }
+
+type ItemsList<
+  TConfig extends FormBuilderConfig,
+  TFields extends FieldValues,
+> = Array<CustomElement<TConfig, TFields> | GetCards<TConfig, TFields>>;
 
 export type { BuilderCardsFn, BuilderProps };

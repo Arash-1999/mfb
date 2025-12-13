@@ -1,5 +1,6 @@
 import type {
   ChildrenPathResult,
+  CustomElement,
   FormBuilderConfig,
   GetCardsImpl,
   GetInputsImpl,
@@ -39,6 +40,10 @@ class ItemInfo<TConfig extends FormBuilderConfig> {
       mode: isAdvanced ? "advanced" : "normal",
       path: "list",
     };
+  }
+
+  public customElement(): ChildrenPathResult {
+    return null;
   }
 
   public input<TFields extends FieldValues>(

@@ -24,6 +24,7 @@ const listActionGuard = <
   );
 };
 
+// TODO: check list input is function
 const listInputGuard = <
   TConfig extends FormBuilderConfig,
   TFields extends FieldValues,

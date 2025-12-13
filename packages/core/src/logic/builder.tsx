@@ -4,6 +4,7 @@ import type {
   AdvancedMapperProps,
   BasicBuilderProps,
   BuilderProps,
+  CustomElement,
   FieldArrayOverrideProps,
   FieldArrayProps,
   FormBuilderConfig,
@@ -23,6 +24,7 @@ import { FieldArrayContext, useFieldArrayContext } from "@/context";
 import { MfbItemProvider } from "@/providers";
 import {
   convertDepsToObject,
+  customElementGuard,
   DefaultValue,
   dispatchFieldArray,
   listActionGuard,
@@ -205,8 +207,13 @@ class FormBuilder<
     const {
       layout: { "grid-container": GridContainer },
     } = this.config;
-    const { Context, DependencyManager, FormLayout, renderCard } = this;
-    console.log("builder render");
+    const {
+      Context,
+      DependencyManager,
+      FormLayout,
+      renderCard,
+      renderCustomElement,
+    } = this;
 
     // TODO: move useMemo into a custom hook with generic type for TItem (and list/inputs)
     const resolvedCards = useMemo(() => {
@@ -244,14 +251,29 @@ class FormBuilder<
             <FormLayout footer={footer} header={header}>
               <MfbItemProvider>
                 <GridContainer {...(gridContainerProps || {})}>
-                  {resolvedCards.map((card, index) => {
+                  {resolvedCards.map((item, index) => {
+                    if (customElementGuard<TConfig, TFields>(item)) {
+                      return (
+                        <DependencyManager<
+                          TFields,
+                          CustomElement<TConfig, TFields>
+                        >
+                          component={item}
+                          getItemInfo={this.childrenPath.customElement}
+                          index={index}
+                          key={`card-${index}`}
+                          render={renderCustomElement}
+                        />
+                      );
+                    }
+
                     return (
                       <DependencyManager<
                         TFields,
                         | GetCardsImpl<TConfig, TFields, false, true>
                         | GetCardsImpl<TConfig, TFields, false>
                       >
-                        component={card}
+                        component={item}
                         getItemInfo={this.childrenPath.card}
                         index={index}
                         key={`card-${index}`}
@@ -316,10 +338,29 @@ class FormBuilder<
     list,
     name,
   }: AdvancedMapperProps<TConfig, TFields>) => {
-    const { DependencyManager, renderAction, renderCard, renderInput } = this;
+    const {
+      DependencyManager,
+      renderAction,
+      renderCard,
+      renderCustomElement,
+      renderInput,
+    } = this;
 
     return list.map((_item, index) => {
+      if (customElementGuard<TConfig, TFields>(_item)) {
+        return (
+          <DependencyManager<TFields, CustomElement<TConfig, TFields>>
+            component={_item}
+            getItemInfo={this.childrenPath.customElement}
+            index={index}
+            key={`card-${index}`}
+            render={renderCustomElement}
+          />
+        );
+      }
+
       const item = typeof _item === "function" ? _item() : _item;
+
       if (item.mode === "card") {
         return (
           <DependencyManager<
@@ -421,9 +462,25 @@ class FormBuilder<
     inputs,
     name, // should passed in list input. optional in card or flat mode inputs.
   }: InputMapperProps<TConfig, TFields>) => {
-    const { DependencyManager, renderAction, renderInput } = this;
+    const {
+      DependencyManager,
+      renderAction,
+      renderCustomElement,
+      renderInput,
+    } = this;
 
     return inputs.map((input, i) => {
+      if (customElementGuard<TConfig, TFields>(input)) {
+        return (
+          <DependencyManager<TFields, CustomElement<TConfig, TFields>>
+            component={input}
+            getItemInfo={this.childrenPath.customElement}
+            index={i}
+            key={`card-${i}`}
+            render={renderCustomElement}
+          />
+        );
+      }
       if (listActionGuard<TConfig, TFields>(input)) {
         return (
           <DependencyManager<TFields, ActionInput<TConfig, TFields>>
@@ -638,6 +695,33 @@ class FormBuilder<
         )}
       </GridContainer>
     );
+  };
+
+  private renderCustomElement = <TFields extends FieldValues>(
+    element: CustomElement<TConfig, TFields>,
+    { dependsOn, formMethods, index, name }: RenderFnOptions<TConfig, TFields>,
+  ) => {
+    const resolvedName = mergeName(name || "", element.name);
+
+    const children = createElement(element.element<TFields>, {
+      deps: convertDepsToObject(dependsOn["bind-value"]),
+      disabled: dependsOn.disable,
+      formMethods,
+      index: index,
+      name: resolvedName,
+      required: element.required,
+      validation: element.validation,
+    });
+
+    if (element.gridProps) {
+      const {
+        layout: { "grid-item": GridItem },
+      } = this.config;
+
+      return <GridItem {...element.gridProps}>{children}</GridItem>;
+    }
+
+    return children;
   };
 
   private renderInput = <TFields extends FieldValues>(
