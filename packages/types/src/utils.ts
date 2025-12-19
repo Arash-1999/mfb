@@ -28,10 +28,17 @@ type GetLayoutProps<
 type HasDependencyField<TInput extends BaseInput> =
   "deps" extends keyof Parameters<TInput>[0] ? false : true;
 
+type MapFn<TItem, TReturn> = (
+  item: TItem,
+  index: number,
+  array: Array<TItem>,
+) => TReturn;
+
 export type {
   GetExtraConditions,
   GetFormats,
   GetInputParameter,
   GetLayoutProps,
   HasDependencyField,
+  MapFn,
 };

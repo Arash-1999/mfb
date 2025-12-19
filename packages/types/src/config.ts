@@ -1,5 +1,5 @@
 import type { JSX } from "react";
-import type { DeepPartial, Field, FieldValues } from "react-hook-form";
+import type { DeepPartial, FieldValues } from "react-hook-form";
 
 import type { FieldArrayOverrideProps } from "./builder-methods/field-array";
 import type { GroupCardComponent, SimpleCardObject } from "./card/component";

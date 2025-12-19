@@ -14,11 +14,12 @@ import type {
   GetInputsImpl,
   InputMapperProps,
   ItemArray,
+  MapFn,
   RenderCardItemProps,
   RenderFnOptions,
 } from "@mfb/types";
-import type { PropsWithChildren } from "react";
-import type { FieldValues } from "react-hook-form";
+import type { JSX, PropsWithChildren } from "react";
+import type { FieldValues, UseFieldArrayReturn } from "react-hook-form";
 
 import { FieldArrayContext, useFieldArrayContext } from "@/context";
 import { MfbItemProvider } from "@/providers";
@@ -418,6 +419,7 @@ class FormBuilder<
     disabled,
     name,
     render,
+    renderItem,
     // TODO: remvoe omit and create a new type for internal field array
   }: Omit<FieldArrayProps<TFields>, "fieldArray">) => {
     const { FieldArrayOverride } = this;
@@ -429,6 +431,7 @@ class FormBuilder<
       id,
       name,
       render,
+      renderItem,
     };
 
     if (component) {
@@ -587,6 +590,25 @@ class FormBuilder<
                 ...card.props,
               })
             }
+            renderItem={(field, i, { length }) => (
+              <FieldArrayContext.Provider value={{ index: i, length }}>
+                <GridContainer {...card.gridContainerProps}>
+                  {"list" in card ? (
+                    <AdvancedMapper
+                      key={field.id}
+                      list={card.list}
+                      name={`${resolvedName}.${i}`}
+                    />
+                  ) : (
+                    <InputMapper
+                      inputs={card.inputs}
+                      key={field.id}
+                      name={`${resolvedName}.${i}`}
+                    />
+                  )}
+                </GridContainer>
+              </FieldArrayContext.Provider>
+            )}
           />
         );
       }
@@ -735,6 +757,31 @@ class FormBuilder<
         layout: { "grid-container": GridContainer, "grid-item": GridItem },
       } = this.config;
 
+      const renderItem: MapFn<
+        UseFieldArrayReturn<TFields>["fields"][number],
+        JSX.Element
+      > = (field, i, { length }) => {
+        let children = <></>;
+        if ("inputs" in input) {
+          children = (
+            <InputMapper inputs={input.inputs} name={`${resolvedName}.${i}`} />
+          );
+        }
+        if ("list" in input) {
+          children = (
+            <AdvancedMapper list={input.list} name={`${resolvedName}.${i}`} />
+          );
+        }
+        return (
+          <FieldArrayContext.Provider
+            key={field.id}
+            value={{ index: i, length }}
+          >
+            {children}
+          </FieldArrayContext.Provider>
+        );
+      };
+
       return (
         <FieldArray<TFields>
           component={input.element}
@@ -743,36 +790,11 @@ class FormBuilder<
           render={(fields) => (
             <GridItem {...input.gridProps}>
               <GridContainer {...input.gridContainerProps}>
-                {fields.map((field, i, { length }) => {
-                  let children = <></>;
-                  if ("inputs" in input) {
-                    children = (
-                      <InputMapper
-                        inputs={input.inputs}
-                        name={`${resolvedName}.${i}`}
-                      />
-                    );
-                  }
-                  if ("list" in input) {
-                    children = (
-                      <AdvancedMapper
-                        list={input.list}
-                        name={`${resolvedName}.${i}`}
-                      />
-                    );
-                  }
-                  return (
-                    <FieldArrayContext.Provider
-                      key={field.id}
-                      value={{ index: i, length }}
-                    >
-                      {children}
-                    </FieldArrayContext.Provider>
-                  );
-                })}
+                {fields.map(renderItem)}
               </GridContainer>
             </GridItem>
           )}
+          renderItem={renderItem}
         />
       );
     }

@@ -3,6 +3,7 @@ import type { FieldValues, UseFieldArrayReturn } from "react-hook-form";
 
 import type { FieldArrayOverrideFn } from "../config";
 import type { FieldArrayValues } from "../default-value";
+import type { MapFn } from "../utils";
 
 interface FieldArrayOverrideProps<
   TFields extends FieldValues,
@@ -18,6 +19,10 @@ interface FieldArrayProps<TFields extends FieldValues> {
   // TODO: use ArrayPath generic type instead of string
   name: string;
   render: (fields: UseFieldArrayReturn<TFields>["fields"]) => JSX.Element;
+  renderItem: MapFn<
+    UseFieldArrayReturn<TFields>["fields"][number],
+    JSX.Element
+  >;
 }
 
 export type { FieldArrayOverrideProps, FieldArrayProps };
