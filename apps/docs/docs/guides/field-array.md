@@ -94,7 +94,7 @@ const Page = () => {
               type: "text",
             },
           ],
-          mode: "input",
+          mode: "input", // difference is here
           name: "field-array-1",
           type: "list",
         },
@@ -107,7 +107,7 @@ const Page = () => {
 
 ### 2. Cards
 
-Only group cards can be field arrays. To do that you should pass `variant: 'list'` to group card item.
+Only group cards can be field arrays. To do that you should pass `variant: 'list'` to [group card](/docs/guides/components/card) item.
 
 ```tsx
 import { FB } from "./path/to/your/instance";
@@ -221,4 +221,5 @@ for methods those need value object (`append`, `prepend` and `insert`) you can p
 
 ### 3. Override field array
 
-If two above solutions doesn't meet your requirement, you can override field array component in `FormBuilder` instance. See [detials](/docs/configuration/field-array-override).
+If two above solutions doesn't meet your requirement, you can override field array component in `FormBuilder` instance or only single field array component.
+See [detials](/docs/configuration/field-array-override).

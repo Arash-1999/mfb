@@ -50,6 +50,7 @@ export { MfbButton };
       name: "field-array-1",
       props: {
         icon: "append",
+        text: "CLICK ME",
       },
       type: "field-array-action",
     },
@@ -57,3 +58,5 @@ export { MfbButton };
   onSubmit={console.log}
 />
 ```
+
+`actionType` is defined for [Field array](/docs/guides/field-array#1-action-items) component.
