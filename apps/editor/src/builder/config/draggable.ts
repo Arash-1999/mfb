@@ -5,7 +5,7 @@ import { createElement } from "react";
 
 import { MfbButton } from "./button";
 import { MfbSidebarStepper } from "./card/group";
-import { DraggableGridContainer, GridItemDrag } from "./layout";
+import { DraggableGridContainer, GridItemEdit } from "./layout";
 
 const draggableConfig = {
   button: {
@@ -31,7 +31,7 @@ const draggableConfig = {
   layout: {
     field: FormField,
     "grid-container": DraggableGridContainer,
-    "grid-item": GridItemDrag,
+    "grid-item": GridItemEdit,
   },
 } satisfies FormBuilderConfig;
 

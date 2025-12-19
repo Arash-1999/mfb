@@ -47,7 +47,8 @@ const Select = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
         console.log(data);
         onSubmit({
           type: "select",
-          name: "new-field",
+          name: "select",
+          variant: "input",
           ...data,
         });
       }}

@@ -28,7 +28,7 @@ const checkboxOptions: Array<GetInputsImpl<MuiConfig, CheckboxOptionsForm>> = [
   },
   {
     gridProps: { size: 12 },
-    name: "size",
+    name: "checkboxProps.size",
     props: {
       defaultValue: "small",
       textFieldProps: {
@@ -36,6 +36,17 @@ const checkboxOptions: Array<GetInputsImpl<MuiConfig, CheckboxOptionsForm>> = [
         label: "Size",
         placeholder: "Size",
         size: "small",
+      },
+    },
+    type: "text",
+  },
+  {
+    gridProps: { size: 12 },
+    name: "label",
+    props: {
+      textFieldProps: {
+        label: "Label",
+        placeholder: "Label",
       },
     },
     type: "text",

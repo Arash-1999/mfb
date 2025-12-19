@@ -48,7 +48,8 @@ const TextFields = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
         console.log(data);
         onSubmit({
           type: "text",
-          name: "new-field",
+          name: "text",
+          variant: "input",
           ...data,
         });
       }}

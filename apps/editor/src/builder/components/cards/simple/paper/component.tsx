@@ -48,8 +48,7 @@ const Paper = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
           console.log(data);
           onSubmit({
             type: "paper",
-            name: "",
-            header: "",
+            variant: "simple-card",
             ...data,
           });
         }}

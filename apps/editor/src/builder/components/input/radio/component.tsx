@@ -48,7 +48,8 @@ const Radio = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
 
         onSubmit({
           type: "radio",
-          name: "new-field",
+          name: "radio",
+          variant: "input",
           ...data,
         });
       }}

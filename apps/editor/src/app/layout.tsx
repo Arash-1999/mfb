@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { Geist, Geist_Mono } from "next/font/google";
+import { DndProvider } from "@/builder/config/draggable/dnd-context";
+import { DndKitProvider } from "@/builder/config/draggable/dnd-provider";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -27,11 +29,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AppRouterCacheProvider>
-          {children}
-        </AppRouterCacheProvider>
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
       </body>
     </html>
   );

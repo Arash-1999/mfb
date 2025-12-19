@@ -49,6 +49,7 @@ const Checkbox = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
           onSubmit({
             type: "checkbox",
             name: "checkbox",
+            variant: "normal",
             ...data,
           });
         }}

@@ -47,7 +47,8 @@ const Slider = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
         console.log(data);
         onSubmit({
           type: "slider",
-          name: "new-field",
+          name: "slider",
+          variant: "input",
           ...data,
         });
       }}

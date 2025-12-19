@@ -3,9 +3,12 @@ import { useAccordionForm } from "./hook";
 import { AccordionOptionsForm } from "./type";
 import { withSubmit } from "@/builder/components/submit/submit";
 import { onSubmitFn } from "@/builder/components/submit/type";
+import { useAtom } from "jotai";
+import { sidebarFormKeyAtom, sidebarTabKeyAtom } from "@/store/atoms/sidebar";
 
-const Accordion = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
+const AccordionGroup = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
   const { fieldInputs, gridItemInputs, propsInputs } = useAccordionForm();
+  const [tabKey, _] = useAtom(sidebarTabKeyAtom);
 
   return (
     <>
@@ -45,12 +48,11 @@ const Accordion = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
         ]}
         id="form-2"
         onSubmit={(data) => {
-          console.log(data);
           onSubmit({
-            type: "accordion",
-            name: "accordion",
+            type: "accordion-group",
+            variant: tabKey === "normal-group-card" ? "normal" : "list",
+            name: "accordion-group",
             header: "header",
-            variant: "simple-card",
             ...data,
           });
         }}
@@ -58,6 +60,6 @@ const Accordion = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
     </>
   );
 };
-const AccordionForm = withSubmit(Accordion);
+const AccordionGroupForm = withSubmit(AccordionGroup);
 
-export { AccordionForm };
+export { AccordionGroupForm };

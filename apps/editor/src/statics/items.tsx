@@ -13,6 +13,7 @@ import { SwitchForm } from "@/builder/components/input/switch";
 import { TextFieldsForm } from "@/builder/components/input/text-field";
 import { PaperForm } from "@/builder/components/cards/simple/paper";
 import { AccordionForm } from "@/builder/components/cards/simple/accordion";
+import { AccordionGroupForm } from "@/builder/components/cards/group/accordion";
 
 type Category =
   | ""
@@ -71,7 +72,7 @@ const renderInputForm = (type: InputKey) => {
 const renderListGroupCardForm = (type: NormalGroupCardKey) => {
   switch (type) {
     case "accordion-group":
-      return <AccordionForm />;
+      return <AccordionGroupForm />;
   }
 };
 const renderSimpleCardForm = (type: SimpleCardKey) => {

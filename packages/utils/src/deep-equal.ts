@@ -5,7 +5,7 @@ import { isPrimitive } from "./is-primitive";
 function deepEqual(
   object1: any,
   object2: any,
-  _internal_visited = new WeakSet(),
+  _internal_visited = new WeakSet()
 ) {
   if (isPrimitive(object1) || isPrimitive(object2)) {
     return object1 === object2;

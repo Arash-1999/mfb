@@ -47,7 +47,8 @@ const Rating = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
         console.log(data);
         onSubmit({
           type: "rating",
-          name: "new-field",
+          name: "rating",
+          variant: "input",
           ...data,
         });
       }}

@@ -20,7 +20,6 @@ const Sidebar = () => {
   // Replace useState with useAtom
   const [tabKey, setTabKey] = useAtom(sidebarTabKeyAtom);
   const [formKey, setFormKey] = useAtom(sidebarFormKeyAtom);
-
   // Optional: Get the reset function if needed
   const [, resetSidebarState] = useAtom(resetSidebarStateAtom);
 
@@ -28,7 +27,6 @@ const Sidebar = () => {
     builderMode,
     currentPath?.path || ""
   );
-
   return (
     <>
       <nav className="sticky top-14 rounded bg-amber-300 w-12 h-[calc(100vh-60px)] shrink-0"></nav>

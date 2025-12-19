@@ -55,7 +55,9 @@ const Switch = ({ onSubmit }: { onSubmit: onSubmitFn }) => {
         console.log(data);
         onSubmit({
           type: "switch",
-          name: "new-field",
+          name: "switch",
+
+          variant: "input",
           ...data,
         });
       }}
