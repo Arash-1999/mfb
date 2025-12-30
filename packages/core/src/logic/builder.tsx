@@ -817,7 +817,7 @@ class FormBuilder<
           })}
         />
       );
-      return input.field ? (
+      return input.field || this.options?.alwaysRenderField ? (
         <Field
           {...input.field}
           disabled={dependsOn.disable}

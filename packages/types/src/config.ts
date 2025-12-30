@@ -40,6 +40,7 @@ interface FormBuilderContext<TFormId extends string = string> {
 }
 
 interface FormBuilderOptions {
+  alwaysRenderField: boolean;
   dependencyShouldReset: boolean;
   extraConditions: ConditionsMap;
   genDefaultValues: boolean;
