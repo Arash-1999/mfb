@@ -818,7 +818,14 @@ class FormBuilder<
         />
       );
       return input.field ? (
-        <Field {...input.field}>{renderedInput}</Field>
+        <Field
+          {...input.field}
+          disabled={dependsOn.disable}
+          required={input.required}
+          validation={input.validation}
+        >
+          {renderedInput}
+        </Field>
       ) : (
         renderedInput
       );
