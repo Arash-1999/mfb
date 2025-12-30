@@ -53,7 +53,7 @@ class DefaultValue<
     this.fieldArray = {} as FieldArrayValues<TFields>;
     this.conditionCalculator = conditionCalculator;
 
-    this.resovle(list);
+    this.resolve(list);
   }
 
   conditionArrayCalculator = (
@@ -91,11 +91,9 @@ class DefaultValue<
       if (deps.length > 0) {
         options.dequeue.push({ ...item, dependsOn: deps, name });
       } else {
-        if ("type" in item && typeof item.type !== "undefined") {
-          const value = this.config.input.defaultValues[item.type];
+        const value = this.getItemDefaultValue(item);
 
-          if (typeof value !== "undefined") set(options.result, name, value);
-        }
+        if (typeof value !== "undefined") set(options.result, name, value);
       }
 
       let currentItems: ItemArray<TConfig, TFields> = [];
@@ -121,7 +119,7 @@ class DefaultValue<
     });
   };
 
-  public resovle = (list: ItemArray<TConfig, TFields>) => {
+  public resolve = (list: ItemArray<TConfig, TFields>) => {
     this.parseItems(list, {
       dequeue: this.dequeue,
       parentDeps: [],
@@ -178,25 +176,30 @@ class DefaultValue<
         }
 
         if (!isHidden && !this.conditionArrayCalculator(deps)) {
-          let value: unknown;
-          if (
-            item.props &&
-            typeof item.props === "object" &&
-            "defaultValue" in item.props
-          ) {
-            value = item.props.defaultValue;
-          } else {
-            if ("type" in item && typeof item.type !== "undefined") {
-              value = this.config.input.defaultValues[item.type];
-            }
-          }
-
+          const value = this.getItemDefaultValue(item);
           set(this.result, item.name || "", value);
         } else {
           this.falseSet.add(item.name || "");
         }
       }
     }
+  };
+
+  protected getItemDefaultValue = (item: Item<TConfig, TFields>) => {
+    let value: unknown;
+    if (
+      item.props &&
+      typeof item.props === "object" &&
+      "defaultValue" in item.props
+    ) {
+      value = item.props.defaultValue;
+    } else {
+      if ("type" in item && typeof item.type !== "undefined") {
+        value = this.config.input.defaultValues[item.type];
+      }
+    }
+
+    return value;
   };
 
   private parseFieldArray = (
